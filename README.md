@@ -3,8 +3,8 @@
 _A Centralized AI Backend with Pedagogical Guardrails_
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Made with ❤️](https://img.shields.io/badge/Made%20with-%E2%9D%A4-red.svg)](#credits)
-[![Backend Powered](https://img.shields.io/badge/Powered%20by-Node.js%20%7C%20Python-blue)](#v0-implementation)
+[![Made with ❤️](https://img.shields.io/badge/Made%20with-%E2%9D%A4-red.svg)](#-credits)
+[![Backend Powered](https://img.shields.io/badge/Powered%20by-Node.js%20%7C%20Python-blue)](#%EF%B8%8F-v0-architecture)
 [![Frontend Partner](https://img.shields.io/badge/Frontend-Zia%20%E2%9C%94-brightgreen)](https://github.com/akshay-abraham/zia)
 
 ---
