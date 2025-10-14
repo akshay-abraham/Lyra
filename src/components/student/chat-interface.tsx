@@ -13,9 +13,11 @@ import remarkGfm from 'remark-gfm';
 import mermaid from 'mermaid';
 import { cn } from '@/lib/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { useChat, type Message } from '@/hooks/use-chat';
+import { useChat } from '@/hooks/use-chat';
 import { useToast } from "@/hooks/use-toast";
-import { getLoadingText, subjects } from '@/lib/loading-texts';
+import { getLoadingText } from '@/lib/loading-texts';
+import { getSubjectsForUser, type SubjectData } from '@/lib/subjects-data';
+
 
 const Mermaid = ({ chart }: { chart: string }) => {
   const chartRef = useRef<HTMLDivElement>(null);
@@ -51,7 +53,7 @@ const CodeBlock: React.FC<any> = ({ node, inline, className, children, ...props 
     );
 };
 
-const NewChatView = React.memo(({ onSubjectSelect, subject }: { onSubjectSelect: (subject: string) => void, subject: string | null }) => (
+const NewChatView = React.memo(({ onSubjectSelect, subject, availableSubjects }: { onSubjectSelect: (subject: string) => void, subject: string | null, availableSubjects: SubjectData[] }) => (
     <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground p-4 animate-fade-in-up">
         <div className="p-3 rounded-full border-2 border-primary/20 bg-primary/10 mb-4 animate-scale-in">
             <BookCheck className="h-10 w-10 text-primary" />
@@ -64,7 +66,14 @@ const NewChatView = React.memo(({ onSubjectSelect, subject }: { onSubjectSelect:
                 <SelectValue placeholder="Select a subject..." />
             </SelectTrigger>
             <SelectContent>
-                {subjects.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                {availableSubjects.map(s => (
+                    <SelectItem key={s.name} value={s.name}>
+                        <div className="flex items-center gap-2">
+                           <s.icon className="h-4 w-4" style={{ color: s.color }}/>
+                           <span>{s.name}</span>
+                        </div>
+                    </SelectItem>
+                ))}
             </SelectContent>
         </Select>
     </div>
@@ -76,6 +85,7 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
   const [input, setInput] = useState('');
   const [subject, setSubject] = useState<string | null>(null);
   const [localLoadingText, setLocalLoadingText] = useState(getLoadingText(null));
+  const [availableSubjects, setAvailableSubjects] = useState<SubjectData[]>([]);
 
   const { toast } = useToast();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -85,6 +95,16 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
   const safeMessages = messages || [];
   const currentSubject = subject || chatSubject;
 
+
+  useEffect(() => {
+    const userInfoStr = sessionStorage.getItem('lyra-user-info');
+    if(userInfoStr) {
+      const userInfo = JSON.parse(userInfoStr);
+      setAvailableSubjects(getSubjectsForUser(userInfo.role, userInfo.grade));
+    } else {
+       setAvailableSubjects(getSubjectsForUser('guest', null));
+    }
+  }, []);
 
   useEffect(() => {
     const scrollArea = scrollAreaRef.current;
@@ -156,7 +176,7 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
       <div className="flex-grow w-full max-w-3xl mx-auto overflow-hidden">
           <ScrollArea className="h-full" ref={scrollAreaRef}>
               <div className="p-4 sm:p-6 space-y-6">
-                  {(safeMessages.length === 0 && !currentChatId) && <NewChatView onSubjectSelect={setSubject} subject={subject} />}
+                  {(safeMessages.length === 0 && !currentChatId) && <NewChatView onSubjectSelect={setSubject} subject={subject} availableSubjects={availableSubjects} />}
 
                   {safeMessages.map((message, index) => (
                       <div key={message.id || index} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''} animate-fade-in-up`}>
@@ -198,7 +218,7 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
       </div>
 
       <div className="w-full max-w-3xl mx-auto p-4 sm:p-6">
-          <Card className={cn("shadow-lg bg-card/80 backdrop-blur-sm", (isLoading || !subject && !currentChatId) ? "" : "")} >
+          <Card className={cn("shadow-lg bg-card/80 backdrop-blur-sm", (isLoading || (!subject && !currentChatId) && availableSubjects.length > 0) ? "" : "")} >
               <CardContent className="p-2">
                   <form onSubmit={handleSubmit} className="w-full flex items-center gap-2">
                       <Textarea
@@ -206,10 +226,10 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
                           value={input}
                           onChange={(e) => setInput(e.target.value)}
                           onKeyDown={handleKeyDown}
-                          placeholder={!subject && !currentChatId ? "Please select a subject above to begin." : "Message Lyra..."}
+                          placeholder={(!subject && !currentChatId && availableSubjects.length > 0) ? "Please select a subject above to begin." : "Message Lyra..."}
                           className="flex-grow resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent"
                           rows={1}
-                          disabled={isLoading || (!subject && !currentChatId)}
+                          disabled={isLoading || ((!subject && !currentChatId) && availableSubjects.length > 0)}
                       />
                       <Button type="submit" disabled={isLoading || !input.trim()} size="icon" aria-label="Submit message">
                           <CornerDownLeft className="h-4 w-4" />
@@ -222,3 +242,5 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
     </div>
   );
 }
+
+    

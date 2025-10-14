@@ -133,7 +133,7 @@ export function LoginForm() {
         try {
             await signInAnonymously(auth);
             // Store user info in session storage for display purposes
-            sessionStorage.setItem('lyra-user-info', JSON.stringify({ name: data.name, role: data.role }));
+            sessionStorage.setItem('lyra-user-info', JSON.stringify({ name: data.name, role: data.role, grade: data.class }));
             toast({ title: 'Login Successful', description: `Welcome, ${data.name}! Let the learning begin!` });
             if (data.role === 'teacher') {
                 router.push('/teacher');
@@ -225,7 +225,7 @@ export function LoginForm() {
                                     <SelectTrigger><SelectValue placeholder="Select your grade" /></SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        {k12Classes.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                                        {k12Classes.map(c => <SelectItem key={c} value={parseInt(c.split(' ')[1])}>{c}</SelectItem>)}
                                     </SelectContent>
                                 </Select>
                                 <FormMessage />
@@ -308,3 +308,5 @@ export function LoginForm() {
     </Card>
   );
 }
+
+    
