@@ -109,7 +109,7 @@ export function ChatInterface() {
                                   <AvatarFallback className="bg-transparent"><Bot className="text-primary h-5 w-5"/></AvatarFallback>
                               </Avatar>
                           )}
-                          <div className={`max-w-xl rounded-lg p-3 text-sm transition-all duration-300 ${message.role === 'user' ? 'bg-primary/20' : 'bg-background'}`}>
+                          <div className={`max-w-xl rounded-lg p-3 text-sm transition-all duration-300 ${message.role === 'user' ? 'bg-primary/20' : 'bg-card/80 backdrop-blur-sm border'}`}>
                               {message.role === 'assistant' ? (
                                 <div className="prose dark:prose-invert max-w-none prose-p:my-2">
                                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -142,7 +142,7 @@ export function ChatInterface() {
       </div>
 
       <div className="w-full max-w-3xl mx-auto p-4 sm:p-6">
-          <Card className="shadow-lg animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+          <Card className="shadow-lg animate-fade-in-up bg-card/80 backdrop-blur-sm" style={{ animationDelay: '0.5s' }}>
               <CardContent className="p-2">
                   <form onSubmit={handleSubmit} className="w-full flex items-center gap-2">
                       <Textarea
@@ -151,7 +151,7 @@ export function ChatInterface() {
                           onChange={(e) => setInput(e.target.value)}
                           onKeyDown={handleKeyDown}
                           placeholder="Message Lyra..."
-                          className="flex-grow resize-none border-0 shadow-none focus-visible:ring-0"
+                          className="flex-grow resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent"
                           rows={1}
                       />
                       <Button type="submit" disabled={isLoading || !input.trim()} size="icon" aria-label="Submit message">
