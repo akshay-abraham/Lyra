@@ -16,17 +16,24 @@ import {
 } from "@/components/ui/sidebar"
 import { Logo } from "@/components/layout/logo"
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { BookOpen, GraduationCap, MessageSquare, LogOut, PlusCircle } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { BookOpen, GraduationCap, LogOut, PlusCircle } from 'lucide-react';
 import React from "react";
-import { useAuth } from "../auth/auth-provider";
+import { useFirebase } from "@/firebase";
 import { Button } from "../ui/button";
 import { ChatHistory } from "../student/chat-history";
 
 function SidebarMenuItems() {
   const pathname = usePathname();
   const { setOpenMobile, isMobile } = useSidebar();
-  const { user } = useAuth();
+  const [userInfo, setUserInfo] = React.useState<{role?: string} | null>(null);
+
+  React.useEffect(() => {
+    const storedInfo = sessionStorage.getItem('lyra-user-info');
+    if (storedInfo) {
+      setUserInfo(JSON.parse(storedInfo));
+    }
+  }, [pathname]);
 
   const handleLinkClick = () => {
     if (isMobile) {
@@ -49,7 +56,7 @@ function SidebarMenuItems() {
         <ChatHistory onLinkClick={handleLinkClick} />
       <SidebarSeparator />
 
-      {user?.role === 'teacher' && (
+      {userInfo?.role === 'teacher' && (
         <SidebarMenuItem>
             <Link href="/teacher" onClick={handleLinkClick}>
             <SidebarMenuButton isActive={pathname.startsWith('/teacher')} tooltip="Teacher">
@@ -72,7 +79,14 @@ function SidebarMenuItems() {
 }
 
 export function SidebarLayout({ children }: { children: React.ReactNode }) {
-    const { logout } = useAuth();
+    const { auth } = useFirebase();
+    const router = useRouter();
+
+    const handleLogout = async () => {
+        await auth.signOut();
+        sessionStorage.removeItem('lyra-user-info');
+        router.push('/login');
+    }
 
   return (
     <SidebarProvider>
@@ -90,7 +104,7 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
         </SidebarContent>
         <SidebarFooter>
           <div className="p-2">
-            <Button variant="ghost" onClick={logout} className="w-full justify-start gap-2">
+            <Button variant="ghost" onClick={handleLogout} className="w-full justify-start gap-2">
                 <LogOut className="h-4 w-4" />
                 <span className="group-data-[collapsible=icon]:hidden">Logout</span>
             </Button>

@@ -1,23 +1,31 @@
 'use client';
-import { useAuth } from '@/components/auth/auth-provider';
 import { SidebarLayout } from '@/components/layout/sidebar-layout';
 import { ChatInterface } from '@/components/student/chat-interface';
+import { useUser } from '@/firebase';
+import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 
 
 function ChatPageContent() {
-  const { user, loading } = useAuth();
+  const { user, isUserLoading } = useUser();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const chatId = searchParams.get('chatId');
 
-  if (loading) {
-      return null;
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/login');
+    }
+  }, [isUserLoading, user, router]);
+
+  if (isUserLoading || !user) {
+      return null; // Or a loading spinner
   }
 
   return (
     <SidebarLayout>
-      {user && <ChatInterface key={chatId} chatId={chatId} />}
+      <ChatInterface key={chatId} chatId={chatId} />
     </SidebarLayout>
   );
 }

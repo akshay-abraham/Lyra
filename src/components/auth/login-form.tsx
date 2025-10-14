@@ -22,10 +22,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { schools, teachersBySchool, studentsBySchool, SchoolName, teacherPassword, getStudentPassword } from '@/lib/school-data';
 import { Input } from '../ui/input';
-import { useAuth } from './auth-provider';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowRight, Contact, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useFirebase } from '@/firebase';
+import { signInAnonymously } from 'firebase/auth';
 
 const formSchema = z.object({
   school: z.string().min(1, 'Please select a school'),
@@ -50,8 +52,8 @@ export function LoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [descriptionIndex, setDescriptionIndex] = useState(0);
   const [typedName, setTypedName] = useState('');
-
-  const { login } = useAuth();
+  const { auth } = useFirebase();
+  const router = useRouter();
   const { toast } = useToast();
 
   const form = useForm<FormData>({
@@ -113,43 +115,48 @@ export function LoginForm() {
       }
   }, [typedName, showAddUser, form]);
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     
-    setTimeout(() => {
-        let passwordCorrect = false;
-        let finalRole: 'student' | 'teacher' | 'guest' = 'student';
+    let passwordCorrect = false;
 
-        if(data.role === 'guest') {
-            passwordCorrect = true;
-            finalRole = 'teacher';
-        } else if (data.role === 'student' && data.name) {
-            const expectedPassword = getStudentPassword(data.name);
-            passwordCorrect = data.password === expectedPassword;
-            finalRole = 'student';
-        } else if (data.role === 'teacher') {
-            passwordCorrect = data.password === teacherPassword;
-            finalRole = 'teacher';
-        }
+    if (data.role === 'guest') {
+        passwordCorrect = true;
+    } else if (data.role === 'student' && data.name) {
+        const expectedPassword = getStudentPassword(data.name);
+        passwordCorrect = data.password === expectedPassword;
+    } else if (data.role === 'teacher') {
+        passwordCorrect = data.password === teacherPassword;
+    }
 
-        if (passwordCorrect) {
-            login({
-                name: data.name,
-                school: data.school,
-                role: finalRole,
-                class: data.class,
-            });
+    if (passwordCorrect) {
+        try {
+            await signInAnonymously(auth);
+            // Store user info in session storage for display purposes
+            sessionStorage.setItem('lyra-user-info', JSON.stringify({ name: data.name, role: data.role }));
             toast({ title: 'Login Successful', description: `Welcome, ${data.name}! Let the learning begin!` });
-        } else {
+            if (data.role === 'teacher') {
+                router.push('/teacher');
+            } else {
+                router.push('/');
+            }
+        } catch (error) {
+            console.error("Firebase anonymous sign-in failed:", error);
             toast({
                 variant: 'destructive',
-                title: 'Login Failed',
-                description: 'The password you entered is incorrect.',
+                title: 'Authentication Failed',
+                description: 'Could not sign in. Please try again.',
             });
         }
-        setIsSubmitting(false);
-    }, 500);
+    } else {
+        toast({
+            variant: 'destructive',
+            title: 'Login Failed',
+            description: 'The password you entered is incorrect.',
+        });
+    }
 
+    setIsSubmitting(false);
   };
 
   const k12Classes = Array.from({ length: 12 }, (_, i) => `Grade ${i + 1}`);

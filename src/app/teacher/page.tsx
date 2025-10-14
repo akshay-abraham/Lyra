@@ -1,14 +1,34 @@
 'use client';
 import { TeacherDashboard } from '@/components/teacher/teacher-dashboard';
-import { useAuth } from '@/components/auth/auth-provider';
-import LoginPage from '../login/page';
+import { useUser } from '@/firebase';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { SidebarLayout } from '@/components/layout/sidebar-layout';
 
 export default function TeacherPage() {
-    const { user, loading } = useAuth();
+    const { user, isUserLoading } = useUser();
+    const router = useRouter();
+    const [userInfo, setUserInfo] = useState<{role?: string} | null>(null);
 
-    if (loading || !user || user.role !== 'teacher') {
-        return null;
+    useEffect(() => {
+        if (!isUserLoading && !user) {
+            router.push('/login');
+        }
+        if (user) {
+            const storedInfo = sessionStorage.getItem('lyra-user-info');
+            if (storedInfo) {
+                setUserInfo(JSON.parse(storedInfo));
+            }
+        }
+    }, [isUserLoading, user, router]);
+
+    if (isUserLoading || !user || userInfo?.role !== 'teacher') {
+        // You can show a loading indicator or a simple "Access Denied" message
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <p>Loading or unauthorized...</p>
+            </div>
+        );
     }
 
     return (
