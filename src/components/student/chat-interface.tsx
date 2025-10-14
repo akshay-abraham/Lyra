@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useRef, useEffect, type FormEvent, type KeyboardEvent } from 'react';
@@ -8,13 +7,20 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { generateAITutorResponse } from '@/ai/flows/generate-ai-tutor-response';
-import { Bot, User, CornerDownLeft } from 'lucide-react';
+import { Bot, User, CornerDownLeft, BookCheck, Loader2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { Logo } from '../layout/logo';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import mermaid from 'mermaid';
 import { cn } from '@/lib/utils';
+import { useFirebase, useUser } from '@/firebase';
+import { collection, doc, serverTimestamp, addDoc } from 'firebase/firestore';
+import { useCollection, WithId } from '@/firebase/firestore/use-collection';
+import { addDocumentNonBlocking, setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { generateChatTitle } from '@/ai/flows/generate-chat-title';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { useRouter } from 'next/navigation';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -66,15 +72,38 @@ const CodeBlock = ({ node, inline, className, children, ...props }) => {
     );
 };
 
+const subjects = ["Math", "Science", "History", "English", "Coding", "Other"];
 
-export function ChatInterface() {
-  const [messages, setMessages] = useState<Message[]>([]);
+export function ChatInterface({ chatId: currentChatId }: { chatId: string | null }) {
+  const [messages, setMessages] = useState<WithId<Message>[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState(loadingTexts[0]);
+  const [subject, setSubject] = useState<string | null>(null);
+  const [isStartingChat, setIsStartingChat] = useState(false);
+  
   const { toast } = useToast();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const router = useRouter();
+
+  const { firestore } = useFirebase();
+  const { user } = useUser();
+
+  // Data fetching for existing chat
+  const messagesQuery = React.useMemo(() => {
+    if (!user || !firestore || !currentChatId) return null;
+    return collection(firestore, 'users', user.uid, 'chatSessions', currentChatId, 'messages');
+  }, [user, firestore, currentChatId]);
+
+  const { data: fetchedMessages, isLoading: isLoadingMessages } = useCollection<Message>(messagesQuery);
+
+  useEffect(() => {
+    if (fetchedMessages) {
+      setMessages(fetchedMessages);
+    }
+  }, [fetchedMessages]);
+
 
   useEffect(() => {
     const scrollArea = scrollAreaRef.current;
@@ -111,31 +140,77 @@ export function ChatInterface() {
   }, [isLoading]);
 
   const handleSendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading || !user || !firestore) return;
 
-    const userMessage: Message = { role: 'user', content: input };
-    setMessages((prev) => [...prev, userMessage]);
+    let chatId = currentChatId;
     const currentInput = input;
     setInput('');
+
+    // If this is the first message of a new chat
+    if (!chatId) {
+      if (!subject) {
+        toast({
+          variant: 'destructive',
+          title: 'Please select a subject',
+          description: 'You need to choose a subject before starting a new chat.',
+        });
+        setInput(currentInput);
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        // 1. Generate a title
+        const titleResponse = await generateChatTitle({ firstMessage: currentInput });
+        const newTitle = titleResponse.title;
+
+        // 2. Create the chat session document
+        const chatSessionRef = await addDoc(collection(firestore, 'users', user.uid, 'chatSessions'), {
+          userId: user.uid,
+          subject: subject,
+          title: newTitle,
+          startTime: serverTimestamp(),
+        });
+        chatId = chatSessionRef.id;
+
+        // 3. Navigate to the new chat URL
+        router.push(`/?chatId=${chatId}`);
+
+      } catch (error) {
+        console.error("Error creating new chat session:", error);
+        toast({ variant: 'destructive', title: 'Error', description: 'Could not start a new chat session.' });
+        setIsLoading(false);
+        setInput(currentInput);
+        return;
+      }
+    }
+
+    if (!chatId) return; // Should not happen, but for type safety
+
+    const userMessage: Message = { role: 'user', content: currentInput };
+    const messagesCol = collection(firestore, 'users', user.uid, 'chatSessions', chatId, 'messages');
+    addDocumentNonBlocking(messagesCol, { ...userMessage, createdAt: serverTimestamp() });
+    
+    setMessages((prev) => [...prev, { ...userMessage, id: 'temp-user' }]);
     setIsLoading(true);
 
     try {
       const response = await generateAITutorResponse({
         problemStatement: currentInput,
-        systemPrompt: "You are Lyra, an AI tutor. Your goal is to help the student verbalize their problem and guide them towards the solution by providing hints, analogies, and questions instead of direct answers. You should never give the direct answer. Emulate the Socratic method. Be patient and encouraging. You can use Markdown for formatting, including MermaidJS for diagrams (using ```mermaid code blocks).",
-        exampleGoodAnswers: []
       });
 
       if (response.tutorResponse) {
         const assistantMessage: Message = { role: 'assistant', content: response.tutorResponse };
-        setMessages((prev) => [...prev, assistantMessage]);
+        addDocumentNonBlocking(messagesCol, { ...assistantMessage, createdAt: serverTimestamp() });
+        setMessages((prev) => [...prev.filter(m => m.id !== 'temp-user'), { ...assistantMessage, id: 'temp-ai' }]);
       } else {
         throw new Error("Failed to get a response from the AI tutor.");
       }
     } catch (error) {
       console.error(error);
       const errorMessage: Message = { role: 'assistant', content: "I seem to be having trouble connecting. Please try again in a moment." };
-      setMessages((prev) => [...prev, errorMessage]);
+      addDocumentNonBlocking(messagesCol, { ...errorMessage, createdAt: serverTimestamp() });
+      setMessages((prev) => [...prev.filter(m => m.id !== 'temp-user'), { ...errorMessage, id: 'temp-error' }]);
       toast({
         variant: "destructive",
         title: "Oh no! Something went wrong.",
@@ -146,6 +221,7 @@ export function ChatInterface() {
       inputRef.current?.focus();
     }
   };
+
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -159,21 +235,35 @@ export function ChatInterface() {
     }
   };
 
+  const NewChatView = () => (
+     <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground p-4 animate-fade-in-up">
+        <div className="p-3 rounded-full border-2 border-primary/20 bg-primary/10 mb-4 animate-scale-in" style={{animationDelay: '0.2s'}}>
+          <BookCheck className="h-10 w-10 text-primary" />
+        </div>
+        <h3 className="text-2xl font-headline text-foreground mb-2 animate-fade-in-up" style={{animationDelay: '0.3s'}}>Start a New Learning Session</h3>
+        <p className="max-w-md mb-6 animate-fade-in-up" style={{animationDelay: '0.4s'}}>What subject are we diving into today? This helps me tailor my guidance.</p>
+        
+        <Select onValueChange={setSubject} value={subject || ""}>
+          <SelectTrigger className="w-[280px] animate-fade-in-up" style={{animationDelay: '0.5s'}}>
+            <SelectValue placeholder="Select a subject..." />
+          </SelectTrigger>
+          <SelectContent>
+            {subjects.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+          </SelectContent>
+        </Select>
+    </div>
+  );
+
+
   return (
     <div className="flex h-[calc(100vh-theme(spacing.14))] md:h-screen flex-col items-center">
       <div className="flex-grow w-full max-w-3xl mx-auto overflow-hidden">
           <ScrollArea className="h-full" ref={scrollAreaRef}>
               <div className="p-4 sm:p-6 space-y-6">
-                  {messages.length === 0 && (
-                      <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground pt-20 animate-fade-in-up">
-                          <div className="p-3 rounded-full border mb-4">
-                            <Logo />
-                          </div>
-                          <h3 className="text-2xl font-semibold text-foreground">How can I help you today?</h3>
-                      </div>
-                  )}
+                  {(messages.length === 0 && !currentChatId) && <NewChatView />}
+
                   {messages.map((message, index) => (
-                      <div key={index} className={`flex items-start gap-4 animate-fade-in-up ${message.role === 'user' ? 'justify-end' : ''}`}>
+                      <div key={message.id || index} className={`flex items-start gap-4 animate-fade-in-up ${message.role === 'user' ? 'justify-end' : ''}`}>
                           {message.role === 'assistant' && (
                               <Avatar className="h-8 w-8 border bg-card">
                                   <AvatarFallback className="bg-transparent"><Bot className="text-primary h-5 w-5"/></AvatarFallback>
@@ -212,7 +302,7 @@ export function ChatInterface() {
       </div>
 
       <div className="w-full max-w-3xl mx-auto p-4 sm:p-6">
-          <Card className={cn("shadow-lg animate-fade-in-up bg-card/80 backdrop-blur-sm animate-colorful-border")} style={{ animationDelay: '0.5s' }}>
+          <Card className={cn("shadow-lg animate-fade-in-up bg-card/80 backdrop-blur-sm", (isLoading || !subject && !currentChatId) ? "" : "animate-colorful-border")} style={{ animationDelay: '0.5s' }}>
               <CardContent className="p-2">
                   <form onSubmit={handleSubmit} className="w-full flex items-center gap-2">
                       <Textarea
@@ -220,9 +310,10 @@ export function ChatInterface() {
                           value={input}
                           onChange={(e) => setInput(e.target.value)}
                           onKeyDown={handleKeyDown}
-                          placeholder="Message Lyra..."
+                          placeholder={!subject && !currentChatId ? "Please select a subject above to begin." : "Message Lyra..."}
                           className="flex-grow resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent animate-glow"
                           rows={1}
+                          disabled={!subject && !currentChatId}
                       />
                       <Button type="submit" disabled={isLoading || !input.trim()} size="icon" aria-label="Submit message">
                           <CornerDownLeft className="h-4 w-4" />

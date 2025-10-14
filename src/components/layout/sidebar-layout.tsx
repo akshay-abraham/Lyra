@@ -11,15 +11,17 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
-  useSidebar
+  useSidebar,
+  SidebarSeparator,
 } from "@/components/ui/sidebar"
 import { Logo } from "@/components/layout/logo"
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpen, GraduationCap, MessageSquare, LogOut } from 'lucide-react';
+import { BookOpen, GraduationCap, MessageSquare, LogOut, PlusCircle } from 'lucide-react';
 import React from "react";
 import { useAuth } from "../auth/auth-provider";
 import { Button } from "../ui/button";
+import { ChatHistory } from "../student/chat-history";
 
 function SidebarMenuItems() {
   const pathname = usePathname();
@@ -36,12 +38,17 @@ function SidebarMenuItems() {
     <SidebarMenu>
         <SidebarMenuItem>
             <Link href="/" onClick={handleLinkClick}>
-            <SidebarMenuButton isActive={pathname === '/'} tooltip="Chat">
-                <MessageSquare />
-                <span>Chat</span>
+            <SidebarMenuButton isActive={pathname === '/'} tooltip="New Chat">
+                <PlusCircle />
+                <span>New Chat</span>
             </SidebarMenuButton>
             </Link>
         </SidebarMenuItem>
+      
+      <SidebarSeparator />
+        <ChatHistory onLinkClick={handleLinkClick} />
+      <SidebarSeparator />
+
       {user?.role === 'teacher' && (
         <SidebarMenuItem>
             <Link href="/teacher" onClick={handleLinkClick}>

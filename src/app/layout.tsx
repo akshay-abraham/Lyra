@@ -3,6 +3,7 @@ import { Inter, Sora } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from '@/components/auth/auth-provider';
+import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const sora = Sora({
@@ -27,9 +28,11 @@ export default function RootLayout({
       <head>
       </head>
       <body className={`${inter.variable} ${sora.variable} font-body antialiased bg-background text-foreground`}>
-        <AuthProvider>
-            {children}
-        </AuthProvider>
+        <FirebaseClientProvider>
+          <AuthProvider>
+              {children}
+          </AuthProvider>
+        </FirebaseClientProvider>
         <Toaster />
       </body>
     </html>
