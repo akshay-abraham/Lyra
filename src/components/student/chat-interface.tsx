@@ -7,21 +7,69 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { generateAITutorResponse } from '@/ai/flows/generate-ai-tutor-response';
-import { Bot, User, CornerDownLeft, Loader2 } from 'lucide-react';
+import { Bot, User, CornerDownLeft } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { Logo } from '../layout/logo';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import mermaid from 'mermaid';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
 }
 
+const loadingTexts = [
+    "Opening textbooks...",
+    "Consulting with the great thinkers...",
+    "Finding where Napoleon left his keys...",
+    "Brewing some fresh ideas...",
+    "Untangling a knot of knowledge...",
+    "Asking the Oracle of Delphi...",
+    "Shuffling the library cards...",
+    "Polishing the crystal ball...",
+];
+
+const Mermaid = ({ chart }) => {
+  const chartRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    mermaid.initialize({ startOnLoad: false, theme: 'neutral' });
+    if (chartRef.current && chart) {
+        mermaid.run({
+            nodes: [chartRef.current],
+        });
+    }
+  }, [chart]);
+
+  return <div ref={chartRef} className="mermaid">{chart}</div>;
+};
+
+const CodeBlock = ({ node, inline, className, children, ...props }) => {
+    const match = /language-(\w+)/.exec(className || '');
+    const lang = match && match[1];
+
+    if (lang === 'mermaid') {
+        return <Mermaid chart={String(children).replace(/\n$/, '')} />;
+    }
+
+    return !inline && match ? (
+        <code className={className} {...props}>
+            {children}
+        </code>
+    ) : (
+        <code className={className} {...props}>
+            {children}
+        </code>
+    );
+};
+
+
 export function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState(loadingTexts[0]);
   const { toast } = useToast();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -38,7 +86,27 @@ export function ChatInterface() {
   
   useEffect(() => {
     inputRef.current?.focus();
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral', darkMode: true, themeVariables: {
+        'background': '#020817',
+        'primaryColor': '#09090b',
+        'primaryTextColor': '#f8fafc',
+        'lineColor': '#334155',
+        'secondaryColor': '#020817',
+        'tertiaryColor': '#1e293b'
+    }});
   }, []);
+
+  useEffect(() => {
+    if (isLoading) {
+      const interval = setInterval(() => {
+        setLoadingText(prev => {
+          const currentIndex = loadingTexts.indexOf(prev);
+          return loadingTexts[(currentIndex + 1) % loadingTexts.length];
+        });
+      }, 2000);
+      return () => clearInterval(interval);
+    }
+  }, [isLoading]);
 
   const handleSendMessage = async () => {
     if (!input.trim() || isLoading) return;
@@ -52,7 +120,7 @@ export function ChatInterface() {
     try {
       const response = await generateAITutorResponse({
         problemStatement: currentInput,
-        systemPrompt: "You are Lyra, an AI tutor. Your goal is to help the student verbalize their problem and guide them towards the solution by providing hints, analogies, and questions instead of direct answers. You should never give the direct answer. Emulate the Socratic method. Be patient and encouraging. You can use Markdown for formatting.",
+        systemPrompt: "You are Lyra, an AI tutor. Your goal is to help the student verbalize their problem and guide them towards the solution by providing hints, analogies, and questions instead of direct answers. You should never give the direct answer. Emulate the Socratic method. Be patient and encouraging. You can use Markdown for formatting, including MermaidJS for diagrams (using ```mermaid code blocks).",
         exampleGoodAnswers: []
       });
 
@@ -105,14 +173,14 @@ export function ChatInterface() {
                   {messages.map((message, index) => (
                       <div key={index} className={`flex items-start gap-4 animate-fade-in-up ${message.role === 'user' ? 'justify-end' : ''}`}>
                           {message.role === 'assistant' && (
-                              <Avatar className="h-8 w-8 border bg-background">
+                              <Avatar className="h-8 w-8 border bg-card">
                                   <AvatarFallback className="bg-transparent"><Bot className="text-primary h-5 w-5"/></AvatarFallback>
                               </Avatar>
                           )}
                           <div className={`max-w-xl rounded-lg p-3 text-sm transition-all duration-300 ${message.role === 'user' ? 'bg-primary/20' : 'bg-card/80 backdrop-blur-sm border'}`}>
                               {message.role === 'assistant' ? (
                                 <div className="prose dark:prose-invert max-w-none prose-p:my-2">
-                                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                  <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ code: CodeBlock }}>
                                       {message.content}
                                   </ReactMarkdown>
                                 </div>
@@ -121,7 +189,7 @@ export function ChatInterface() {
                               )}
                           </div>
                           {message.role === 'user' && (
-                              <Avatar className="h-8 w-8 border bg-background">
+                              <Avatar className="h-8 w-8 border bg-card">
                                   <AvatarFallback className="bg-transparent"><User className="text-accent h-5 w-5"/></AvatarFallback>
                               </Avatar>
                           )}
@@ -129,11 +197,11 @@ export function ChatInterface() {
                   ))}
                   {isLoading && (
                       <div className="flex items-start gap-4 animate-fade-in-up">
-                           <Avatar className="h-8 w-8 border bg-background">
+                           <Avatar className="h-8 w-8 border bg-card">
                               <AvatarFallback className="bg-transparent"><Bot className="text-primary h-5 w-5"/></AvatarFallback>
                           </Avatar>
-                          <div className="max-w-md rounded-lg p-3 bg-secondary flex items-center">
-                              <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                          <div className="max-w-md rounded-lg p-3 bg-card/80 backdrop-blur-sm border flex items-center">
+                              <p className="text-sm text-muted-foreground animate-fade-in">{loadingText}</p>
                           </div>
                       </div>
                   )}
