@@ -16,7 +16,7 @@
     --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
+    --accent: 34.9 91.4% 58.2%;
     --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
@@ -83,20 +83,6 @@
   }
   body {
     @apply bg-background text-foreground;
-  }
-
-  .particle {
-    position: absolute;
-    border-radius: 50%;
-    background: hsl(var(--primary) / 0.5);
-    animation: float 25s infinite ease-in-out;
-    opacity: 0;
-  }
-
-  @keyframes float {
-    0% { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
-    50% { transform: translateY(-100vh) translateX(10vw) scale(1.5); opacity: 0.5; }
-    100% { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
   }
 
   @keyframes glow {
