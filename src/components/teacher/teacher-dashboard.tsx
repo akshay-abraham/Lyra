@@ -129,7 +129,7 @@ export function TeacherDashboard() {
         <Tabs defaultValue="style" className="w-full space-y-8">
           <TabsList className="grid w-full grid-cols-2 bg-card/80 backdrop-blur-sm animate-fade-in-up">
             <TabsTrigger value="style"><Wand2 className="mr-2" /> AI Teaching Style</TabsTrigger>
-            <TabsTrigger value="rag"><BrainCircuit className="mr-2" /> Custom Knowledge</TabsTrigger>
+            <TabsTrigger value="rag"><BrainCircuit className="mr-2 animate-pulse" /> Custom Knowledge</TabsTrigger>
           </TabsList>
           
           <TabsContent value="style">

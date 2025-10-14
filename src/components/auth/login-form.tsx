@@ -1,4 +1,5 @@
 
+
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -84,10 +85,10 @@ export function LoginForm() {
         setAvailableNames([]);
     } else if (selectedSchool && selectedRole === 'teacher') {
         const schoolTeachers = teachersBySchool[selectedSchool] || [];
-        setAvailableNames(schoolTeachers.sort());
+        setAvailableNames(schoolTeachers);
     } else if (selectedSchool && selectedRole === 'student') {
         const schoolStudents = studentsBySchool[selectedSchool] || [];
-        setAvailableNames(schoolStudents.sort());
+        setAvailableNames(schoolStudents);
     } else {
         setAvailableNames([]);
     }
@@ -156,7 +157,7 @@ export function LoginForm() {
     <Card className="w-full max-w-md shadow-2xl shadow-primary/10 bg-card/80 backdrop-blur-sm border-primary/20 animate-fade-in-up animate-colorful-border">
       <CardHeader className="text-center">
         <CardTitle className="font-headline text-3xl animate-fade-in-down" style={{ animationDelay: '0.2s' }}>Welcome to Lyra</CardTitle>
-        <CardDescription className="animate-fade-in-down transition-all duration-500" style={{ animationDelay: '0.3s' }}>{cyclingDescriptions[descriptionIndex]}</CardDescription>
+        <CardDescription key={descriptionIndex} className="animate-fade-in-down transition-all duration-500" style={{ animationDelay: '0.3s' }}>{cyclingDescriptions[descriptionIndex]}</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
