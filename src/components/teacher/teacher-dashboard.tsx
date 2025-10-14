@@ -21,10 +21,12 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from "@/hooks/use-toast";
 import { customizeAiTeachingStyle } from '@/ai/flows/customize-ai-teaching-style';
 import { generateGuidedResponse } from '@/ai/flows/guide-ai-response-generation';
-import { Bot, Loader2, Sparkles, Wand2, X } from 'lucide-react';
+import { Bot, Loader2, Sparkles, Wand2, X, BrainCircuit, BookCopy } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { RagManagement } from './rag-management';
 
 const formSchema = z.object({
   systemPrompt: z.string().min(10, {
@@ -119,136 +121,151 @@ export function TeacherDashboard() {
 
   return (
     <div className="space-y-8">
-        <div>
+        <div className="animate-fade-in-down">
             <h1 className="text-3xl font-headline font-bold">Teacher Dashboard</h1>
-            <p className="text-muted-foreground">Customize the behavior of your classroom's AI tutor.</p>
+            <p className="text-muted-foreground">Customize the behavior and knowledge of your classroom's AI tutor.</p>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 lg:col-span-2">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="font-headline text-2xl flex items-center gap-2"><Wand2 /> AI Teaching Style</CardTitle>
-                            <CardDescription>Define how the AI should behave. This is the most important step.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                             <FormField
-                                control={form.control}
-                                name="systemPrompt"
-                                render={({ field }) => (
-                                    <FormItem>
-                                    <FormLabel>System Prompt</FormLabel>
-                                    <FormControl>
-                                        <Textarea rows={8} placeholder="e.g., You are a friendly math tutor for 5th graders..." {...field} />
-                                    </FormControl>
-                                    <FormDescription>
-                                        This sets the AI's personality, role, and rules. Be explicit about what it should and shouldn't do. Markdown is supported.
-                                    </FormDescription>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                                />
-                        </CardContent>
-                    </Card>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="font-headline text-2xl flex items-center gap-2"><Sparkles /> Few-Shot Examples</CardTitle>
-                            <CardDescription>Guide the AI by providing examples of high-quality answers.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4">
-                                <FormLabel>Example Good Answers</FormLabel>
-                                <div className="space-y-2">
-                                    {fields.map((field, index) => (
-                                        <div key={field.id} className="flex items-center gap-2">
-                                            <FormField
-                                                control={form.control}
-                                                name={`exampleAnswers.${index}.value`}
-                                                render={({ field }) => (
-                                                <FormItem className="flex-grow">
-                                                    <FormControl>
-                                                        <Input placeholder={`Example ${index + 1}`} {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                                )}
-                                            />
-                                            <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} aria-label="Remove example">
-                                                <X className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    ))}
-                                </div>
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => append({ value: '' })}
-                                >
-                                    Add Example
-                                </Button>
-                                <FormDescription>
-                                    Show the AI what a good hint or guiding question looks like. The AI will learn from your style. Markdown is supported.
-                                </FormDescription>
-                            </div>
-                        </CardContent>
-                    </Card>
-                    
-                    <Button type="submit" disabled={isSaving} size="lg">
-                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                        Save Customizations
-                    </Button>
-                </form>
-            </Form>
-            
-            <div className="space-y-6 lg:sticky lg:top-20">
-                 <Card>
-                    <CardHeader>
-                        <CardTitle className="font-headline text-2xl">Test Your AI</CardTitle>
-                        <CardDescription>See how the AI will respond with your current settings.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                         <Form {...testForm}>
-                            <form onSubmit={testForm.handleSubmit(onTest)} className="space-y-4">
+        <Tabs defaultValue="style" className="w-full space-y-8">
+          <TabsList className="grid w-full grid-cols-2 bg-card/80 backdrop-blur-sm">
+            <TabsTrigger value="style"><Wand2 className="mr-2" /> AI Teaching Style</TabsTrigger>
+            <TabsTrigger value="rag"><BrainCircuit className="mr-2" /> RAG Content</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="style">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start animate-fade-in-up">
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 lg:col-span-2">
+                        <Card className="bg-card/80 backdrop-blur-sm border-primary/20 shadow-lg">
+                            <CardHeader>
+                                <CardTitle className="font-headline text-2xl flex items-center gap-2"><Wand2 /> AI Personality</CardTitle>
+                                <CardDescription>Define how the AI should behave. This is the most important step.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
                                 <FormField
-                                    control={testForm.control}
-                                    name="studentQuestion"
+                                    control={form.control}
+                                    name="systemPrompt"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Student's Question</FormLabel>
-                                            <FormControl>
-                                                <Textarea placeholder="e.g., How do I solve for x in 2x + 5 = 15?" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
+                                        <FormLabel>System Prompt</FormLabel>
+                                        <FormControl>
+                                            <Textarea rows={8} placeholder="e.g., You are a friendly math tutor for 5th graders..." {...field} />
+                                        </FormControl>
+                                        <FormDescription>
+                                            This sets the AI's personality, role, and rules. Be explicit. Markdown is supported.
+                                        </FormDescription>
+                                        <FormMessage />
                                         </FormItem>
                                     )}
-                                />
-                                <Button type="submit" disabled={isTesting} className="w-full">
-                                    {isTesting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                                    Run Test
-                                </Button>
-                            </form>
-                         </Form>
-                        { (isTesting || testResult) && <Separator className="my-6" />}
-                        { testResult && (
-                             <Alert>
-                                <Bot className="h-4 w-4" />
-                                <AlertTitle className="font-headline">AI Response</AlertTitle>
-                                <AlertDescription>
-                                    <div className="prose-sm dark:prose-invert max-w-none whitespace-pre-wrap">
-                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                            {testResult}
-                                        </ReactMarkdown>
-                                    </div>
-                                </AlertDescription>
-                            </Alert>
-                        )}
-                    </CardContent>
-                 </Card>
-            </div>
+                                    />
+                            </CardContent>
+                        </Card>
 
-        </div>
+                        <Card className="bg-card/80 backdrop-blur-sm border-primary/20 shadow-lg">
+                            <CardHeader>
+                                <CardTitle className="font-headline text-2xl flex items-center gap-2"><Sparkles /> Few-Shot Examples</CardTitle>
+                                <CardDescription>Guide the AI by providing examples of high-quality answers.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-4">
+                                    <FormLabel>Example Good Answers</FormLabel>
+                                    <div className="space-y-2">
+                                        {fields.map((field, index) => (
+                                            <div key={field.id} className="flex items-center gap-2">
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`exampleAnswers.${index}.value`}
+                                                    render={({ field }) => (
+                                                    <FormItem className="flex-grow">
+                                                        <FormControl>
+                                                            <Input placeholder={`Example ${index + 1}`} {...field} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                    )}
+                                                />
+                                                <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} aria-label="Remove example">
+                                                    <X className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => append({ value: '' })}
+                                    >
+                                        Add Example
+                                    </Button>
+                                    <FormDescription>
+                                        Show the AI what a good hint or guiding question looks like. Markdown is supported.
+                                    </FormDescription>
+                                </div>
+                            </CardContent>
+                        </Card>
+                        
+                        <Button type="submit" disabled={isSaving} size="lg">
+                            {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                            Save Customizations
+                        </Button>
+                    </form>
+                </Form>
+                
+                <div className="space-y-6 lg:sticky lg:top-24">
+                    <Card className="bg-card/80 backdrop-blur-sm border-accent/20 shadow-lg">
+                        <CardHeader>
+                            <CardTitle className="font-headline text-2xl">Test Your AI</CardTitle>
+                            <CardDescription>See how the AI will respond with your current settings.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Form {...testForm}>
+                                <form onSubmit={testForm.handleSubmit(onTest)} className="space-y-4">
+                                    <FormField
+                                        control={testForm.control}
+                                        name="studentQuestion"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Student's Question</FormLabel>
+                                                <FormControl>
+                                                    <Textarea placeholder="e.g., How do I solve for x in 2x + 5 = 15?" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <Button type="submit" disabled={isTesting} className="w-full">
+                                        {isTesting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                                        Run Test
+                                    </Button>
+                                </form>
+                            </Form>
+                            { (isTesting || testResult) && <Separator className="my-6" />}
+                            { testResult && (
+                                <Alert>
+                                    <Bot className="h-4 w-4" />
+                                    <AlertTitle className="font-headline">AI Response</AlertTitle>
+                                    <AlertDescription>
+                                        <div className="prose-sm dark:prose-invert max-w-none whitespace-pre-wrap">
+                                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                                {testResult}
+                                            </ReactMarkdown>
+                                        </div>
+                                    </AlertDescription>
+                                </Alert>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="rag">
+              <RagManagement />
+          </TabsContent>
+        </Tabs>
     </div>
   );
 }
+
+    
