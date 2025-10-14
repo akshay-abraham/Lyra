@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { generateAITutorResponse } from '@/ai/flows/generate-ai-tutor-response';
-import { Bot, User, CornerDownLeft, BookCheck, Loader2 } from 'lucide-react';
+import { Bot, User, CornerDownLeft, BookCheck } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -74,15 +74,15 @@ const CodeBlock = ({ node, inline, className, children, ...props }) => {
 };
 
 const NewChatView = ({ onSubjectSelect, subject }) => (
-    <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground p-4 animate-fade-in-up">
-        <div className="p-3 rounded-full border-2 border-primary/20 bg-primary/10 mb-4 animate-scale-in" style={{animationDelay: '0.2s'}}>
+    <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground p-4">
+        <div className="p-3 rounded-full border-2 border-primary/20 bg-primary/10 mb-4">
             <BookCheck className="h-10 w-10 text-primary" />
         </div>
-        <h3 className="text-2xl font-headline text-foreground mb-2 animate-fade-in-up" style={{animationDelay: '0.3s'}}>Start a New Learning Session</h3>
-        <p className="max-w-md mb-6 animate-fade-in-up" style={{animationDelay: '0.4s'}}>What subject are we diving into today? This helps me tailor my guidance.</p>
+        <h3 className="text-2xl font-headline text-foreground mb-2">Start a New Learning Session</h3>
+        <p className="max-w-md mb-6">What subject are we diving into today? This helps me tailor my guidance.</p>
         
         <Select onValueChange={onSubjectSelect} value={subject || ""}>
-            <SelectTrigger className="w-[280px] animate-fade-in-up" style={{animationDelay: '0.5s'}}>
+            <SelectTrigger className="w-[280px]">
                 <SelectValue placeholder="Select a subject..." />
             </SelectTrigger>
             <SelectContent>
@@ -167,6 +167,7 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
 
     let chatId = currentChatId;
     const currentInput = input;
+    const userMessage: Message = { role: 'user', content: currentInput };
     setInput('');
 
     // If this is the first message of a new chat
@@ -182,6 +183,8 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
       }
 
       setIsLoading(true);
+      setMessages((prev) => [...prev, { ...userMessage, id: 'temp-user-initial' }]);
+
       try {
         // 1. Generate a title
         const titleResponse = await generateChatTitle({ firstMessage: currentInput });
@@ -197,24 +200,29 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
         chatId = chatSessionRef.id;
 
         // 3. Navigate to the new chat URL
-        router.push(`/?chatId=${chatId}`);
+        router.push(`/?chatId=${chatId}`, { scroll: false });
 
       } catch (error) {
         console.error("Error creating new chat session:", error);
         toast({ variant: 'destructive', title: 'Error', description: 'Could not start a new chat session.' });
         setIsLoading(false);
         setInput(currentInput);
+        setMessages(messages.filter(m => m.id !== 'temp-user-initial')); // remove optimistic message
         return;
       }
     }
 
     if (!chatId) return; // Should not happen, but for type safety
 
-    const userMessage: Message = { role: 'user', content: currentInput };
     const messagesCol = collection(firestore, 'users', user.uid, 'chatSessions', chatId, 'messages');
     addDocumentNonBlocking(messagesCol, { ...userMessage, createdAt: serverTimestamp() });
     
-    setMessages((prev) => [...prev, { ...userMessage, id: 'temp-user' }]);
+    // Optimistically update UI only if it's not the very first message of a new chat
+    // (which is handled above to prevent duplicates)
+    if(currentChatId) {
+      setMessages((prev) => [...prev, { ...userMessage, id: 'temp-user' }]);
+    }
+    
     setIsLoading(true);
 
     try {
@@ -264,7 +272,7 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
                   {(messages.length === 0 && !currentChatId) && <NewChatView onSubjectSelect={setSubject} subject={subject} />}
 
                   {messages.map((message, index) => (
-                      <div key={message.id || index} className={`flex items-start gap-4 animate-fade-in-up ${message.role === 'user' ? 'justify-end' : ''}`}>
+                      <div key={message.id || index} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''}`}>
                           {message.role === 'assistant' && (
                               <Avatar className="h-8 w-8 border bg-card">
                                   <AvatarFallback className="bg-transparent"><Bot className="text-primary h-5 w-5"/></AvatarFallback>
@@ -289,12 +297,12 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
                       </div>
                   ))}
                   {isLoading && (
-                      <div className="flex items-start gap-4 animate-fade-in-up">
+                      <div className="flex items-start gap-4">
                            <Avatar className="h-8 w-8 border bg-card">
                               <AvatarFallback className="bg-transparent"><Bot className="text-primary h-5 w-5"/></AvatarFallback>
                           </Avatar>
                           <div className="max-w-md rounded-lg p-3 bg-card/80 backdrop-blur-sm border flex items-center">
-                              <p className="text-sm text-muted-foreground animate-fade-in">{loadingText}</p>
+                              <p className="text-sm text-muted-foreground">{loadingText}</p>
                           </div>
                       </div>
                   )}
@@ -303,7 +311,7 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
       </div>
 
       <div className="w-full max-w-3xl mx-auto p-4 sm:p-6">
-          <Card className={cn("shadow-lg animate-fade-in-up bg-card/80 backdrop-blur-sm", (isLoading || !subject && !currentChatId) ? "" : "animate-colorful-border")} style={{ animationDelay: '0.5s' }}>
+          <Card className={cn("shadow-lg bg-card/80 backdrop-blur-sm", (isLoading || !subject && !currentChatId) ? "" : "")} >
               <CardContent className="p-2">
                   <form onSubmit={handleSubmit} className="w-full flex items-center gap-2">
                       <Textarea
@@ -312,7 +320,7 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
                           onChange={(e) => setInput(e.target.value)}
                           onKeyDown={handleKeyDown}
                           placeholder={!subject && !currentChatId ? "Please select a subject above to begin." : "Message Lyra..."}
-                          className="flex-grow resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent animate-glow"
+                          className="flex-grow resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent"
                           rows={1}
                           disabled={!subject && !currentChatId}
                       />
