@@ -1,5 +1,3 @@
-
-
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -51,6 +49,7 @@ export function LoginForm() {
   const [showAddUser, setShowAddUser] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [descriptionIndex, setDescriptionIndex] = useState(0);
+  const [typedName, setTypedName] = useState('');
 
   const { login } = useAuth();
   const { toast } = useToast();
@@ -79,22 +78,20 @@ export function LoginForm() {
     }, []);
 
   useEffect(() => {
+    let currentNames: string[] = [];
     if (selectedSchool === 'guest') {
         form.setValue('role', 'guest');
         form.setValue('name', 'Guest');
-        setAvailableNames([]);
     } else if (selectedSchool && selectedRole === 'teacher') {
-        const schoolTeachers = teachersBySchool[selectedSchool] || [];
-        setAvailableNames(schoolTeachers);
+        currentNames = teachersBySchool[selectedSchool] || [];
     } else if (selectedSchool && selectedRole === 'student') {
-        const schoolStudents = studentsBySchool[selectedSchool] || [];
-        setAvailableNames(schoolStudents);
-    } else {
-        setAvailableNames([]);
+        currentNames = studentsBySchool[selectedSchool] || [];
     }
     
-    if (selectedSchool !== 'guest') {
-      form.setValue('name', '');
+    setAvailableNames(currentNames);
+    
+    if (selectedSchool !== 'guest' && form.getValues('name') !== 'Other') {
+        form.setValue('name', '');
     }
 
     setShowAddUser(false);
@@ -103,12 +100,18 @@ export function LoginForm() {
   const handleNameChange = (name: string) => {
     form.setValue('name', name);
     if (name === 'Other') {
-        form.setValue('name', '');
+        setTypedName('');
         setShowAddUser(true);
     } else {
         setShowAddUser(false);
     }
   };
+
+  useEffect(() => {
+      if (showAddUser) {
+          form.setValue('name', typedName);
+      }
+  }, [typedName, showAddUser, form]);
 
   const onSubmit = (data: FormData) => {
     setIsSubmitting(true);
@@ -151,12 +154,12 @@ export function LoginForm() {
 
   const k12Classes = Array.from({ length: 12 }, (_, i) => `Grade ${i + 1}`);
   const isGuest = selectedSchool === 'guest';
-  const isFormValid = isGuest || form.formState.isValid;
+  const isFormValid = isGuest || (form.formState.isValid && (showAddUser ? typedName.length > 0 : true));
 
   return (
     <Card className="w-full max-w-md shadow-2xl shadow-primary/10 bg-card/80 backdrop-blur-sm border-primary/20 animate-fade-in-up animate-colorful-border">
       <CardHeader className="text-center">
-        <CardTitle className="font-headline text-3xl animate-fade-in-down" style={{ animationDelay: '0.2s' }}>Welcome to Lyra</CardTitle>
+        <CardTitle className="font-headline text-3xl animate-fade-in-down gradient-text" style={{ animationDelay: '0.2s' }}>Welcome to Lyra</CardTitle>
         <CardDescription key={descriptionIndex} className="animate-fade-in-down transition-all duration-500" style={{ animationDelay: '0.3s' }}>{cyclingDescriptions[descriptionIndex]}</CardDescription>
       </CardHeader>
       <CardContent>
@@ -254,7 +257,7 @@ export function LoginForm() {
                                 <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
                                     <FormLabel>Enter Your Full Name</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="e.g., Jane Doe" {...field} />
+                                        <Input placeholder="e.g., Jane Doe" value={typedName} onChange={(e) => setTypedName(e.target.value)} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -262,7 +265,7 @@ export function LoginForm() {
                         />
                     )}
                     
-                    {selectedName && selectedRole !== 'guest' && (
+                    { (selectedName || typedName) && selectedRole !== 'guest' && (
                         <FormField
                             control={form.control}
                             name="password"

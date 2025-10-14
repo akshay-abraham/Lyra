@@ -106,4 +106,18 @@
       border-style: solid;
       animation: colorful-border 5s linear infinite;
   }
+
+  .gradient-text {
+    background: linear-gradient(45deg, hsl(var(--primary)), hsl(var(--accent)), hsl(310, 83%, 58%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 200% 200%;
+    animation: gradient-animation 4s ease infinite;
+  }
+
+  @keyframes gradient-animation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
 }

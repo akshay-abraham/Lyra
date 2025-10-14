@@ -1,5 +1,3 @@
-
-
 export const schools = [
     'Girideepam Bethany Central School',
     'Girideepam Bethany HSS',
@@ -19,7 +17,7 @@ export type SchoolName =
     | 'guest';
 
 const girideepamTeachersUnsorted = [
-    'Mrs. Alinta Antony', 'Mrs. Ameena Fathima', 'Mrs. Ancy George', 'Mrs. Ancy P Mathew', 
+    'Mrs. Alinta Antony', 'Mrs. Ancy George', 'Mrs. Ancy P Mathew', 
     'Mrs. Anmol Jolly', 'Mrs. Anniamma Mamman', 'Mrs. Aranya Krishnankutty', 'Mrs. Asha B Kurian', 
     'Mrs. Asha Rose Mathew', 'Mrs. Bency Jacob', 'Mrs. Bindhu Eapen', 'Mrs. Bindhu S', 
     'Mrs. Cathy Thomas', 'Mrs. Chithra S Nair', 'Mrs. Deepa Abraham', 'Mrs. Deepamol C.R', 
