@@ -1,6 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Logo } from '@/components/layout/logo';
-import { BookOpen, BrainCircuit, Database, Languages } from 'lucide-react';
+import { BookOpen, BrainCircuit, Database, Languages, ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function AboutPage() {
   return (
@@ -50,9 +52,13 @@ export default function AboutPage() {
           </div>
 
         </CardContent>
-        <div className="bg-primary/5 p-6 text-center animate-fade-in" style={{ animationDelay: '1.1s' }}>
-            <h2 className="font-headline text-2xl mb-2">Project by</h2>
-            <a href="https://akshayabraham.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-lg text-primary hover:underline transition-colors duration-300">Akshay K Rooben Abraham</a>
+        <div className="bg-primary/5 p-6 text-center animate-fade-in border-t border-primary/10" style={{ animationDelay: '1.1s' }}>
+          <p className="text-sm text-muted-foreground mb-4">Copyright © 2025 | Apache 2.0 | Akshay Abraham</p>
+          <Button asChild variant="outline">
+            <Link href="https://akshayabraham.vercel.app/" target="_blank" rel="noopener noreferrer">
+              Connect <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
         </div>
       </Card>
     </div>

@@ -228,7 +228,7 @@ export function ChatInterface() {
                   </form>
               </CardContent>
           </Card>
-           <p className="text-xs text-center text-muted-foreground mt-2">Lyra can make mistakes. Consider checking important information.</p>
+           <p className="text-xs text-center text-muted-foreground mt-2">Lyra can make mistakes. Consider checking important information with your teachers.</p>
       </div>
     </div>
   );
