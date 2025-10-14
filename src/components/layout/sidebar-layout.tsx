@@ -35,7 +35,7 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
         <SidebarContent>
           <SidebarMenu>
             <SidebarMenuItem>
-                <Link href="/" passHref legacyBehavior>
+                <Link href="/">
                     <SidebarMenuButton isActive={pathname === '/'} tooltip="Chat">
                         <MessageSquare />
                         <span>Chat</span>
@@ -43,7 +43,7 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
                 </Link>
             </SidebarMenuItem>
             <SidebarMenuItem>
-                <Link href="/teacher" passHref legacyBehavior>
+                <Link href="/teacher">
                     <SidebarMenuButton isActive={pathname.startsWith('/teacher')} tooltip="Teacher">
                         <GraduationCap />
                         <span>Teacher</span>
@@ -51,7 +51,7 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
                 </Link>
             </SidebarMenuItem>
             <SidebarMenuItem>
-                <Link href="/about" passHref legacyBehavior>
+                <Link href="/about">
                     <SidebarMenuButton isActive={pathname.startsWith('/about')} tooltip="About">
                         <BookOpen />
                         <span>About</span>
