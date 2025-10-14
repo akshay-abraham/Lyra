@@ -4,9 +4,9 @@ import { BookOpen, BrainCircuit, Database, Languages } from 'lucide-react';
 
 export default function AboutPage() {
   return (
-    <div className="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
-      <Card className="overflow-hidden">
-        <CardHeader className="text-center bg-primary/10 p-10">
+    <div className="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8 animate-fade-in">
+      <Card className="overflow-hidden shadow-2xl shadow-primary/10">
+        <CardHeader className="text-center bg-primary/10 p-10 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           <div className="flex justify-center items-center mb-4">
             <Logo />
           </div>
@@ -14,27 +14,27 @@ export default function AboutPage() {
           <p className="text-muted-foreground text-lg">An Ethical AI Tutor, Customizable by Teachers</p>
         </CardHeader>
         <CardContent className="p-6 md:p-10 space-y-12">
-          <div className="prose prose-lg max-w-none dark:prose-invert">
+          <div className="prose prose-lg max-w-none dark:prose-invert animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
               <h2 className="font-headline text-3xl">Our Motivation</h2>
               <p>
                 In today’s classrooms, AI is often met with suspicion. Educators fear that students will outsource thinking. The real challenge is not to ban AI, but to integrate it as a tool for critical thinking. Lyra is designed to be a smart, pedagogical assistant that guides students through problems with hints and Socratic questioning, much like a real tutor. It encourages students to verbalize their thought processes—a technique known as rubber duck debugging—to help them arrive at solutions on their own.
               </p>
           </div>
 
-          <div>
+          <div className="animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
             <h2 className="font-headline text-3xl text-center mb-8">Core Components</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-              <div className="flex flex-col items-center p-4 rounded-lg">
+              <div className="flex flex-col items-center p-4 rounded-lg transition-transform duration-300 hover:scale-105">
                 <BrainCircuit className="h-12 w-12 text-primary mb-4" />
                 <h3 className="font-headline text-xl mb-2">Retrieval-Augmented Generation</h3>
                 <p className="text-muted-foreground">Lyra uses RAG to ground its responses in factual, course-specific information, reducing the risk of hallucination.</p>
               </div>
-              <div className="flex flex-col items-center p-4 rounded-lg">
+              <div className="flex flex-col items-center p-4 rounded-lg transition-transform duration-300 hover:scale-105" style={{ transitionDelay: '100ms' }}>
                 <Database className="h-12 w-12 text-primary mb-4" />
                 <h3 className="font-headline text-xl mb-2">Vector Databases</h3>
                 <p className="text-muted-foreground">For fast and semantically relevant information retrieval from lecture notes and documents.</p>
               </div>
-              <div className="flex flex-col items-center p-4 rounded-lg">
+              <div className="flex flex-col items-center p-4 rounded-lg transition-transform duration-300 hover:scale-105" style={{ transitionDelay: '200ms' }}>
                 <Languages className="h-12 w-12 text-primary mb-4" />
                 <h3 className="font-headline text-xl mb-2">Prompt Engineering</h3>
                 <p className="text-muted-foreground">Carefully crafted prompts ensure the AI follows pedagogical rules, adapting to different teaching styles.</p>
@@ -42,7 +42,7 @@ export default function AboutPage() {
             </div>
           </div>
           
-          <div className="text-center">
+          <div className="text-center animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
             <h2 className="font-headline text-3xl">The Vision</h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto mt-4">
               Lyra aims to be a customizable and scalable AI tutoring platform with educational ethics at its core. It's a tool for learning, not just for getting answers.
@@ -50,7 +50,7 @@ export default function AboutPage() {
           </div>
 
         </CardContent>
-        <div className="bg-primary/10 p-6 text-center">
+        <div className="bg-primary/10 p-6 text-center animate-fade-in" style={{ animationDelay: '1s' }}>
             <h2 className="font-headline text-2xl mb-2">Project by</h2>
             <a href="https://akshayabraham.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-lg text-primary hover:underline">Akshay K Rooben Abraham</a>
         </div>

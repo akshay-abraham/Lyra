@@ -62,7 +62,7 @@ export function TeacherLogin({ onAuthSuccess }: TeacherLoginProps) {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+    <div className="flex items-center justify-center min-h-[calc(100vh-200px)] animate-fade-in-up">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit mb-2">

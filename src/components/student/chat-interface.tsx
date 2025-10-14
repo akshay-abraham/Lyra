@@ -95,7 +95,7 @@ export function ChatInterface() {
           <ScrollArea className="h-full" ref={scrollAreaRef}>
               <div className="p-4 sm:p-6 space-y-6">
                   {messages.length === 0 && (
-                      <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground pt-20">
+                      <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground pt-20 animate-fade-in-up">
                           <div className="p-3 rounded-full border mb-4">
                             <Logo />
                           </div>
@@ -103,13 +103,13 @@ export function ChatInterface() {
                       </div>
                   )}
                   {messages.map((message, index) => (
-                      <div key={index} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''}`}>
+                      <div key={index} className={`flex items-start gap-4 animate-fade-in-up ${message.role === 'user' ? 'justify-end' : ''}`}>
                           {message.role === 'assistant' && (
                               <Avatar className="h-8 w-8 border bg-background">
                                   <AvatarFallback className="bg-transparent"><Bot className="text-primary h-5 w-5"/></AvatarFallback>
                               </Avatar>
                           )}
-                          <div className={`max-w-xl rounded-lg p-3 text-sm ${message.role === 'user' ? 'bg-primary/20' : 'bg-background'}`}>
+                          <div className={`max-w-xl rounded-lg p-3 text-sm transition-all duration-300 ${message.role === 'user' ? 'bg-primary/20' : 'bg-background'}`}>
                               {message.role === 'assistant' ? (
                                 <div className="prose dark:prose-invert max-w-none prose-p:my-2">
                                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -128,7 +128,7 @@ export function ChatInterface() {
                       </div>
                   ))}
                   {isLoading && (
-                      <div className="flex items-start gap-4">
+                      <div className="flex items-start gap-4 animate-fade-in-up">
                            <Avatar className="h-8 w-8 border bg-background">
                               <AvatarFallback className="bg-transparent"><Bot className="text-primary h-5 w-5"/></AvatarFallback>
                           </Avatar>
@@ -142,7 +142,7 @@ export function ChatInterface() {
       </div>
 
       <div className="w-full max-w-3xl mx-auto p-4 sm:p-6">
-          <Card className="shadow-lg">
+          <Card className="shadow-lg animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
               <CardContent className="p-2">
                   <form onSubmit={handleSubmit} className="w-full flex items-center gap-2">
                       <Textarea
