@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, type FormEvent, type KeyboardEvent } from 'react';
+import React, { useState, useRef, useEffect, type FormEvent, type KeyboardEvent } from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,7 +15,7 @@ import remarkGfm from 'remark-gfm';
 import mermaid from 'mermaid';
 import { cn } from '@/lib/utils';
 import { useFirebase, useUser } from '@/firebase';
-import { collection, doc, serverTimestamp, addDoc } from 'firebase/firestore';
+import { collection, doc, serverTimestamp, addDoc, query, orderBy } from 'firebase/firestore';
 import { useCollection, WithId } from '@/firebase/firestore/use-collection';
 import { addDocumentNonBlocking, setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { generateChatTitle } from '@/ai/flows/generate-chat-title';
@@ -80,7 +80,6 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState(loadingTexts[0]);
   const [subject, setSubject] = useState<string | null>(null);
-  const [isStartingChat, setIsStartingChat] = useState(false);
   
   const { toast } = useToast();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -93,16 +92,21 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
   // Data fetching for existing chat
   const messagesQuery = React.useMemo(() => {
     if (!user || !firestore || !currentChatId) return null;
-    return collection(firestore, 'users', user.uid, 'chatSessions', currentChatId, 'messages');
+    return query(
+        collection(firestore, 'users', user.uid, 'chatSessions', currentChatId, 'messages'),
+        orderBy('createdAt', 'asc')
+    );
   }, [user, firestore, currentChatId]);
 
-  const { data: fetchedMessages, isLoading: isLoadingMessages } = useCollection<Message>(messagesQuery);
+  const { data: fetchedMessages } = useCollection<Message>(messagesQuery);
 
   useEffect(() => {
     if (fetchedMessages) {
       setMessages(fetchedMessages);
+    } else if (!currentChatId) {
+        setMessages([]); // Clear messages when starting a new chat
     }
-  }, [fetchedMessages]);
+  }, [fetchedMessages, currentChatId]);
 
 
   useEffect(() => {
@@ -202,7 +206,6 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
       if (response.tutorResponse) {
         const assistantMessage: Message = { role: 'assistant', content: response.tutorResponse };
         addDocumentNonBlocking(messagesCol, { ...assistantMessage, createdAt: serverTimestamp() });
-        setMessages((prev) => [...prev.filter(m => m.id !== 'temp-user'), { ...assistantMessage, id: 'temp-ai' }]);
       } else {
         throw new Error("Failed to get a response from the AI tutor.");
       }
@@ -210,7 +213,6 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
       console.error(error);
       const errorMessage: Message = { role: 'assistant', content: "I seem to be having trouble connecting. Please try again in a moment." };
       addDocumentNonBlocking(messagesCol, { ...errorMessage, createdAt: serverTimestamp() });
-      setMessages((prev) => [...prev.filter(m => m.id !== 'temp-user'), { ...errorMessage, id: 'temp-error' }]);
       toast({
         variant: "destructive",
         title: "Oh no! Something went wrong.",
