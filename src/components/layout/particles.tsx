@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 
-const NUM_PARTICLES = 15;
+const NUM_PARTICLES = 50;
 
 interface ParticleStyle {
     left: string;
@@ -17,11 +17,11 @@ export function Particles() {
     useEffect(() => {
         const styles: ParticleStyle[] = [];
         for (let i = 0; i < NUM_PARTICLES; i++) {
-            const size = Math.random() * 3 + 1; // size between 1px and 4px
+            const size = Math.random() * 4 + 2;
             styles.push({
                 left: `${Math.random() * 100}%`,
                 animationDelay: `${Math.random() * 25}s`,
-                animationDuration: `${Math.random() * 20 + 20}s`, // duration between 20s and 40s
+                animationDuration: `${Math.random() * 15 + 20}s`,
                 width: `${size}px`,
                 height: `${size}px`,
             });

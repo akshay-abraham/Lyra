@@ -24,9 +24,9 @@ export function RagManagement() {
                             <BrainCircuit className="h-8 w-8 text-primary" />
                         </div>
                         <div>
-                            <CardTitle className="font-headline text-2xl">RAG Content Management</CardTitle>
+                            <CardTitle className="font-headline text-2xl">Customize AI Knowledge</CardTitle>
                             <CardDescription>
-                                Upload your course materials to customize the AI's knowledge base.
+                                Upload your course materials to give the AI a custom brain for your class.
                             </CardDescription>
                         </div>
                     </div>
@@ -34,15 +34,15 @@ export function RagManagement() {
                 <CardContent className="space-y-6">
                     <Alert className="bg-primary/5 border-primary/20">
                         <BrainCircuit className="h-4 w-4 !text-primary" />
-                        <AlertTitle className="font-headline">How it Works</AlertTitle>
+                        <AlertTitle className="font-headline">The Magic Behind the Curtain</AlertTitle>
                         <AlertDescription>
-                            This system uses <strong>Retrieval-Augmented Generation (RAG)</strong> and a <strong>Vector Database</strong>. When you upload documents, they are converted into a format the AI can search instantly. When a student asks a question, Lyra finds the most relevant information from your documents to provide a grounded, context-aware response.
+                            This system uses <strong>Retrieval-Augmented Generation (RAG)</strong>, a fancy term for giving the AI a super-fast search engine for your documents. When a student asks a question, Lyra finds the most relevant snippets from your uploaded materials to provide a grounded, context-aware response. It's like giving the AI your personal textbook!
                         </AlertDescription>
                     </Alert>
 
                     <div className="space-y-4">
                         <div className='flex justify-between items-center'>
-                             <h3 className="font-headline text-xl">Uploaded Materials</h3>
+                             <h3 className="font-headline text-xl">Your Course Materials</h3>
                              <Button>
                                 <FileUp className="mr-2 h-4 w-4" />
                                 Upload New File
@@ -74,5 +74,3 @@ export function RagManagement() {
         </div>
     );
 }
-
-    

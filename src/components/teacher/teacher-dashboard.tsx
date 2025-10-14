@@ -123,23 +123,23 @@ export function TeacherDashboard() {
     <div className="space-y-8">
         <div className="animate-fade-in-down">
             <h1 className="text-3xl font-headline font-bold">Teacher Dashboard</h1>
-            <p className="text-muted-foreground">Customize the behavior and knowledge of your classroom's AI tutor.</p>
+            <p className="text-muted-foreground">Welcome! Here you can shape the AI's personality and give it custom knowledge.</p>
         </div>
 
         <Tabs defaultValue="style" className="w-full space-y-8">
-          <TabsList className="grid w-full grid-cols-2 bg-card/80 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-2 bg-card/80 backdrop-blur-sm animate-fade-in-up">
             <TabsTrigger value="style"><Wand2 className="mr-2" /> AI Teaching Style</TabsTrigger>
-            <TabsTrigger value="rag"><BrainCircuit className="mr-2" /> RAG Content</TabsTrigger>
+            <TabsTrigger value="rag"><BrainCircuit className="mr-2" /> Custom Knowledge</TabsTrigger>
           </TabsList>
           
           <TabsContent value="style">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start animate-fade-in-up">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 lg:col-span-2">
-                        <Card className="bg-card/80 backdrop-blur-sm border-primary/20 shadow-lg">
+                        <Card className="bg-card/80 backdrop-blur-sm border-primary/20 shadow-lg animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
                             <CardHeader>
                                 <CardTitle className="font-headline text-2xl flex items-center gap-2"><Wand2 /> AI Personality</CardTitle>
-                                <CardDescription>Define how the AI should behave. This is the most important step.</CardDescription>
+                                <CardDescription>This is where you tell the AI how to act. Think of it as setting the classroom rules!</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <FormField
@@ -161,10 +161,10 @@ export function TeacherDashboard() {
                             </CardContent>
                         </Card>
 
-                        <Card className="bg-card/80 backdrop-blur-sm border-primary/20 shadow-lg">
+                        <Card className="bg-card/80 backdrop-blur-sm border-primary/20 shadow-lg animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
                             <CardHeader>
-                                <CardTitle className="font-headline text-2xl flex items-center gap-2"><Sparkles /> Few-Shot Examples</CardTitle>
-                                <CardDescription>Guide the AI by providing examples of high-quality answers.</CardDescription>
+                                <CardTitle className="font-headline text-2xl flex items-center gap-2"><Sparkles /> Answer Examples</CardTitle>
+                                <CardDescription>Show the AI what a good response looks like. It learns from your examples.</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-4">
@@ -199,13 +199,13 @@ export function TeacherDashboard() {
                                         Add Example
                                     </Button>
                                     <FormDescription>
-                                        Show the AI what a good hint or guiding question looks like. Markdown is supported.
+                                        Show the AI what a good hint or guiding question looks like.
                                     </FormDescription>
                                 </div>
                             </CardContent>
                         </Card>
                         
-                        <Button type="submit" disabled={isSaving} size="lg">
+                        <Button type="submit" disabled={isSaving} size="lg" className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
                             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                             Save Customizations
                         </Button>
@@ -213,7 +213,7 @@ export function TeacherDashboard() {
                 </Form>
                 
                 <div className="space-y-6 lg:sticky lg:top-24">
-                    <Card className="bg-card/80 backdrop-blur-sm border-accent/20 shadow-lg">
+                    <Card className="bg-card/80 backdrop-blur-sm border-accent/20 shadow-lg animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
                         <CardHeader>
                             <CardTitle className="font-headline text-2xl">Test Your AI</CardTitle>
                             <CardDescription>See how the AI will respond with your current settings.</CardDescription>
@@ -267,5 +267,3 @@ export function TeacherDashboard() {
     </div>
   );
 }
-
-    
