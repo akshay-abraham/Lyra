@@ -1,3 +1,4 @@
+
 export const schools = [
     'Girideepam Bethany Central School',
     'Girideepam Bethany HSS',
@@ -52,7 +53,7 @@ const girideepamTeachers = [
     'Niji Vinod',
     'Nimmy Merin Alex',
     'Nisha James',
-taking 'Nizy Abraham',
+    'Nizy Abraham',
     'P.S. Jolly',
     'Prema Sara Cherian',
     'Pretha Korah',
