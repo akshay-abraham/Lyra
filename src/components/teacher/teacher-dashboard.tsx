@@ -149,7 +149,7 @@ export function TeacherDashboard() {
                                         <FormItem>
                                         <FormLabel>System Prompt</FormLabel>
                                         <FormControl>
-                                            <Textarea rows={8} placeholder="e.g., You are a friendly math tutor for 5th graders..." {...field} />
+                                            <Textarea rows={8} placeholder="e.g., You are a friendly math tutor for 5th graders..." {...field} className="animate-glow"/>
                                         </FormControl>
                                         <FormDescription>
                                             This sets the AI's personality, role, and rules. Be explicit. Markdown is supported.
@@ -205,7 +205,7 @@ export function TeacherDashboard() {
                             </CardContent>
                         </Card>
                         
-                        <Button type="submit" disabled={isSaving} size="lg" className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+                        <Button type="submit" disabled={isSaving} size="lg" className="animate-fade-in-up group transition-all duration-300 ease-in-out hover:scale-105" style={{ animationDelay: '0.4s' }}>
                             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                             Save Customizations
                         </Button>
@@ -228,7 +228,7 @@ export function TeacherDashboard() {
                                             <FormItem>
                                                 <FormLabel>Student's Question</FormLabel>
                                                 <FormControl>
-                                                    <Textarea placeholder="e.g., How do I solve for x in 2x + 5 = 15?" {...field} />
+                                                    <Textarea placeholder="e.g., How do I solve for x in 2x + 5 = 15?" {...field} className="animate-glow" />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>

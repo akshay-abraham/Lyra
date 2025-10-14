@@ -63,8 +63,8 @@ export default function AboutPage() {
                   <span className="hidden sm:inline">•</span>
                   <span>Created by <span className="font-semibold text-primary">Akshay Abraham</span></span>
               </div>
-              <Button asChild>
-                  <Link href="https://akshayabraham.vercel.app/" target="_blank" rel="noopener noreferrer" className="group">
+              <Button asChild className="group transition-all duration-300 ease-in-out hover:scale-105">
+                  <Link href="https://akshayabraham.vercel.app/" target="_blank" rel="noopener noreferrer">
                       Connect <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
               </Button>

@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 
-const NUM_PARTICLES = 50;
+const NUM_PARTICLES = 100;
 
 interface ParticleStyle {
     left: string;

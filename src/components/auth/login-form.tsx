@@ -97,7 +97,7 @@ export function LoginForm() {
     
     setTimeout(() => {
         let passwordCorrect = false;
-        let finalRole: 'student' | 'teacher' = 'student';
+        let finalRole: 'student' | 'teacher' | 'guest' = 'student';
 
         if(data.role === 'guest') {
             passwordCorrect = true;
@@ -136,7 +136,7 @@ export function LoginForm() {
   const isFormValid = isGuest || form.formState.isValid;
 
   return (
-    <Card className="w-full max-w-md shadow-2xl shadow-primary/10 bg-card/80 backdrop-blur-sm border-primary/20 animate-fade-in-up">
+    <Card className="w-full max-w-md shadow-2xl shadow-primary/10 bg-card/80 backdrop-blur-sm border-primary/20 animate-fade-in-up animate-colorful-border">
       <CardHeader className="text-center">
         <CardTitle className="font-headline text-3xl animate-fade-in-down" style={{ animationDelay: '0.2s' }}>Welcome to Lyra</CardTitle>
         <CardDescription className="animate-fade-in-down" style={{ animationDelay: '0.3s' }}>Step into a world of guided learning. Your AI Tutor awaits!</CardDescription>
@@ -271,7 +271,7 @@ export function LoginForm() {
         <div className="mt-6 text-center text-sm animate-fade-in-up" style={{ animationDelay: '1.1s' }}>
             <p className="text-muted-foreground">Is your school not listed?</p>
              <Link href="https://akshayabraham.vercel.app/" target="_blank" rel="noopener noreferrer">
-                <Button variant="link" className="text-primary">
+                <Button variant="link" className="text-primary group transition-all duration-300 ease-in-out hover:scale-105">
                     <Contact className="mr-2 h-4 w-4"/> Let's get you set up!
                 </Button>
             </Link>

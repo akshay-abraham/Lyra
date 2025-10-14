@@ -219,7 +219,7 @@ export function ChatInterface() {
                           onChange={(e) => setInput(e.target.value)}
                           onKeyDown={handleKeyDown}
                           placeholder="Message Lyra..."
-                          className="flex-grow resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent"
+                          className="flex-grow resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent animate-glow"
                           rows={1}
                       />
                       <Button type="submit" disabled={isLoading || !input.trim()} size="icon" aria-label="Submit message">

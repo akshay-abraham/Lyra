@@ -43,15 +43,15 @@ export function RagManagement() {
                     <div className="space-y-4">
                         <div className='flex justify-between items-center'>
                              <h3 className="font-headline text-xl">Your Course Materials</h3>
-                             <Button>
-                                <FileUp className="mr-2 h-4 w-4" />
+                             <Button className="group transition-all duration-300 ease-in-out hover:scale-105">
+                                <FileUp className="mr-2 h-4 w-4 transition-transform group-hover:rotate-[-5deg]" />
                                 Upload New File
                             </Button>
                         </div>
                        
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {exampleFiles.map((file, index) => (
-                                <Card key={index} className="transition-all duration-300 hover:shadow-md hover:border-primary/30 animate-fade-in-up" style={{animationDelay: `${index * 100}ms`}}>
+                                <Card key={index} className="transition-all duration-300 hover:shadow-lg hover:border-primary/30 hover:-translate-y-1 animate-fade-in-up" style={{animationDelay: `${index * 100}ms`}}>
                                     <CardContent className="p-4 flex items-center gap-4">
                                         <file.icon className="h-8 w-8 text-primary" />
                                         <div className="flex-grow">
@@ -61,8 +61,8 @@ export function RagManagement() {
                                                 <span>{file.size}</span>
                                             </div>
                                         </div>
-                                        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive">
-                                            <Trash2 className="h-4 w-4" />
+                                        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive group">
+                                            <Trash2 className="h-4 w-4 transition-transform group-hover:scale-110" />
                                         </Button>
                                     </CardContent>
                                 </Card>
