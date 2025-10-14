@@ -10,16 +10,56 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarFooter
+  SidebarFooter,
+  useSidebar
 } from "@/components/ui/sidebar"
 import { Logo } from "@/components/layout/logo"
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BookOpen, GraduationCap, MessageSquare } from 'lucide-react';
+import React from "react";
 
+function SidebarMenuItems() {
+  const pathname = usePathname();
+  const { setOpenMobile, isMobile } = useSidebar();
+
+  const handleLinkClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
+
+  return (
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <Link href="/" onClick={handleLinkClick}>
+          <SidebarMenuButton isActive={pathname === '/'} tooltip="Chat">
+            <MessageSquare />
+            <span>Chat</span>
+          </SidebarMenuButton>
+        </Link>
+      </SidebarMenuItem>
+      <SidebarMenuItem>
+        <Link href="/teacher" onClick={handleLinkClick}>
+          <SidebarMenuButton isActive={pathname.startsWith('/teacher')} tooltip="Teacher">
+            <GraduationCap />
+            <span>Teacher</span>
+          </SidebarMenuButton>
+        </Link>
+      </SidebarMenuItem>
+      <SidebarMenuItem>
+        <Link href="/about" onClick={handleLinkClick}>
+          <SidebarMenuButton isActive={pathname.startsWith('/about')} tooltip="About">
+            <BookOpen />
+            <span>About</span>
+          </SidebarMenuButton>
+        </Link>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  );
+}
 
 export function SidebarLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
 
   return (
     <SidebarProvider>
@@ -33,32 +73,7 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
           </div>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarMenu>
-            <SidebarMenuItem>
-                <Link href="/">
-                    <SidebarMenuButton isActive={pathname === '/'} tooltip="Chat">
-                        <MessageSquare />
-                        <span>Chat</span>
-                    </SidebarMenuButton>
-                </Link>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-                <Link href="/teacher">
-                    <SidebarMenuButton isActive={pathname.startsWith('/teacher')} tooltip="Teacher">
-                        <GraduationCap />
-                        <span>Teacher</span>
-                    </SidebarMenuButton>
-                </Link>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-                <Link href="/about">
-                    <SidebarMenuButton isActive={pathname.startsWith('/about')} tooltip="About">
-                        <BookOpen />
-                        <span>About</span>
-                    </SidebarMenuButton>
-                </Link>
-            </SidebarMenuItem>
-          </SidebarMenu>
+          <SidebarMenuItems />
         </SidebarContent>
         <SidebarFooter>
           {/* Footer content can go here */}
