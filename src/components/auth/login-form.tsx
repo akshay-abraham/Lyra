@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { schools, teachersBySchool, studentsBySchool, SchoolName } from '@/lib/school-data';
+import { schools, teachersBySchool, studentsBySchool, SchoolName, teacherPassword, getStudentPassword } from '@/lib/school-data';
 import { Input } from '../ui/input';
 import { useAuth } from './auth-provider';
 import { useToast } from '@/hooks/use-toast';
@@ -61,7 +61,11 @@ export function LoginForm() {
   const selectedName = form.watch('name');
 
   useEffect(() => {
-    if (selectedSchool && selectedRole === 'teacher') {
+    if (selectedSchool === 'guest') {
+        form.setValue('role', 'guest');
+        form.setValue('name', 'Guest');
+        setAvailableNames([]);
+    } else if (selectedSchool && selectedRole === 'teacher') {
         const schoolTeachers = teachersBySchool[selectedSchool] || [];
         setAvailableNames(schoolTeachers.sort());
     } else if (selectedSchool && selectedRole === 'student') {
@@ -70,7 +74,11 @@ export function LoginForm() {
     } else {
         setAvailableNames([]);
     }
-    form.setValue('name', '');
+    
+    if (selectedSchool !== 'guest') {
+      form.setValue('name', '');
+    }
+
     setShowAddUser(false);
   }, [selectedSchool, selectedRole, form]);
 
@@ -87,17 +95,15 @@ export function LoginForm() {
   const onSubmit = (data: FormData) => {
     setIsSubmitting(true);
     
-    // Simulate password check
     setTimeout(() => {
         let passwordCorrect = false;
         if(data.role === 'guest') {
             passwordCorrect = true;
         } else if (data.role === 'student' && data.name) {
-            const expectedPassword = data.name.split(' ')[0].toLowerCase();
+            const expectedPassword = getStudentPassword(data.name);
             passwordCorrect = data.password === expectedPassword;
         } else if (data.role === 'teacher') {
-            // Complex password logic can be added here
-            passwordCorrect = data.password === 'teach'; // Placeholder
+            passwordCorrect = data.password === teacherPassword;
         }
 
         if (passwordCorrect) {
@@ -150,7 +156,7 @@ export function LoginForm() {
                 </FormItem>
               )}
             />
-            {selectedSchool && (
+            {selectedSchool && selectedSchool !== 'guest' && (
                 <>
                     <FormField
                     control={form.control}
@@ -163,9 +169,8 @@ export function LoginForm() {
                             <SelectTrigger><SelectValue placeholder="Select your role" /></SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                                {selectedSchool !== 'guest' && <SelectItem value="student">Student</SelectItem>}
-                                {selectedSchool !== 'guest' && <SelectItem value="teacher">Teacher</SelectItem>}
-                                {selectedSchool === 'guest' && <SelectItem value="guest">Guest</SelectItem>}
+                                <SelectItem value="student">Student</SelectItem>
+                                <SelectItem value="teacher">Teacher</SelectItem>
                             </SelectContent>
                         </Select>
                         <FormMessage />

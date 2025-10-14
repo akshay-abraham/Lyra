@@ -34,7 +34,6 @@ function SidebarMenuItems() {
 
   return (
     <SidebarMenu>
-      {user?.role !== 'teacher' && (
         <SidebarMenuItem>
             <Link href="/" onClick={handleLinkClick}>
             <SidebarMenuButton isActive={pathname === '/'} tooltip="Chat">
@@ -43,7 +42,6 @@ function SidebarMenuItems() {
             </SidebarMenuButton>
             </Link>
         </SidebarMenuItem>
-      )}
       {user?.role === 'teacher' && (
         <SidebarMenuItem>
             <Link href="/teacher" onClick={handleLinkClick}>
@@ -67,7 +65,7 @@ function SidebarMenuItems() {
 }
 
 export function SidebarLayout({ children }: { children: React.ReactNode }) {
-    const { user, logout } = useAuth();
+    const { logout } = useAuth();
 
   return (
     <SidebarProvider>
@@ -93,7 +91,7 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
-        <header className="flex h-14 items-center justify-start border-b px-4 md:hidden bg-background/80 backdrop-blur-sm sticky top-0 z-10">
+        <header className="flex h-14 items-center justify-start border-b px-4 md:hidden bg-card/80 backdrop-blur-sm sticky top-0 z-10">
             <SidebarTrigger />
              <Link href="/" className="ml-4 flex items-center space-x-2">
                 <Logo />

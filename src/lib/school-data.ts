@@ -57,3 +57,14 @@ export const studentsBySchool: Record<SchoolName, string[]> = {
     'Marian Senior Secondary School': ['Grace', 'Heidi'],
     'guest': []
 };
+
+// --- Password Logic ---
+// You can edit the passwords here.
+
+// For teachers:
+export const teacherPassword = 'teach';
+
+// For students:
+export const getStudentPassword = (name: string) => {
+    return name.split(' ')[0].toLowerCase();
+};
