@@ -1,3 +1,4 @@
+
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -37,10 +38,18 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
+const cyclingDescriptions = [
+    "Step into a world of guided learning. Your AI Tutor awaits!",
+    "The future of AI in education starts here.",
+    "Customizable, ethical AI for your classroom.",
+    "Empowering students, supporting teachers."
+];
+
 export function LoginForm() {
   const [availableNames, setAvailableNames] = useState<string[]>([]);
   const [showAddUser, setShowAddUser] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [descriptionIndex, setDescriptionIndex] = useState(0);
 
   const { login } = useAuth();
   const { toast } = useToast();
@@ -59,6 +68,14 @@ export function LoginForm() {
   const selectedSchool = form.watch('school') as SchoolName;
   const selectedRole = form.watch('role');
   const selectedName = form.watch('name');
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setDescriptionIndex(prevIndex => (prevIndex + 1) % cyclingDescriptions.length);
+        }, 3000); // Change text every 3 seconds
+
+        return () => clearInterval(interval);
+    }, []);
 
   useEffect(() => {
     if (selectedSchool === 'guest') {
@@ -139,7 +156,7 @@ export function LoginForm() {
     <Card className="w-full max-w-md shadow-2xl shadow-primary/10 bg-card/80 backdrop-blur-sm border-primary/20 animate-fade-in-up animate-colorful-border">
       <CardHeader className="text-center">
         <CardTitle className="font-headline text-3xl animate-fade-in-down" style={{ animationDelay: '0.2s' }}>Welcome to Lyra</CardTitle>
-        <CardDescription className="animate-fade-in-down" style={{ animationDelay: '0.3s' }}>Step into a world of guided learning. Your AI Tutor awaits!</CardDescription>
+        <CardDescription className="animate-fade-in-down transition-all duration-500" style={{ animationDelay: '0.3s' }}>{cyclingDescriptions[descriptionIndex]}</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>

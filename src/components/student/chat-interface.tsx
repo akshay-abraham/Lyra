@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, useEffect, type FormEvent, type KeyboardEvent } from 'react';
@@ -13,6 +14,7 @@ import { Logo } from '../layout/logo';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import mermaid from 'mermaid';
+import { cn } from '@/lib/utils';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -210,7 +212,7 @@ export function ChatInterface() {
       </div>
 
       <div className="w-full max-w-3xl mx-auto p-4 sm:p-6">
-          <Card className="shadow-lg animate-fade-in-up bg-card/80 backdrop-blur-sm" style={{ animationDelay: '0.5s' }}>
+          <Card className={cn("shadow-lg animate-fade-in-up bg-card/80 backdrop-blur-sm animate-colorful-border")} style={{ animationDelay: '0.5s' }}>
               <CardContent className="p-2">
                   <form onSubmit={handleSubmit} className="w-full flex items-center gap-2">
                       <Textarea
