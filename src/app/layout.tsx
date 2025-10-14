@@ -27,7 +27,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
       </head>
-      <body className={`${inter.variable} ${sora.variable} font-body antialiased bg-background text-foreground dark animated-gradient`}>
+      <body className={`${inter.variable} ${sora.variable} font-body antialiased bg-background text-foreground`}>
         <Particles />
         <AuthProvider>
             {children}

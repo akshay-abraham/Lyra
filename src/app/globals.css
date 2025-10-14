@@ -4,24 +4,24 @@
 
 @layer base {
   :root {
-    --background: 224 71% 4%;
-    --foreground: 210 40% 98%;
-    --card: 224 71% 10%;
-    --card-foreground: 210 40% 98%;
-    --popover: 224 71% 4%;
-    --popover-foreground: 210 40% 98%;
+    --background: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
     --primary: 262.1 83.3% 57.8%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 215 28% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 215 28% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 34.9 91.4% 58.2%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 63% 31%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 215 28% 17%;
-    --input: 215 28% 17%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
     --ring: 262.1 83.3% 57.8%;
     --chart-1: 210 40% 98%;
     --chart-2: 150 40% 98%;
@@ -29,7 +29,7 @@
     --chart-4: 270 40% 98%;
     --chart-5: 330 40% 98%;
     --radius: 0.75rem;
-    --sidebar-background: 224 71% 6%;
+    --sidebar-background: 224 71% 4%;
     --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 262.1 83.3% 57.8%;
     --sidebar-primary-foreground: 210 20% 98%;
@@ -38,6 +38,7 @@
     --sidebar-border: 215 28% 17%;
     --sidebar-ring: 262.1 83.3% 57.8%;
   }
+
   .dark {
     --background: 224 71% 4%;
     --foreground: 210 40% 98%;
@@ -82,30 +83,16 @@
     @apply bg-background text-foreground;
   }
 
-  .animated-gradient {
-    animation: gradient-animation 15s ease infinite;
-    background: linear-gradient(-45deg, hsl(var(--primary)/0.1), hsl(var(--accent)/0.1), hsl(var(--background)), hsl(var(--background)));
-    background-size: 400% 400%;
-  }
-
-  @keyframes gradient-animation {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-
   .particle {
     position: absolute;
     border-radius: 50%;
-    background: hsl(var(--primary) / 0.5);
-    animation: float 25s infinite;
+    background: hsl(var(--primary) / 0.2);
+    animation: float 25s infinite ease-in-out;
   }
 
   @keyframes float {
-    0% { transform: translateY(0) translateX(0); opacity: 0.5; }
-    25% { transform: translateY(-20vh) translateX(10vw); opacity: 0.2; }
-    50% { transform: translateY(-40vh) translateX(-15vw); opacity: 0.5; }
-    75% { transform: translateY(-60vh) translateX(5vw); opacity: 0.3; }
-    100% { transform: translateY(-100vh) translateX(0); opacity: 0; }
+    0% { transform: translateY(0) translateX(0); opacity: 0.7; }
+    50% { transform: translateY(-100vh) translateX(10vw); opacity: 0.1; }
+    100% { transform: translateY(0) translateX(0); opacity: 0.7; }
   }
 }

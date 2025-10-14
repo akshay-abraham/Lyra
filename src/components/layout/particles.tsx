@@ -1,15 +1,14 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 
-const NUM_PARTICLES = 20;
+const NUM_PARTICLES = 15;
 
 interface ParticleStyle {
     left: string;
-    bottom: string;
-    width: string;
-    height: string;
     animationDelay: string;
     animationDuration: string;
+    width: string;
+    height: string;
 }
 
 export function Particles() {
@@ -18,14 +17,13 @@ export function Particles() {
     useEffect(() => {
         const styles: ParticleStyle[] = [];
         for (let i = 0; i < NUM_PARTICLES; i++) {
-            const size = Math.random() * 5 + 2; // size between 2px and 7px
+            const size = Math.random() * 3 + 1; // size between 1px and 4px
             styles.push({
                 left: `${Math.random() * 100}%`,
-                bottom: `-${Math.random() * 20 + 10}px`, // Start below the viewport
+                animationDelay: `${Math.random() * 25}s`,
+                animationDuration: `${Math.random() * 20 + 20}s`, // duration between 20s and 40s
                 width: `${size}px`,
                 height: `${size}px`,
-                animationDelay: `${Math.random() * 25}s`,
-                animationDuration: `${Math.random() * 20 + 15}s`, // duration between 15s and 35s
             });
         }
         setParticleStyles(styles);
@@ -34,7 +32,7 @@ export function Particles() {
     return (
         <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-[-1] overflow-hidden">
             {particleStyles.map((style, index) => (
-                <div key={index} className="particle" style={style} />
+                <div key={index} className="particle" style={{...style, bottom: '-20px'}} />
             ))}
         </div>
     );
