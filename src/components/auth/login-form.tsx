@@ -97,23 +97,28 @@ export function LoginForm() {
     
     setTimeout(() => {
         let passwordCorrect = false;
+        let finalRole: 'student' | 'teacher' = 'student';
+
         if(data.role === 'guest') {
             passwordCorrect = true;
+            finalRole = 'teacher';
         } else if (data.role === 'student' && data.name) {
             const expectedPassword = getStudentPassword(data.name);
             passwordCorrect = data.password === expectedPassword;
+            finalRole = 'student';
         } else if (data.role === 'teacher') {
             passwordCorrect = data.password === teacherPassword;
+            finalRole = 'teacher';
         }
 
         if (passwordCorrect) {
             login({
                 name: data.name,
                 school: data.school,
-                role: data.role,
+                role: finalRole,
                 class: data.class,
             });
-            toast({ title: 'Login Successful', description: `Welcome, ${data.name}!` });
+            toast({ title: 'Login Successful', description: `Welcome, ${data.name}! Let the learning begin!` });
         } else {
             toast({
                 variant: 'destructive',
@@ -127,12 +132,14 @@ export function LoginForm() {
   };
 
   const k12Classes = Array.from({ length: 12 }, (_, i) => `Grade ${i + 1}`);
+  const isGuest = selectedSchool === 'guest';
+  const isFormValid = isGuest || form.formState.isValid;
 
   return (
     <Card className="w-full max-w-md shadow-2xl shadow-primary/10 bg-card/80 backdrop-blur-sm border-primary/20 animate-fade-in-up">
       <CardHeader className="text-center">
-        <CardTitle className="font-headline text-3xl">Welcome to Lyra</CardTitle>
-        <CardDescription>Your personal AI Tutor</CardDescription>
+        <CardTitle className="font-headline text-3xl animate-fade-in-down" style={{ animationDelay: '0.2s' }}>Welcome to Lyra</CardTitle>
+        <CardDescription className="animate-fade-in-down" style={{ animationDelay: '0.3s' }}>Step into a world of guided learning. Your AI Tutor awaits!</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -141,7 +148,7 @@ export function LoginForm() {
               control={form.control}
               name="school"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
                   <FormLabel>School</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
@@ -149,7 +156,7 @@ export function LoginForm() {
                     </FormControl>
                     <SelectContent>
                       {schools.map(school => <SelectItem key={school} value={school}>{school}</SelectItem>)}
-                       <SelectItem value="guest">Guest User</SelectItem>
+                       <SelectItem value="guest">Guest User (Full Access)</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -162,7 +169,7 @@ export function LoginForm() {
                     control={form.control}
                     name="role"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
                         <FormLabel>I am a...</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
@@ -183,7 +190,7 @@ export function LoginForm() {
                             control={form.control}
                             name="class"
                             render={({ field }) => (
-                                <FormItem>
+                                <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
                                 <FormLabel>Class</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
@@ -204,7 +211,7 @@ export function LoginForm() {
                         control={form.control}
                         name="name"
                         render={({ field }) => (
-                            <FormItem>
+                            <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.7s' }}>
                             <FormLabel>Name</FormLabel>
                             <Select onValueChange={handleNameChange} value={field.value}>
                                 <FormControl>
@@ -226,7 +233,7 @@ export function LoginForm() {
                             control={form.control}
                             name="name"
                             render={({ field }) => (
-                                <FormItem>
+                                <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
                                     <FormLabel>Enter Your Full Name</FormLabel>
                                     <FormControl>
                                         <Input placeholder="e.g., Jane Doe" {...field} />
@@ -242,7 +249,7 @@ export function LoginForm() {
                             control={form.control}
                             name="password"
                             render={({ field }) => (
-                                <FormItem>
+                                <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.9s' }}>
                                     <FormLabel>Password</FormLabel>
                                     <FormControl>
                                         <Input type="password" placeholder={selectedRole === 'teacher' ? 'Enter administrator password' : "Enter your provided password"} {...field} className={selectedRole === 'teacher' ? 'border-accent ring-accent focus-visible:ring-accent' : ''} />
@@ -255,17 +262,17 @@ export function LoginForm() {
                 </>
             )}
 
-            <Button type="submit" className="w-full" disabled={isSubmitting || !form.formState.isValid}>
+            <Button type="submit" className="w-full animate-fade-in-up" style={{ animationDelay: '1s' }} disabled={isSubmitting || !isFormValid}>
               {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              Login <ArrowRight className="ml-2 h-4 w-4" />
+              Enter the Classroom <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </form>
         </Form>
-        <div className="mt-6 text-center text-sm">
+        <div className="mt-6 text-center text-sm animate-fade-in-up" style={{ animationDelay: '1.1s' }}>
             <p className="text-muted-foreground">Is your school not listed?</p>
              <Link href="https://akshayabraham.vercel.app/" target="_blank" rel="noopener noreferrer">
                 <Button variant="link" className="text-primary">
-                    <Contact className="mr-2 h-4 w-4"/> Contact us to get added!
+                    <Contact className="mr-2 h-4 w-4"/> Let's get you set up!
                 </Button>
             </Link>
         </div>
