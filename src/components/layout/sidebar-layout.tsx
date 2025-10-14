@@ -16,12 +16,15 @@ import {
 import { Logo } from "@/components/layout/logo"
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpen, GraduationCap, MessageSquare } from 'lucide-react';
+import { BookOpen, GraduationCap, MessageSquare, LogOut } from 'lucide-react';
 import React from "react";
+import { useAuth } from "../auth/auth-provider";
+import { Button } from "../ui/button";
 
 function SidebarMenuItems() {
   const pathname = usePathname();
   const { setOpenMobile, isMobile } = useSidebar();
+  const { user } = useAuth();
 
   const handleLinkClick = () => {
     if (isMobile) {
@@ -31,22 +34,26 @@ function SidebarMenuItems() {
 
   return (
     <SidebarMenu>
-      <SidebarMenuItem>
-        <Link href="/" onClick={handleLinkClick}>
-          <SidebarMenuButton isActive={pathname === '/'} tooltip="Chat">
-            <MessageSquare />
-            <span>Chat</span>
-          </SidebarMenuButton>
-        </Link>
-      </SidebarMenuItem>
-      <SidebarMenuItem>
-        <Link href="/teacher" onClick={handleLinkClick}>
-          <SidebarMenuButton isActive={pathname.startsWith('/teacher')} tooltip="Teacher">
-            <GraduationCap />
-            <span>Teacher</span>
-          </SidebarMenuButton>
-        </Link>
-      </SidebarMenuItem>
+      {user?.role !== 'teacher' && (
+        <SidebarMenuItem>
+            <Link href="/" onClick={handleLinkClick}>
+            <SidebarMenuButton isActive={pathname === '/'} tooltip="Chat">
+                <MessageSquare />
+                <span>Chat</span>
+            </SidebarMenuButton>
+            </Link>
+        </SidebarMenuItem>
+      )}
+      {user?.role === 'teacher' && (
+        <SidebarMenuItem>
+            <Link href="/teacher" onClick={handleLinkClick}>
+            <SidebarMenuButton isActive={pathname.startsWith('/teacher')} tooltip="Teacher">
+                <GraduationCap />
+                <span>Teacher</span>
+            </SidebarMenuButton>
+            </Link>
+        </SidebarMenuItem>
+      )}
       <SidebarMenuItem>
         <Link href="/about" onClick={handleLinkClick}>
           <SidebarMenuButton isActive={pathname.startsWith('/about')} tooltip="About">
@@ -60,6 +67,7 @@ function SidebarMenuItems() {
 }
 
 export function SidebarLayout({ children }: { children: React.ReactNode }) {
+    const { user, logout } = useAuth();
 
   return (
     <SidebarProvider>
@@ -76,11 +84,16 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
           <SidebarMenuItems />
         </SidebarContent>
         <SidebarFooter>
-          {/* Footer content can go here */}
+          <div className="p-2">
+            <Button variant="ghost" onClick={logout} className="w-full justify-start gap-2">
+                <LogOut className="h-4 w-4" />
+                <span className="group-data-[collapsible=icon]:hidden">Logout</span>
+            </Button>
+          </div>
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
-        <header className="flex h-14 items-center justify-start border-b px-4 md:hidden">
+        <header className="flex h-14 items-center justify-start border-b px-4 md:hidden bg-background/80 backdrop-blur-sm sticky top-0 z-10">
             <SidebarTrigger />
              <Link href="/" className="ml-4 flex items-center space-x-2">
                 <Logo />

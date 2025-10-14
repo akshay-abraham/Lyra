@@ -1,18 +1,25 @@
 'use client';
-import { useState } from 'react';
 import { TeacherDashboard } from '@/components/teacher/teacher-dashboard';
-import { TeacherLogin } from '@/components/teacher/teacher-login';
+import { useAuth } from '@/components/auth/auth-provider';
+import LoginPage from '../login/page';
+import { SidebarLayout } from '@/components/layout/sidebar-layout';
 
 export default function TeacherPage() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const { user, loading } = useAuth();
 
-    if (!isAuthenticated) {
-        return <TeacherLogin onAuthSuccess={() => setIsAuthenticated(true)} />;
+    if (loading) {
+        return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    }
+    
+    if (!user || user.role !== 'teacher') {
+        return <LoginPage />;
     }
 
     return (
-        <div className="p-4 sm:p-6 lg:p-8 animate-fade-in">
-            <TeacherDashboard />
-        </div>
+        <SidebarLayout>
+            <div className="p-4 sm:p-6 lg:p-8 animate-fade-in">
+                <TeacherDashboard />
+            </div>
+        </SidebarLayout>
     );
 }
