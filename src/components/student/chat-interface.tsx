@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useRef, useEffect, type FormEvent, type KeyboardEvent } from 'react';
@@ -94,6 +95,7 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const { messages, sendMessage, isLoading } = useChat(currentChatId);
+  const safeMessages = messages || [];
 
   useEffect(() => {
     const scrollArea = scrollAreaRef.current;
@@ -103,7 +105,7 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
         behavior: 'smooth',
       });
     }
-  }, [messages, isLoading]);
+  }, [safeMessages, isLoading]);
   
   useEffect(() => {
     inputRef.current?.focus();
@@ -165,9 +167,9 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
       <div className="flex-grow w-full max-w-3xl mx-auto overflow-hidden">
           <ScrollArea className="h-full" ref={scrollAreaRef}>
               <div className="p-4 sm:p-6 space-y-6">
-                  {(messages.length === 0 && !currentChatId) && <NewChatView onSubjectSelect={setSubject} subject={subject} />}
+                  {(safeMessages.length === 0 && !currentChatId) && <NewChatView onSubjectSelect={setSubject} subject={subject} />}
 
-                  {messages.map((message, index) => (
+                  {safeMessages.map((message, index) => (
                       <div key={message.id || index} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''}`}>
                           {message.role === 'assistant' && (
                               <Avatar className="h-8 w-8 border bg-card">
