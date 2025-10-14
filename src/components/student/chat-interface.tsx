@@ -9,7 +9,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { generateAITutorResponse } from '@/ai/flows/generate-ai-tutor-response';
 import { Bot, User, CornerDownLeft, BookCheck, Loader2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
-import { Logo } from '../layout/logo';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import mermaid from 'mermaid';
@@ -17,7 +16,7 @@ import { cn } from '@/lib/utils';
 import { useFirebase, useUser } from '@/firebase';
 import { collection, doc, serverTimestamp, addDoc, query, orderBy } from 'firebase/firestore';
 import { useCollection, WithId } from '@/firebase/firestore/use-collection';
-import { addDocumentNonBlocking, setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { generateChatTitle } from '@/ai/flows/generate-chat-title';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { useRouter } from 'next/navigation';
@@ -37,6 +36,8 @@ const loadingTexts = [
     "Shuffling the library cards...",
     "Polishing the crystal ball...",
 ];
+
+const subjects = ["Math", "Science", "History", "English", "Coding", "Other"];
 
 const Mermaid = ({ chart }) => {
   const chartRef = useRef<HTMLDivElement>(null);
@@ -72,7 +73,25 @@ const CodeBlock = ({ node, inline, className, children, ...props }) => {
     );
 };
 
-const subjects = ["Math", "Science", "History", "English", "Coding", "Other"];
+const NewChatView = ({ onSubjectSelect, subject }) => (
+    <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground p-4 animate-fade-in-up">
+        <div className="p-3 rounded-full border-2 border-primary/20 bg-primary/10 mb-4 animate-scale-in" style={{animationDelay: '0.2s'}}>
+            <BookCheck className="h-10 w-10 text-primary" />
+        </div>
+        <h3 className="text-2xl font-headline text-foreground mb-2 animate-fade-in-up" style={{animationDelay: '0.3s'}}>Start a New Learning Session</h3>
+        <p className="max-w-md mb-6 animate-fade-in-up" style={{animationDelay: '0.4s'}}>What subject are we diving into today? This helps me tailor my guidance.</p>
+        
+        <Select onValueChange={onSubjectSelect} value={subject || ""}>
+            <SelectTrigger className="w-[280px] animate-fade-in-up" style={{animationDelay: '0.5s'}}>
+                <SelectValue placeholder="Select a subject..." />
+            </SelectTrigger>
+            <SelectContent>
+                {subjects.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+            </SelectContent>
+        </Select>
+    </div>
+);
+
 
 export function ChatInterface({ chatId: currentChatId }: { chatId: string | null }) {
   const [messages, setMessages] = useState<WithId<Message>[]>([]);
@@ -237,32 +256,12 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
     }
   };
 
-  const NewChatView = () => (
-     <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground p-4 animate-fade-in-up">
-        <div className="p-3 rounded-full border-2 border-primary/20 bg-primary/10 mb-4 animate-scale-in" style={{animationDelay: '0.2s'}}>
-          <BookCheck className="h-10 w-10 text-primary" />
-        </div>
-        <h3 className="text-2xl font-headline text-foreground mb-2 animate-fade-in-up" style={{animationDelay: '0.3s'}}>Start a New Learning Session</h3>
-        <p className="max-w-md mb-6 animate-fade-in-up" style={{animationDelay: '0.4s'}}>What subject are we diving into today? This helps me tailor my guidance.</p>
-        
-        <Select onValueChange={setSubject} value={subject || ""}>
-          <SelectTrigger className="w-[280px] animate-fade-in-up" style={{animationDelay: '0.5s'}}>
-            <SelectValue placeholder="Select a subject..." />
-          </SelectTrigger>
-          <SelectContent>
-            {subjects.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-          </SelectContent>
-        </Select>
-    </div>
-  );
-
-
   return (
     <div className="flex h-[calc(100vh-theme(spacing.14))] md:h-screen flex-col items-center">
       <div className="flex-grow w-full max-w-3xl mx-auto overflow-hidden">
           <ScrollArea className="h-full" ref={scrollAreaRef}>
               <div className="p-4 sm:p-6 space-y-6">
-                  {(messages.length === 0 && !currentChatId) && <NewChatView />}
+                  {(messages.length === 0 && !currentChatId) && <NewChatView onSubjectSelect={setSubject} subject={subject} />}
 
                   {messages.map((message, index) => (
                       <div key={message.id || index} className={`flex items-start gap-4 animate-fade-in-up ${message.role === 'user' ? 'justify-end' : ''}`}>
