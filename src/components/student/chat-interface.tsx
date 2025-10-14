@@ -6,25 +6,15 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { generateAITutorResponse } from '@/ai/flows/generate-ai-tutor-response';
 import { Bot, User, CornerDownLeft, BookCheck } from 'lucide-react';
-import { useToast } from "@/hooks/use-toast";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import mermaid from 'mermaid';
 import { cn } from '@/lib/utils';
-import { useFirebase, useUser } from '@/firebase';
-import { collection, doc, serverTimestamp, addDoc, query, orderBy } from 'firebase/firestore';
-import { useCollection, WithId } from '@/firebase/firestore/use-collection';
-import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
-import { generateChatTitle } from '@/ai/flows/generate-chat-title';
+import { type WithId } from '@/firebase/firestore/use-collection';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { useRouter } from 'next/navigation';
-
-interface Message {
-  role: 'user' | 'assistant';
-  content: string;
-}
+import { useChat, type Message } from '@/hooks/use-chat';
+import { useToast } from "@/hooks/use-toast";
 
 const loadingTexts = [
     "Opening textbooks...",
@@ -39,7 +29,7 @@ const loadingTexts = [
 
 const subjects = ["Math", "Science", "History", "English", "Coding", "Other"];
 
-const Mermaid = ({ chart }) => {
+const Mermaid = ({ chart }: { chart: string }) => {
   const chartRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -54,7 +44,7 @@ const Mermaid = ({ chart }) => {
   return <div ref={chartRef} className="mermaid">{chart}</div>;
 };
 
-const CodeBlock = ({ node, inline, className, children, ...props }) => {
+const CodeBlock: React.FC<any> = ({ node, inline, className, children, ...props }) => {
     const match = /language-(\w+)/.exec(className || '');
     const lang = match && match[1];
 
@@ -73,7 +63,7 @@ const CodeBlock = ({ node, inline, className, children, ...props }) => {
     );
 };
 
-const NewChatView = React.memo(({ onSubjectSelect, subject }) => (
+const NewChatView = React.memo(({ onSubjectSelect, subject }: { onSubjectSelect: (subject: string) => void, subject: string | null }) => (
     <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground p-4">
         <div className="p-3 rounded-full border-2 border-primary/20 bg-primary/10 mb-4">
             <BookCheck className="h-10 w-10 text-primary" />
@@ -95,39 +85,15 @@ NewChatView.displayName = 'NewChatView';
 
 
 export function ChatInterface({ chatId: currentChatId }: { chatId: string | null }) {
-  const [messages, setMessages] = useState<WithId<Message>[]>([]);
   const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [loadingText, setLoadingText] = useState(loadingTexts[0]);
   const [subject, setSubject] = useState<string | null>(null);
-  
+  const [localLoadingText, setLocalLoadingText] = useState(loadingTexts[0]);
+
   const { toast } = useToast();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const router = useRouter();
 
-  const { firestore } = useFirebase();
-  const { user } = useUser();
-
-  // Data fetching for existing chat
-  const messagesQuery = React.useMemo(() => {
-    if (!user || !firestore || !currentChatId) return null;
-    return query(
-        collection(firestore, 'users', user.uid, 'chatSessions', currentChatId, 'messages'),
-        orderBy('createdAt', 'asc')
-    );
-  }, [user, firestore, currentChatId]);
-
-  const { data: fetchedMessages } = useCollection<Message>(messagesQuery);
-
-  useEffect(() => {
-    if (fetchedMessages) {
-      setMessages(fetchedMessages);
-    } else if (!currentChatId) {
-        setMessages([]); // Clear messages when starting a new chat
-    }
-  }, [fetchedMessages, currentChatId]);
-
+  const { messages, sendMessage, isLoading } = useChat(currentChatId);
 
   useEffect(() => {
     const scrollArea = scrollAreaRef.current;
@@ -154,7 +120,7 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
   useEffect(() => {
     if (isLoading) {
       const interval = setInterval(() => {
-        setLoadingText(prev => {
+        setLocalLoadingText(prev => {
           const currentIndex = loadingTexts.indexOf(prev);
           return loadingTexts[(currentIndex + 1) % loadingTexts.length];
         });
@@ -162,100 +128,23 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
       return () => clearInterval(interval);
     }
   }, [isLoading]);
-
-    const processMessage = async (chatId: string, userMessageContent: string) => {
-        if (!user || !firestore) return;
-        const userMessage: Message = { role: 'user', content: userMessageContent };
-        
-        const messagesCol = collection(firestore, 'users', user.uid, 'chatSessions', chatId, 'messages');
-        
-        // Don't add optimistic UI message if it's the very first message of a new chat,
-        // as it's handled separately to avoid duplicates.
-        if (currentChatId) {
-            setMessages((prev) => [...prev, { ...userMessage, id: 'temp-user' }]);
-        }
-        
-        await addDocumentNonBlocking(messagesCol, { ...userMessage, createdAt: serverTimestamp() });
-        
-        setIsLoading(true);
-
-        try {
-            const response = await generateAITutorResponse({
-                problemStatement: userMessageContent,
-            });
-
-            if (response.tutorResponse) {
-                const assistantMessage: Message = { role: 'assistant', content: response.tutorResponse };
-                await addDocumentNonBlocking(messagesCol, { ...assistantMessage, createdAt: serverTimestamp() });
-            } else {
-                throw new Error("Failed to get a response from the AI tutor.");
-            }
-        } catch (error) {
-            console.error(error);
-            const errorMessage: Message = { role: 'assistant', content: "I seem to be having trouble connecting. Please try again in a moment." };
-            await addDocumentNonBlocking(messagesCol, { ...errorMessage, createdAt: serverTimestamp() });
-            toast({
-                variant: "destructive",
-                title: "Oh no! Something went wrong.",
-                description: "There was a problem with your request.",
-            });
-        } finally {
-            setIsLoading(false);
-            inputRef.current?.focus();
-        }
-    };
-
-
+  
   const handleSendMessage = async () => {
-    if (!input.trim() || isLoading || !user || !firestore) return;
+    if (!input.trim()) return;
 
+    if (!currentChatId && !subject) {
+      toast({
+        variant: 'destructive',
+        title: 'Please select a subject',
+        description: 'You need to choose a subject before starting a new chat.',
+      });
+      return;
+    }
+    
     const currentInput = input;
     setInput('');
-
-    if (!currentChatId) {
-      if (!subject) {
-        toast({
-          variant: 'destructive',
-          title: 'Please select a subject',
-          description: 'You need to choose a subject before starting a new chat.',
-        });
-        setInput(currentInput); // Restore input
-        return;
-      }
-      
-      // Optimistically add the first user message
-      const userMessage: Message = { role: 'user', content: currentInput };
-      setMessages((prev) => [...prev, { ...userMessage, id: 'temp-user-initial' }]);
-      
-      try {
-        const titleResponse = await generateChatTitle({ firstMessage: currentInput });
-        const newTitle = titleResponse.title;
-
-        const chatSessionRef = await addDoc(collection(firestore, 'users', user.uid, 'chatSessions'), {
-          userId: user.uid,
-          subject: subject,
-          title: newTitle,
-          startTime: serverTimestamp(),
-        });
-        
-        const newChatId = chatSessionRef.id;
-
-        // Navigate to the new chat URL without a full page reload
-        router.push(`/?chatId=${newChatId}`, { scroll: false });
-        
-        // Now that the chat is created, process the first message
-        await processMessage(newChatId, currentInput);
-
-      } catch (error) {
-        console.error("Error creating new chat session:", error);
-        toast({ variant: 'destructive', title: 'Error', description: 'Could not start a new chat session.' });
-        setMessages(messages.filter(m => m.id !== 'temp-user-initial')); // remove optimistic message
-        setInput(currentInput); // Restore input
-      }
-    } else {
-        // This is an existing chat
-        await processMessage(currentChatId, currentInput);
-    }
+    
+    await sendMessage(currentInput, subject);
   };
 
 
@@ -309,7 +198,7 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
                               <AvatarFallback className="bg-transparent"><Bot className="text-primary h-5 w-5"/></AvatarFallback>
                           </Avatar>
                           <div className="max-w-md rounded-lg p-3 bg-card/80 backdrop-blur-sm border flex items-center">
-                              <p className="text-sm text-muted-foreground">{loadingText}</p>
+                              <p className="text-sm text-muted-foreground">{localLoadingText}</p>
                           </div>
                       </div>
                   )}
@@ -329,7 +218,7 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
                           placeholder={!subject && !currentChatId ? "Please select a subject above to begin." : "Message Lyra..."}
                           className="flex-grow resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent"
                           rows={1}
-                          disabled={!subject && !currentChatId}
+                          disabled={isLoading || (!subject && !currentChatId)}
                       />
                       <Button type="submit" disabled={isLoading || !input.trim()} size="icon" aria-label="Submit message">
                           <CornerDownLeft className="h-4 w-4" />
