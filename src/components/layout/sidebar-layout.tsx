@@ -42,38 +42,42 @@ function SidebarMenuItems() {
   };
 
   return (
-    <SidebarMenu>
-        <SidebarMenuItem>
-            <Link href="/" onClick={handleLinkClick}>
-            <SidebarMenuButton isActive={pathname === '/'} tooltip="New Chat">
-                <PlusCircle />
-                <span>New Chat</span>
-            </SidebarMenuButton>
-            </Link>
-        </SidebarMenuItem>
+    <SidebarMenu className="p-0">
+        <div className="p-2">
+            <SidebarMenuItem>
+                <Link href="/" onClick={handleLinkClick}>
+                <SidebarMenuButton isActive={pathname === '/'} tooltip="New Chat">
+                    <PlusCircle />
+                    <span>New Chat</span>
+                </SidebarMenuButton>
+                </Link>
+            </SidebarMenuItem>
+        </div>
       
       <SidebarSeparator />
         <ChatHistory onLinkClick={handleLinkClick} />
       <SidebarSeparator />
 
-      {userInfo?.role === 'teacher' && (
-        <SidebarMenuItem>
-            <Link href="/teacher" onClick={handleLinkClick}>
-            <SidebarMenuButton isActive={pathname.startsWith('/teacher')} tooltip="Teacher">
-                <GraduationCap />
-                <span>Teacher</span>
-            </SidebarMenuButton>
-            </Link>
-        </SidebarMenuItem>
-      )}
-      <SidebarMenuItem>
-        <Link href="/about" onClick={handleLinkClick}>
-          <SidebarMenuButton isActive={pathname.startsWith('/about')} tooltip="About">
-            <BookOpen />
-            <span>About</span>
-          </SidebarMenuButton>
-        </Link>
-      </SidebarMenuItem>
+        <div className="p-2">
+            {userInfo?.role === 'teacher' && (
+                <SidebarMenuItem>
+                    <Link href="/teacher" onClick={handleLinkClick}>
+                    <SidebarMenuButton isActive={pathname.startsWith('/teacher')} tooltip="Teacher">
+                        <GraduationCap />
+                        <span>Teacher</span>
+                    </SidebarMenuButton>
+                    </Link>
+                </SidebarMenuItem>
+            )}
+            <SidebarMenuItem>
+                <Link href="/about" onClick={handleLinkClick}>
+                <SidebarMenuButton isActive={pathname.startsWith('/about')} tooltip="About">
+                    <BookOpen />
+                    <span>About</span>
+                </SidebarMenuButton>
+                </Link>
+            </SidebarMenuItem>
+        </div>
     </SidebarMenu>
   );
 }

@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { useChat } from '@/hooks/use-chat';
 import { useToast } from "@/hooks/use-toast";
 import { getLoadingText } from '@/lib/loading-texts';
-import { getSubjectsForUser, type SubjectData } from '@/lib/subjects-data';
+import { getSubjectsForUser, type SubjectData, allSubjects } from '@/lib/subjects-data';
 
 
 const Mermaid = ({ chart }: { chart: string }) => {
@@ -80,6 +80,7 @@ const NewChatView = React.memo(({ onSubjectSelect, subject, availableSubjects }:
 ));
 NewChatView.displayName = 'NewChatView';
 
+const subjectColorMap = new Map<string, string>(allSubjects.map(s => [s.name, s.color]));
 
 export function ChatInterface({ chatId: currentChatId }: { chatId: string | null }) {
   const [input, setInput] = useState('');
@@ -94,7 +95,7 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
   const { messages, sendMessage, isLoading, chatSubject } = useChat(currentChatId);
   const safeMessages = messages || [];
   const currentSubject = subject || chatSubject;
-
+  const chatAccentColor = currentSubject ? subjectColorMap.get(currentSubject) || 'hsl(var(--primary))' : 'hsl(var(--primary))';
 
   useEffect(() => {
     const userInfoStr = sessionStorage.getItem('lyra-user-info');
@@ -172,7 +173,10 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
   };
 
   return (
-    <div className="flex h-[calc(100vh-theme(spacing.14))] md:h-screen flex-col items-center">
+    <div 
+        className="flex h-[calc(100vh-theme(spacing.14))] md:h-screen flex-col items-center"
+        style={{ '--chat-accent-color': chatAccentColor } as React.CSSProperties}
+    >
       <div className="flex-grow w-full max-w-3xl mx-auto overflow-hidden">
           <ScrollArea className="h-full" ref={scrollAreaRef}>
               <div className="p-4 sm:p-6 space-y-6">
@@ -185,7 +189,7 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
                                   <AvatarFallback className="bg-transparent"><Bot className="text-primary h-5 w-5"/></AvatarFallback>
                               </Avatar>
                           )}
-                          <div className={`max-w-xl rounded-lg p-3 text-sm transition-all duration-300 ${message.role === 'user' ? 'bg-primary/20' : 'bg-card/80 backdrop-blur-sm border'}`}>
+                          <div className={`max-w-xl rounded-lg p-3 text-sm transition-all duration-300 ${message.role === 'user' ? 'bg-[var(--chat-accent-color)]/20' : 'bg-card/80 backdrop-blur-sm border'}`}>
                               {message.role === 'assistant' ? (
                                 <div className="prose dark:prose-invert max-w-none prose-p:my-2">
                                   <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ code: CodeBlock }}>
@@ -198,7 +202,7 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
                           </div>
                           {message.role === 'user' && (
                               <Avatar className="h-8 w-8 border bg-card">
-                                  <AvatarFallback className="bg-transparent"><User className="text-accent h-5 w-5"/></AvatarFallback>
+                                  <AvatarFallback className="bg-transparent"><User className="h-5 w-5" style={{ color: 'var(--chat-accent-color)' }}/></AvatarFallback>
                               </Avatar>
                           )}
                       </div>
@@ -242,5 +246,3 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
     </div>
   );
 }
-
-    
