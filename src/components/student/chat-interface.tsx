@@ -12,23 +12,10 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import mermaid from 'mermaid';
 import { cn } from '@/lib/utils';
-import { type WithId } from '@/firebase/firestore/use-collection';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { useChat, type Message } from '@/hooks/use-chat';
 import { useToast } from "@/hooks/use-toast";
-
-const loadingTexts = [
-    "Opening textbooks...",
-    "Consulting with the great thinkers...",
-    "Finding where Napoleon left his keys...",
-    "Brewing some fresh ideas...",
-    "Untangling a knot of knowledge...",
-    "Asking the Oracle of Delphi...",
-    "Shuffling the library cards...",
-    "Polishing the crystal ball...",
-];
-
-const subjects = ["Math", "Science", "History", "English", "Coding", "Other"];
+import { getLoadingText, subjects } from '@/lib/loading-texts';
 
 const Mermaid = ({ chart }: { chart: string }) => {
   const chartRef = useRef<HTMLDivElement>(null);
@@ -65,8 +52,8 @@ const CodeBlock: React.FC<any> = ({ node, inline, className, children, ...props 
 };
 
 const NewChatView = React.memo(({ onSubjectSelect, subject }: { onSubjectSelect: (subject: string) => void, subject: string | null }) => (
-    <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground p-4">
-        <div className="p-3 rounded-full border-2 border-primary/20 bg-primary/10 mb-4">
+    <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground p-4 animate-fade-in-up">
+        <div className="p-3 rounded-full border-2 border-primary/20 bg-primary/10 mb-4 animate-scale-in">
             <BookCheck className="h-10 w-10 text-primary" />
         </div>
         <h3 className="text-2xl font-headline text-foreground mb-2">Start a New Learning Session</h3>
@@ -88,14 +75,16 @@ NewChatView.displayName = 'NewChatView';
 export function ChatInterface({ chatId: currentChatId }: { chatId: string | null }) {
   const [input, setInput] = useState('');
   const [subject, setSubject] = useState<string | null>(null);
-  const [localLoadingText, setLocalLoadingText] = useState(loadingTexts[0]);
+  const [localLoadingText, setLocalLoadingText] = useState(getLoadingText(null));
 
   const { toast } = useToast();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const { messages, sendMessage, isLoading } = useChat(currentChatId);
+  const { messages, sendMessage, isLoading, chatSubject } = useChat(currentChatId);
   const safeMessages = messages || [];
+  const currentSubject = subject || chatSubject;
+
 
   useEffect(() => {
     const scrollArea = scrollAreaRef.current;
@@ -121,15 +110,15 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
 
   useEffect(() => {
     if (isLoading) {
+      // Set initial loading text right away
+      setLocalLoadingText(getLoadingText(currentSubject));
+      // Then cycle through more every few seconds
       const interval = setInterval(() => {
-        setLocalLoadingText(prev => {
-          const currentIndex = loadingTexts.indexOf(prev);
-          return loadingTexts[(currentIndex + 1) % loadingTexts.length];
-        });
-      }, 2000);
+        setLocalLoadingText(getLoadingText(currentSubject));
+      }, 2500);
       return () => clearInterval(interval);
     }
-  }, [isLoading]);
+  }, [isLoading, currentSubject]);
   
   const handleSendMessage = async () => {
     if (!input.trim()) return;
@@ -170,7 +159,7 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
                   {(safeMessages.length === 0 && !currentChatId) && <NewChatView onSubjectSelect={setSubject} subject={subject} />}
 
                   {safeMessages.map((message, index) => (
-                      <div key={message.id || index} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''}`}>
+                      <div key={message.id || index} className={`flex items-start gap-4 ${message.role === 'user' ? 'justify-end' : ''} animate-fade-in-up`}>
                           {message.role === 'assistant' && (
                               <Avatar className="h-8 w-8 border bg-card">
                                   <AvatarFallback className="bg-transparent"><Bot className="text-primary h-5 w-5"/></AvatarFallback>
@@ -195,7 +184,7 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
                       </div>
                   ))}
                   {isLoading && (
-                      <div className="flex items-start gap-4">
+                      <div className="flex items-start gap-4 animate-fade-in-up">
                            <Avatar className="h-8 w-8 border bg-card">
                               <AvatarFallback className="bg-transparent"><Bot className="text-primary h-5 w-5"/></AvatarFallback>
                           </Avatar>

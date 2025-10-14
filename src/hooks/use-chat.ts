@@ -9,17 +9,24 @@ import {
   orderBy,
   addDoc,
   serverTimestamp,
+  doc,
 } from 'firebase/firestore';
 import { useFirebase, useUser, useMemoFirebase } from '@/firebase';
 import { useCollection, WithId } from '@/firebase/firestore/use-collection';
+import { useDoc } from '@/firebase/firestore/use-doc';
 import { generateAITutorResponse } from '@/ai/flows/generate-ai-tutor-response';
 import { generateChatTitle } from '@/ai/flows/generate-chat-title';
 import { useToast } from "@/hooks/use-toast";
 import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 export interface Message {
+  id?: string;
   role: 'user' | 'assistant';
   content: string;
+}
+
+interface ChatSession {
+    subject: string;
 }
 
 export function useChat(chatId: string | null) {
@@ -29,6 +36,13 @@ export function useChat(chatId: string | null) {
   const router = useRouter();
   const { toast } = useToast();
 
+  const chatSessionRef = useMemoFirebase(() => {
+    if (!user || !firestore || !chatId) return null;
+    return doc(firestore, 'users', user.uid, 'chatSessions', chatId);
+  }, [user, firestore, chatId]);
+
+  const { data: chatSession } = useDoc<ChatSession>(chatSessionRef);
+
   const messagesQuery = useMemoFirebase(() => {
     if (!user || !firestore || !chatId) return null;
     return query(
@@ -37,7 +51,7 @@ export function useChat(chatId: string | null) {
     );
   }, [user, firestore, chatId]);
 
-  const { data: messages = [], error: messagesError } = useCollection<Message>(messagesQuery);
+  const { data: messages, error: messagesError } = useCollection<Message>(messagesQuery);
     
   useEffect(() => {
     if (messagesError) {
@@ -81,6 +95,8 @@ export function useChat(chatId: string | null) {
         });
 
         currentChatId = chatSessionRef.id;
+        // The router push will trigger a re-render with the new chatId,
+        // which will then cause the useChat hook to re-evaluate and fetch messages.
         router.push(`/?chatId=${currentChatId}`, { scroll: false });
       }
 
@@ -124,5 +140,5 @@ export function useChat(chatId: string | null) {
     }
   }, [chatId, user, firestore, router, toast]);
 
-  return { messages, sendMessage, isLoading };
+  return { messages, sendMessage, isLoading, chatSubject: chatSession?.subject };
 }
