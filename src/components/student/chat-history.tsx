@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { useCollection } from '@/firebase/firestore/use-collection';
-import { useFirebase, useUser } from '@/firebase';
-import { collection, query, where, orderBy } from 'firebase/firestore';
+import { useFirebase, useUser, useMemoFirebase } from '@/firebase';
+import { collection, query, orderBy } from 'firebase/firestore';
 import { SidebarMenuItem, SidebarMenuButton, SidebarMenuSkeleton } from '../ui/sidebar';
 import Link from 'next/link';
 import { MessageSquareText } from 'lucide-react';
@@ -20,7 +20,7 @@ export function ChatHistory({ onLinkClick }: { onLinkClick: () => void }) {
     const { user } = useUser();
     const pathname = usePathname();
 
-    const chatSessionsQuery = React.useMemo(() => {
+    const chatSessionsQuery = useMemoFirebase(() => {
         if (!user || !firestore) return null;
         return query(
             collection(firestore, 'users', user.uid, 'chatSessions'),
