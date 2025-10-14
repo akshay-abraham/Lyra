@@ -23,6 +23,8 @@ import { customizeAiTeachingStyle } from '@/ai/flows/customize-ai-teaching-style
 import { generateGuidedResponse } from '@/ai/flows/guide-ai-response-generation';
 import { Bot, Loader2, Sparkles, Wand2, X } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const formSchema = z.object({
   systemPrompt: z.string().min(10, {
@@ -37,7 +39,7 @@ const testSchema = z.object({
     })
 });
 
-const defaultSystemPrompt = "You are Lyra, an AI tutor. Your goal is to help the student verbalize their problem and guide them towards the solution by providing hints, analogies, and questions instead of direct answers. You should never give the direct answer. Emulate the Socratic method. Be patient and encouraging.";
+const defaultSystemPrompt = "You are Lyra, an AI tutor. Your goal is to help the student verbalize their problem and guide them towards the solution by providing hints, analogies, and questions instead of direct answers. You should never give the direct answer. Emulate the Socratic method. Be patient and encouraging. You can use Markdown for formatting.";
 
 export function TeacherDashboard() {
   const [isSaving, setIsSaving] = useState(false);
@@ -140,7 +142,7 @@ export function TeacherDashboard() {
                                         <Textarea rows={8} placeholder="e.g., You are a friendly math tutor for 5th graders..." {...field} />
                                     </FormControl>
                                     <FormDescription>
-                                        This sets the AI's personality, role, and rules. Be explicit about what it should and shouldn't do.
+                                        This sets the AI's personality, role, and rules. Be explicit about what it should and shouldn't do. Markdown is supported.
                                     </FormDescription>
                                     <FormMessage />
                                     </FormItem>
@@ -187,7 +189,7 @@ export function TeacherDashboard() {
                                     Add Example
                                 </Button>
                                 <FormDescription>
-                                    Show the AI what a good hint or guiding question looks like. The AI will learn from your style.
+                                    Show the AI what a good hint or guiding question looks like. The AI will learn from your style. Markdown is supported.
                                 </FormDescription>
                             </div>
                         </CardContent>
@@ -233,8 +235,12 @@ export function TeacherDashboard() {
                              <Alert>
                                 <Bot className="h-4 w-4" />
                                 <AlertTitle className="font-headline">AI Response</AlertTitle>
-                                <AlertDescription className="prose-sm max-w-none text-foreground whitespace-pre-wrap">
-                                    {testResult}
+                                <AlertDescription>
+                                    <div className="prose-sm dark:prose-invert max-w-none whitespace-pre-wrap">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                            {testResult}
+                                        </ReactMarkdown>
+                                    </div>
                                 </AlertDescription>
                             </Alert>
                         )}

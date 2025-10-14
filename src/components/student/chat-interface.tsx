@@ -10,6 +10,8 @@ import { generateAITutorResponse } from '@/ai/flows/generate-ai-tutor-response';
 import { Bot, User, CornerDownLeft, Loader2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { Logo } from '../layout/logo';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -50,7 +52,7 @@ export function ChatInterface() {
     try {
       const response = await generateAITutorResponse({
         problemStatement: currentInput,
-        systemPrompt: "You are Lyra, an AI tutor. Your goal is to help the student verbalize their problem and guide them towards the solution by providing hints, analogies, and questions instead of direct answers. You should never give the direct answer. Emulate the Socratic method. Be patient and encouraging.",
+        systemPrompt: "You are Lyra, an AI tutor. Your goal is to help the student verbalize their problem and guide them towards the solution by providing hints, analogies, and questions instead of direct answers. You should never give the direct answer. Emulate the Socratic method. Be patient and encouraging. You can use Markdown for formatting.",
         exampleGoodAnswers: []
       });
 
@@ -107,8 +109,16 @@ export function ChatInterface() {
                                   <AvatarFallback className="bg-transparent"><Bot className="text-primary h-5 w-5"/></AvatarFallback>
                               </Avatar>
                           )}
-                          <div className={`max-w-xl rounded-lg p-3 text-sm prose dark:prose-invert max-w-none prose-p:my-2 ${message.role === 'user' ? 'bg-primary/20' : 'bg-background'}`}>
-                              <p className="whitespace-pre-wrap">{message.content}</p>
+                          <div className={`max-w-xl rounded-lg p-3 text-sm ${message.role === 'user' ? 'bg-primary/20' : 'bg-background'}`}>
+                              {message.role === 'assistant' ? (
+                                <div className="prose dark:prose-invert max-w-none prose-p:my-2">
+                                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                      {message.content}
+                                  </ReactMarkdown>
+                                </div>
+                              ) : (
+                                <p className="whitespace-pre-wrap">{message.content}</p>
+                              )}
                           </div>
                           {message.role === 'user' && (
                               <Avatar className="h-8 w-8 border bg-background">
