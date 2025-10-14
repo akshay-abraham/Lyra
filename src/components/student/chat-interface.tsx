@@ -73,7 +73,7 @@ const CodeBlock = ({ node, inline, className, children, ...props }) => {
     );
 };
 
-const NewChatView = ({ onSubjectSelect, subject }) => (
+const NewChatView = React.memo(({ onSubjectSelect, subject }) => (
     <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground p-4">
         <div className="p-3 rounded-full border-2 border-primary/20 bg-primary/10 mb-4">
             <BookCheck className="h-10 w-10 text-primary" />
@@ -90,7 +90,8 @@ const NewChatView = ({ onSubjectSelect, subject }) => (
             </SelectContent>
         </Select>
     </div>
-);
+));
+NewChatView.displayName = 'NewChatView';
 
 
 export function ChatInterface({ chatId: currentChatId }: { chatId: string | null }) {
@@ -162,92 +163,98 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
     }
   }, [isLoading]);
 
+    const processMessage = async (chatId: string, userMessageContent: string) => {
+        if (!user || !firestore) return;
+        const userMessage: Message = { role: 'user', content: userMessageContent };
+        
+        const messagesCol = collection(firestore, 'users', user.uid, 'chatSessions', chatId, 'messages');
+        
+        // Don't add optimistic UI message if it's the very first message of a new chat,
+        // as it's handled separately to avoid duplicates.
+        if (currentChatId) {
+            setMessages((prev) => [...prev, { ...userMessage, id: 'temp-user' }]);
+        }
+        
+        await addDocumentNonBlocking(messagesCol, { ...userMessage, createdAt: serverTimestamp() });
+        
+        setIsLoading(true);
+
+        try {
+            const response = await generateAITutorResponse({
+                problemStatement: userMessageContent,
+            });
+
+            if (response.tutorResponse) {
+                const assistantMessage: Message = { role: 'assistant', content: response.tutorResponse };
+                await addDocumentNonBlocking(messagesCol, { ...assistantMessage, createdAt: serverTimestamp() });
+            } else {
+                throw new Error("Failed to get a response from the AI tutor.");
+            }
+        } catch (error) {
+            console.error(error);
+            const errorMessage: Message = { role: 'assistant', content: "I seem to be having trouble connecting. Please try again in a moment." };
+            await addDocumentNonBlocking(messagesCol, { ...errorMessage, createdAt: serverTimestamp() });
+            toast({
+                variant: "destructive",
+                title: "Oh no! Something went wrong.",
+                description: "There was a problem with your request.",
+            });
+        } finally {
+            setIsLoading(false);
+            inputRef.current?.focus();
+        }
+    };
+
+
   const handleSendMessage = async () => {
     if (!input.trim() || isLoading || !user || !firestore) return;
 
-    let chatId = currentChatId;
     const currentInput = input;
-    const userMessage: Message = { role: 'user', content: currentInput };
     setInput('');
 
-    // If this is the first message of a new chat
-    if (!chatId) {
+    if (!currentChatId) {
       if (!subject) {
         toast({
           variant: 'destructive',
           title: 'Please select a subject',
           description: 'You need to choose a subject before starting a new chat.',
         });
-        setInput(currentInput);
+        setInput(currentInput); // Restore input
         return;
       }
-
-      setIsLoading(true);
+      
+      // Optimistically add the first user message
+      const userMessage: Message = { role: 'user', content: currentInput };
       setMessages((prev) => [...prev, { ...userMessage, id: 'temp-user-initial' }]);
-
+      
       try {
-        // 1. Generate a title
         const titleResponse = await generateChatTitle({ firstMessage: currentInput });
         const newTitle = titleResponse.title;
 
-        // 2. Create the chat session document
         const chatSessionRef = await addDoc(collection(firestore, 'users', user.uid, 'chatSessions'), {
           userId: user.uid,
           subject: subject,
           title: newTitle,
           startTime: serverTimestamp(),
         });
-        chatId = chatSessionRef.id;
+        
+        const newChatId = chatSessionRef.id;
 
-        // 3. Navigate to the new chat URL
-        router.push(`/?chatId=${chatId}`, { scroll: false });
+        // Navigate to the new chat URL without a full page reload
+        router.push(`/?chatId=${newChatId}`, { scroll: false });
+        
+        // Now that the chat is created, process the first message
+        await processMessage(newChatId, currentInput);
 
       } catch (error) {
         console.error("Error creating new chat session:", error);
         toast({ variant: 'destructive', title: 'Error', description: 'Could not start a new chat session.' });
-        setIsLoading(false);
-        setInput(currentInput);
         setMessages(messages.filter(m => m.id !== 'temp-user-initial')); // remove optimistic message
-        return;
+        setInput(currentInput); // Restore input
       }
-    }
-
-    if (!chatId) return; // Should not happen, but for type safety
-
-    const messagesCol = collection(firestore, 'users', user.uid, 'chatSessions', chatId, 'messages');
-    addDocumentNonBlocking(messagesCol, { ...userMessage, createdAt: serverTimestamp() });
-    
-    // Optimistically update UI only if it's not the very first message of a new chat
-    // (which is handled above to prevent duplicates)
-    if(currentChatId) {
-      setMessages((prev) => [...prev, { ...userMessage, id: 'temp-user' }]);
-    }
-    
-    setIsLoading(true);
-
-    try {
-      const response = await generateAITutorResponse({
-        problemStatement: currentInput,
-      });
-
-      if (response.tutorResponse) {
-        const assistantMessage: Message = { role: 'assistant', content: response.tutorResponse };
-        addDocumentNonBlocking(messagesCol, { ...assistantMessage, createdAt: serverTimestamp() });
-      } else {
-        throw new Error("Failed to get a response from the AI tutor.");
-      }
-    } catch (error) {
-      console.error(error);
-      const errorMessage: Message = { role: 'assistant', content: "I seem to be having trouble connecting. Please try again in a moment." };
-      addDocumentNonBlocking(messagesCol, { ...errorMessage, createdAt: serverTimestamp() });
-      toast({
-        variant: "destructive",
-        title: "Oh no! Something went wrong.",
-        description: "There was a problem with your request.",
-      });
-    } finally {
-      setIsLoading(false);
-      inputRef.current?.focus();
+    } else {
+        // This is an existing chat
+        await processMessage(currentChatId, currentInput);
     }
   };
 
