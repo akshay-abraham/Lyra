@@ -131,7 +131,9 @@ export function LoginForm() {
 
     if (passwordCorrect) {
         try {
-            await signInAnonymously(auth);
+            if (!auth.currentUser) {
+              await signInAnonymously(auth);
+            }
             // Store user info in session storage for display purposes
             sessionStorage.setItem('lyra-user-info', JSON.stringify({ name: data.name, role: data.role, grade: data.class }));
             toast({ title: 'Login Successful', description: `Welcome, ${data.name}! Let the learning begin!` });
@@ -220,12 +222,12 @@ export function LoginForm() {
                             render={({ field }) => (
                                 <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
                                 <FormLabel>Class</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                                     <FormControl>
                                     <SelectTrigger><SelectValue placeholder="Select your grade" /></SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        {k12Classes.map(c => <SelectItem key={c} value={parseInt(c.split(' ')[1])}>{c}</SelectItem>)}
+                                        {k12Classes.map(c => <SelectItem key={c} value={String(parseInt(c.split(' ')[1]))}>{c}</SelectItem>)}
                                     </SelectContent>
                                 </Select>
                                 <FormMessage />
@@ -309,4 +311,4 @@ export function LoginForm() {
   );
 }
 
-    
+  
