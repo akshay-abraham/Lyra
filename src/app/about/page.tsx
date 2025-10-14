@@ -53,14 +53,16 @@ export default function AboutPage() {
 
         </CardContent>
         <div className="bg-primary/5 p-6 text-center animate-fade-in border-t border-primary/10" style={{ animationDelay: '1.1s' }}>
-            <div className="flex justify-center items-center gap-4 text-sm text-muted-foreground mb-4">
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-4 text-sm text-muted-foreground mb-4">
                 <span>Copyright © 2025</span>
+                <span className="hidden sm:inline">•</span>
                 <span className="flex items-center gap-1.5"><Shield className="h-4 w-4" /> Apache 2.0</span>
-                <span className="font-semibold text-primary">Akshay Abraham</span>
+                <span className="hidden sm:inline">•</span>
+                <span>Created by <span className="font-semibold text-primary">Akshay Abraham</span></span>
             </div>
-            <Button asChild variant="outline">
-                <Link href="https://akshayabraham.vercel.app/" target="_blank" rel="noopener noreferrer">
-                Connect <ArrowRight className="ml-2 h-4 w-4" />
+            <Button asChild>
+                <Link href="https://akshayabraham.vercel.app/" target="_blank" rel="noopener noreferrer" className="group">
+                    Connect <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
             </Button>
         </div>
