@@ -38,7 +38,7 @@ export default function AboutPage() {
             This project is brought to you by:
           </p>
           <ul>
-            <li>Akshay Abraham</li>
+            <li><a href="https://akshayabraham.vercel.app/" target="_blank" rel="noopener noreferrer">Akshay K Rooben Abraham</a></li>
             <li>Andre Milan Ajith</li>
             <li>Ameena Fathima</li>
           </ul>

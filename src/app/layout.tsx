@@ -1,14 +1,14 @@
 import type { Metadata } from 'next';
-import { Inter, Poppins } from 'next/font/google';
+import { Inter, Sora } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { SidebarLayout } from '@/components/layout/sidebar-layout';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
-const poppins = Poppins({
+const sora = Sora({
   subsets: ['latin'],
   weight: ['400', '600', '700'],
-  variable: '--font-poppins',
+  variable: '--font-sora',
 });
 
 
@@ -26,7 +26,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className='dark'>
       <head>
       </head>
-      <body className={`${inter.variable} ${poppins.variable} font-body antialiased bg-background text-foreground`}>
+      <body className={`${inter.variable} ${sora.variable} font-body antialiased bg-background text-foreground`}>
         <SidebarLayout>
           {children}
         </SidebarLayout>
