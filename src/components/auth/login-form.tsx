@@ -306,9 +306,16 @@ export function LoginForm() {
                 </Button>
             </Link>
         </div>
+         <div className="mt-4 text-center text-xs text-muted-foreground animate-fade-in-up" style={{ animationDelay: '1.2s' }}>
+          <p>
+            By continuing, you agree to our{' '}
+            <Link href="/about" className="underline hover:text-primary">
+              Terms and Conditions
+            </Link>
+            .
+          </p>
+        </div>
       </CardContent>
     </Card>
   );
 }
-
-  
