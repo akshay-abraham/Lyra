@@ -28,6 +28,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useFirebase } from '@/firebase';
 import { signInAnonymously } from 'firebase/auth';
+import { TermsDialog } from './terms-dialog';
 
 const formSchema = z.object({
   school: z.string().min(1, 'Please select a school'),
@@ -52,6 +53,9 @@ export function LoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [descriptionIndex, setDescriptionIndex] = useState(0);
   const [typedName, setTypedName] = useState('');
+  const [showTerms, setShowTerms] = useState(false);
+  const [formData, setFormData] = useState<FormData | null>(null);
+
   const { auth } = useFirebase();
   const router = useRouter();
   const { toast } = useToast();
@@ -114,9 +118,17 @@ export function LoginForm() {
           form.setValue('name', typedName);
       }
   }, [typedName, showAddUser, form]);
+  
+  const handleLoginSubmit = (data: FormData) => {
+    setFormData(data);
+    setShowTerms(true);
+  };
+  
+  const proceedToLogin = async (data: FormData | null) => {
+    if (!data) return;
 
-  const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
+    setShowTerms(false);
     
     let passwordCorrect = false;
 
@@ -166,156 +178,176 @@ export function LoginForm() {
   const isFormValid = isGuest || (form.formState.isValid && (showAddUser ? typedName.length > 0 : true));
 
   return (
-    <Card className="w-full max-w-md shadow-2xl shadow-primary/10 bg-card/80 backdrop-blur-sm border-primary/20 animate-fade-in-up animate-colorful-border">
-      <CardHeader className="text-center">
-        <CardTitle className="font-headline text-3xl animate-fade-in-down gradient-text" style={{ animationDelay: '0.2s' }}>Welcome to Lyra</CardTitle>
-        <CardDescription key={descriptionIndex} className="animate-fade-in-down transition-all duration-500" style={{ animationDelay: '0.3s' }}>{cyclingDescriptions[descriptionIndex]}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="school"
-              render={({ field }) => (
-                <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-                  <FormLabel>School</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger><SelectValue placeholder="Select your school" /></SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {schools.map(school => <SelectItem key={school} value={school}>{school}</SelectItem>)}
-                       <SelectItem value="guest">Guest User (Full Access)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
+    <>
+      <TermsDialog 
+        isOpen={showTerms}
+        onAgree={() => proceedToLogin(formData)}
+        onCancel={() => setShowTerms(false)}
+      />
+      <Card className="w-full max-w-md shadow-2xl shadow-primary/10 bg-card/80 backdrop-blur-sm border-primary/20 animate-fade-in-up animate-colorful-border">
+        <CardHeader className="text-center">
+          <CardTitle className="font-headline text-3xl animate-fade-in-down gradient-text" style={{ animationDelay: '0.2s' }}>Welcome to Lyra</CardTitle>
+          <CardDescription key={descriptionIndex} className="animate-fade-in-down transition-all duration-500" style={{ animationDelay: '0.3s' }}>{cyclingDescriptions[descriptionIndex]}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleLoginSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="school"
+                render={({ field }) => (
+                  <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+                    <FormLabel>School</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger><SelectValue placeholder="Select your school" /></SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {schools.map(school => <SelectItem key={school} value={school}>{school}</SelectItem>)}
+                        <SelectItem value="guest">Guest User (Full Access)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {selectedSchool && selectedSchool !== 'guest' && (
+                  <>
+                      <FormField
+                      control={form.control}
+                      name="role"
+                      render={({ field }) => (
+                          <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+                          <FormLabel>I am a...</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                              <SelectTrigger><SelectValue placeholder="Select your role" /></SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                  <SelectItem value="student">Student</SelectItem>
+                                  <SelectItem value="teacher">Teacher</SelectItem>
+                              </SelectContent>
+                          </Select>
+                          <FormMessage />
+                          </FormItem>
+                      )}
+                      />
+                  
+                      {selectedRole === 'student' && (
+                          <FormField
+                              control={form.control}
+                              name="class"
+                              render={({ field }) => (
+                                  <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+                                  <FormLabel>Class</FormLabel>
+                                  <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
+                                      <FormControl>
+                                      <SelectTrigger><SelectValue placeholder="Select your grade" /></SelectTrigger>
+                                      </FormControl>
+                                      <SelectContent>
+                                          {k12Classes.map(c => <SelectItem key={c} value={String(parseInt(c.split(' ')[1]))}>{c}</SelectItem>)}
+                                      </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                  </FormItem>
+                              )}
+                          />
+                      )}
+
+                      {(selectedRole === 'student' || selectedRole === 'teacher') && availableNames.length > 0 && (
+                          <FormField
+                          control={form.control}
+                          name="name"
+                          render={({ field }) => (
+                              <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.7s' }}>
+                              <FormLabel>Name</FormLabel>
+                              <Select onValueChange={handleNameChange} value={field.value}>
+                                  <FormControl>
+                                  <SelectTrigger><SelectValue placeholder="Select your name" /></SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                      {availableNames.map(name => <SelectItem key={name} value={name}>{name}</SelectItem>)}
+                                      <SelectItem value="Other">My name is not on this list</SelectItem>
+                                  </SelectContent>
+                              </Select>
+                              <FormMessage />
+                              </FormItem>
+                          )}
+                          />
+                      )}
+
+                      {showAddUser && (
+                          <FormField
+                              control={form.control}
+                              name="name"
+                              render={({ field }) => (
+                                  <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
+                                      <FormLabel>Enter Your Full Name</FormLabel>
+                                      <FormControl>
+                                          <Input placeholder="e.g., Jane Doe" value={typedName} onChange={(e) => setTypedName(e.target.value)} />
+                                      </FormControl>
+                                      <FormMessage />
+                                  </FormItem>
+                              )}
+                          />
+                      )}
+                      
+                      { (selectedName || typedName) && selectedRole !== 'guest' && (
+                          <FormField
+                              control={form.control}
+                              name="password"
+                              render={({ field }) => (
+                                  <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.9s' }}>
+                                      <FormLabel>Password</FormLabel>
+                                      <FormControl>
+                                          <Input type="password" placeholder={selectedRole === 'teacher' ? 'Enter administrator password' : "Enter your provided password"} {...field} className={selectedRole === 'teacher' ? 'border-accent ring-accent focus-visible:ring-accent' : ''} />
+                                      </FormControl>
+                                      <FormMessage />
+                                  </FormItem>
+                              )}
+                          />
+                      )}
+                  </>
               )}
-            />
-            {selectedSchool && selectedSchool !== 'guest' && (
-                <>
-                    <FormField
-                    control={form.control}
-                    name="role"
-                    render={({ field }) => (
-                        <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
-                        <FormLabel>I am a...</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                            <SelectTrigger><SelectValue placeholder="Select your role" /></SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                <SelectItem value="student">Student</SelectItem>
-                                <SelectItem value="teacher">Teacher</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                    />
-                
-                    {selectedRole === 'student' && (
-                         <FormField
-                            control={form.control}
-                            name="class"
-                            render={({ field }) => (
-                                <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-                                <FormLabel>Class</FormLabel>
-                                <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
-                                    <FormControl>
-                                    <SelectTrigger><SelectValue placeholder="Select your grade" /></SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {k12Classes.map(c => <SelectItem key={c} value={String(parseInt(c.split(' ')[1]))}>{c}</SelectItem>)}
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    )}
 
-                    {(selectedRole === 'student' || selectedRole === 'teacher') && availableNames.length > 0 && (
-                        <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                            <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.7s' }}>
-                            <FormLabel>Name</FormLabel>
-                            <Select onValueChange={handleNameChange} value={field.value}>
-                                <FormControl>
-                                <SelectTrigger><SelectValue placeholder="Select your name" /></SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    {availableNames.map(name => <SelectItem key={name} value={name}>{name}</SelectItem>)}
-                                    <SelectItem value="Other">My name is not on this list</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                            </FormItem>
-                        )}
-                        />
-                    )}
-
-                    {showAddUser && (
-                        <FormField
-                            control={form.control}
-                            name="name"
-                            render={({ field }) => (
-                                <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
-                                    <FormLabel>Enter Your Full Name</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="e.g., Jane Doe" value={typedName} onChange={(e) => setTypedName(e.target.value)} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    )}
-                    
-                    { (selectedName || typedName) && selectedRole !== 'guest' && (
-                        <FormField
-                            control={form.control}
-                            name="password"
-                            render={({ field }) => (
-                                <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.9s' }}>
-                                    <FormLabel>Password</FormLabel>
-                                    <FormControl>
-                                        <Input type="password" placeholder={selectedRole === 'teacher' ? 'Enter administrator password' : "Enter your provided password"} {...field} className={selectedRole === 'teacher' ? 'border-accent ring-accent focus-visible:ring-accent' : ''} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    )}
-                </>
-            )}
-
-            <Button type="submit" className="w-full animate-fade-in-up" style={{ animationDelay: '1s' }} disabled={isSubmitting || !isFormValid}>
-              {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              Enter the Classroom <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </form>
-        </Form>
-        <div className="mt-6 text-center text-sm animate-fade-in-up" style={{ animationDelay: '1.1s' }}>
-            <p className="text-muted-foreground">Is your school not listed?</p>
-             <Link href="https://akshayabraham.vercel.app/" target="_blank" rel="noopener noreferrer">
-                <Button variant="link" className="text-primary group transition-all duration-300 ease-in-out hover:scale-105">
-                    <Contact className="mr-2 h-4 w-4"/> Let's get you set up!
-                </Button>
-            </Link>
-        </div>
-         <div className="mt-4 text-center text-xs text-muted-foreground animate-fade-in-up" style={{ animationDelay: '1.2s' }}>
-          <p>
-            By continuing, you agree to our{' '}
-            <Link href="/about" className="underline hover:text-primary">
-              Terms and Conditions
-            </Link>
-            .
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+              <Button type="submit" className="w-full animate-fade-in-up" style={{ animationDelay: '1s' }} disabled={isSubmitting || !isFormValid}>
+                {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                Enter the Classroom <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </form>
+          </Form>
+          <div className="mt-6 text-center text-sm animate-fade-in-up" style={{ animationDelay: '1.1s' }}>
+              <p className="text-muted-foreground">Is your school not listed?</p>
+              <Link href="https://akshayabraham.vercel.app/" target="_blank" rel="noopener noreferrer">
+                  <Button variant="link" className="text-primary group transition-all duration-300 ease-in-out hover:scale-105">
+                      <Contact className="mr-2 h-4 w-4"/> Let's get you set up!
+                  </Button>
+              </Link>
+          </div>
+          <div className="mt-4 text-center text-xs text-muted-foreground animate-fade-in-up" style={{ animationDelay: '1.2s' }}>
+            <p>
+              By continuing, you agree to our{' '}
+              <button onClick={() => {
+                  form.trigger().then(isValid => {
+                      if (isValid) {
+                          setFormData(form.getValues());
+                          setShowTerms(true);
+                      } else {
+                          toast({
+                              variant: "destructive",
+                              title: "Incomplete Form",
+                              description: "Please fill out all required fields before proceeding.",
+                          })
+                      }
+                  })
+              }} className="underline hover:text-primary">
+                Terms and Conditions
+              </button>
+              .
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </>
   );
 }
