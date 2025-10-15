@@ -1,7 +1,7 @@
 'use client';
 
 import { firebaseConfig } from '@/firebase/config';
-import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
+import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore'
 
@@ -29,7 +29,8 @@ export function initializeFirebase() {
   }
 
   // If already initialized, return the SDKs with the already initialized App
-  return getSdks(getApp());
+  const app = getApps()[0];
+  return getSdks(app);
 }
 
 export function getSdks(firebaseApp: FirebaseApp) {
