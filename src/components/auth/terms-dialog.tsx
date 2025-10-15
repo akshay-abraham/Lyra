@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -12,46 +12,27 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 
-const COUNTDOWN_SECONDS = 5;
-
 export function TermsDialog({ isOpen, onAgree, onCancel }: { isOpen: boolean, onAgree: () => void, onCancel: () => void }) {
   const [hasScrolledToEnd, setHasScrolledToEnd] = useState(false);
-  const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
-  const [isTimerActive, setIsTimerActive] = useState(false);
   
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const target = e.currentTarget;
-    // Check if the user is within a small threshold of the bottom
-    if (target.scrollHeight - target.scrollTop <= target.clientHeight + 1) {
+    // Check if the user has scrolled to the very bottom
+    if (target.scrollHeight - Math.ceil(target.scrollTop) === target.clientHeight) {
       if (!hasScrolledToEnd) {
         setHasScrolledToEnd(true);
-        setIsTimerActive(true);
       }
     }
   };
 
   useEffect(() => {
+    // Reset scroll state when the dialog opens
     if (isOpen) {
-      // Reset state when dialog opens
       setHasScrolledToEnd(false);
-      setIsTimerActive(false);
-      setCountdown(COUNTDOWN_SECONDS);
     }
   }, [isOpen]);
 
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isTimerActive && countdown > 0) {
-      timer = setTimeout(() => {
-        setCountdown(c => c - 1);
-      }, 1000);
-    } else if (countdown === 0) {
-        setIsTimerActive(false);
-    }
-    return () => clearTimeout(timer);
-  }, [isTimerActive, countdown]);
-
-  const isAgreeButtonDisabled = !hasScrolledToEnd || countdown > 0;
+  const isAgreeButtonDisabled = !hasScrolledToEnd;
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onCancel}>
@@ -93,10 +74,7 @@ export function TermsDialog({ isOpen, onAgree, onCancel }: { isOpen: boolean, on
         <AlertDialogFooter>
           <Button variant="outline" onClick={onCancel}>Cancel</Button>
           <Button onClick={onAgree} disabled={isAgreeButtonDisabled}>
-            {isAgreeButtonDisabled
-                ? `Agree ${hasScrolledToEnd && countdown > 0 ? `in ${countdown}s` : ''}`
-                : 'Agree & Continue'
-            }
+            {isAgreeButtonDisabled ? `Scroll to Agree` : 'Agree & Continue'}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
