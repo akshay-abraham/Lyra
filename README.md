@@ -1,11 +1,18 @@
 # 🪐 Lyra
 
-_A Centralized AI Backend with Pedagogical Guardrails_
+**Copyright © 2025 Akshay K. Rooben Abraham. All rights reserved.**
 
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Made with ❤️](https://img.shields.io/badge/Made%20with-%E2%9D%A4-red.svg)](#-credits)
-[![Backend Powered](https://img.shields.io/badge/Powered%20by-Node.js%20%7C%20Python-blue)](#%EF%B8%8F-v0-architecture)
-[![Frontend Partner](https://img.shields.io/badge/Frontend-Zia%21%E2%9C%94-brightgreen)](https://github.com/akshay-abraham/zia)
+This software and all associated materials, including but not limited to the codebase, design, architecture, content, and branding of “Lyra”, are proprietary intellectual property owned by Akshay K. Rooben Abraham.
+
+Unauthorized reproduction, distribution, modification, or deployment of this system, in whole or in part, is strictly prohibited.
+
+Usage of Lyra is limited to verified and registered educational institutions with explicit written authorization.
+Any other usage — including installations, trials, demonstrations, or derivative works — must be approved in writing by the author.
+
+Violators will be subject to legal action under applicable intellectual property and cyber laws.
+
+For licensing and partnership inquiries, please contact:
+📧 akshayroobenabraham@gmail.com
 
 ---
 
@@ -195,15 +202,6 @@ We are drafting a **long-form expansion** on future directions (multi-agent tuto
 
 ---
 
-## 🤝 Credits
-
-- **Akshay Abraham** → [Portfolio](http://akshayabraham.vercel.app/)
-- **Andre Milan Ajith**
-- **Ameena Fathima**
-
----
-
 ## 🌐 Connected Projects
 
 - Frontend Partner: [Zia (React Web App)](https://github.com/akshay-abraham/zia)
-

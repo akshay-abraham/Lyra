@@ -1,10 +1,10 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Logo } from '@/components/layout/logo';
 import { BookOpen, BrainCircuit, Database, Languages, ArrowRight, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { SidebarLayout } from '@/components/layout/sidebar-layout';
+import Image from 'next/image';
 
 export default function AboutPage() {
   return (
@@ -13,7 +13,7 @@ export default function AboutPage() {
         <Card className="overflow-hidden shadow-2xl shadow-primary/10 bg-card/80 backdrop-blur-sm border-primary/20">
           <CardHeader className="text-center bg-primary/5 p-10 animate-fade-in-down" style={{ animationDelay: '0.2s' }}>
             <div className="flex justify-center items-center mb-4 animate-scale-in" style={{ animationDelay: '0.3s' }}>
-              <Logo />
+                <Image src="/logo.webp" alt="Lyra AI Tutor Logo" width={80} height={80} />
             </div>
             <CardTitle className="font-headline text-5xl">Lyra</CardTitle>
             <p className="text-muted-foreground text-lg">An Ethical AI Tutor, Customizable by Teachers</p>
@@ -57,16 +57,12 @@ export default function AboutPage() {
           </CardContent>
           <div className="bg-primary/5 p-6 text-center animate-fade-in border-t border-primary/10" style={{ animationDelay: '1.1s' }}>
               <div className="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-4 text-sm text-muted-foreground mb-4">
-                  <span>Copyright © 2025</span>
-                  <span className="hidden sm:inline">•</span>
-                  <span className="flex items-center gap-1.5"><Shield className="h-4 w-4" /> Apache 2.0</span>
-                  <span className="hidden sm:inline">•</span>
-                  <span>Created by <span className="font-semibold text-primary">Akshay Abraham</span></span>
+                  <span className="flex items-center gap-1.5"><Shield className="h-4 w-4" /> Copyright © 2025 Akshay K. Rooben Abraham. All rights reserved.</span>
               </div>
               <Button asChild className="group transition-all duration-300 ease-in-out hover:scale-105">
-                  <Link href="https://akshayabraham.vercel.app/" target="_blank" rel="noopener noreferrer">
-                      Connect <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </Link>
+                  <a href="mailto:akshayroobenabraham@gmail.com">
+                      Contact for Licensing <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </a>
               </Button>
           </div>
         </Card>
