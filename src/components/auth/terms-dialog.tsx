@@ -18,7 +18,7 @@ export function TermsDialog({ isOpen, onAgree, onCancel }: { isOpen: boolean, on
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const target = e.currentTarget;
     // Check if the user has scrolled to the very bottom
-    if (target.scrollHeight - Math.ceil(target.scrollTop) === target.clientHeight) {
+    if (target.scrollHeight - Math.ceil(target.scrollTop) <= target.clientHeight) {
       if (!hasScrolledToEnd) {
         setHasScrolledToEnd(true);
       }
