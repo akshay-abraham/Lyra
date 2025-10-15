@@ -1,6 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, BrainCircuit, Database, Languages, ArrowRight, Shield } from 'lucide-react';
+import { BookOpen, BrainCircuit, Database, Languages, ArrowRight, Shield, Scale } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { SidebarLayout } from '@/components/layout/sidebar-layout';
@@ -54,8 +54,30 @@ export default function AboutPage() {
               </p>
             </div>
 
+            <Card className="bg-card/80 backdrop-blur-sm border-accent/20 animate-fade-in-up" style={{ animationDelay: '1.2s' }}>
+              <CardHeader className="flex flex-row items-center gap-4">
+                <Scale className="h-8 w-8 text-accent"/>
+                <CardTitle className="font-headline text-2xl">Proprietary License</CardTitle>
+              </CardHeader>
+              <CardContent className="prose prose-sm max-w-none dark:prose-invert">
+                <p>
+                  This software and all associated materials, including but not limited to the codebase, design, architecture, content, and branding of “Lyra”, are proprietary intellectual property owned by Akshay K. Rooben Abraham.
+                </p>
+                <p>
+                  <strong>Unauthorized reproduction, distribution, modification, or deployment of this system, in whole or in part, is strictly prohibited.</strong>
+                </p>
+                <p>
+                  Usage of Lyra is limited to verified and registered educational institutions with explicit written authorization.
+                  Any other usage — including installations, trials, demonstrations, or derivative works — must be approved in writing by the author.
+                </p>
+                <p>
+                  Violators will be subject to legal action under applicable intellectual property and cyber laws.
+                </p>
+              </CardContent>
+            </Card>
+
           </CardContent>
-          <div className="bg-primary/5 p-6 text-center animate-fade-in border-t border-primary/10" style={{ animationDelay: '1.1s' }}>
+          <div className="bg-primary/5 p-6 text-center animate-fade-in border-t border-primary/10" style={{ animationDelay: '1.3s' }}>
               <div className="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-4 text-sm text-muted-foreground mb-4">
                   <span className="flex items-center gap-1.5"><Shield className="h-4 w-4" /> Copyright © 2025 Akshay K. Rooben Abraham. All rights reserved.</span>
               </div>
