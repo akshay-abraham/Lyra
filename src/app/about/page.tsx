@@ -61,6 +61,9 @@ export default function AboutPage() {
               </CardHeader>
               <CardContent className="prose prose-sm max-w-none dark:prose-invert">
                 <p>
+                  <strong>Copyright © 2025 Akshay K. Rooben Abraham. All rights reserved.</strong>
+                </p>
+                <p>
                   This software and all associated materials, including but not limited to the codebase, design, architecture, content, and branding of “Lyra”, are proprietary intellectual property owned by Akshay K. Rooben Abraham.
                 </p>
                 <p>
@@ -73,6 +76,9 @@ export default function AboutPage() {
                 <p>
                   Violators will be subject to legal action under applicable intellectual property and cyber laws.
                 </p>
+                <p>
+                  For licensing and partnership inquiries, please contact: 📧 akshayroobenabraham@gmail.com
+                </p>
               </CardContent>
             </Card>
 
@@ -82,7 +88,7 @@ export default function AboutPage() {
                   <span className="flex items-center gap-1.5"><Shield className="h-4 w-4" /> Copyright © 2025 Akshay K. Rooben Abraham. All rights reserved.</span>
               </div>
               <Button asChild className="group transition-all duration-300 ease-in-out hover:scale-105">
-                  <a href="mailto:akshayroobenabraham@gmail.com">
+                  <a href="https://akshayabraham.vercel.app/" target="_blank" rel="noopener noreferrer">
                       Contact for Licensing <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </a>
               </Button>
