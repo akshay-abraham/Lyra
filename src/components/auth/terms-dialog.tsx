@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -13,37 +13,16 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 
 export function TermsDialog({ isOpen, onAgree, onCancel }: { isOpen: boolean, onAgree: () => void, onCancel: () => void }) {
-  const [hasScrolledToEnd, setHasScrolledToEnd] = useState(false);
-  
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const target = e.currentTarget;
-    // Check if the user has scrolled to the very bottom
-    if (target.scrollHeight - Math.ceil(target.scrollTop) <= target.clientHeight) {
-      if (!hasScrolledToEnd) {
-        setHasScrolledToEnd(true);
-      }
-    }
-  };
-
-  useEffect(() => {
-    // Reset scroll state when the dialog opens
-    if (isOpen) {
-      setHasScrolledToEnd(false);
-    }
-  }, [isOpen]);
-
-  const isAgreeButtonDisabled = !hasScrolledToEnd;
-
   return (
     <AlertDialog open={isOpen} onOpenChange={onCancel}>
       <AlertDialogContent className="max-w-2xl">
         <AlertDialogHeader>
           <AlertDialogTitle className="font-headline">Terms and Conditions</AlertDialogTitle>
           <AlertDialogDescription>
-            Please read the following terms carefully and scroll to the bottom to proceed.
+            Please read the following terms carefully before proceeding. By clicking "Agree & Continue," you are bound by these terms.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <ScrollArea className="h-96 w-full rounded-md border p-4" onScroll={handleScroll}>
+        <ScrollArea className="h-96 w-full rounded-md border p-4">
             <div className="prose prose-sm dark:prose-invert max-w-none">
               <h3 className="font-bold">Proprietary License & Copyright Notice</h3>
               <p><strong>Copyright © 2025 Akshay K. Rooben Abraham. All rights reserved.</strong></p>
@@ -73,8 +52,8 @@ export function TermsDialog({ isOpen, onAgree, onCancel }: { isOpen: boolean, on
         </ScrollArea>
         <AlertDialogFooter>
           <Button variant="outline" onClick={onCancel}>Cancel</Button>
-          <Button onClick={onAgree} disabled={isAgreeButtonDisabled}>
-            {isAgreeButtonDisabled ? `Scroll to Agree` : 'Agree & Continue'}
+          <Button onClick={onAgree}>
+            Agree & Continue
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
