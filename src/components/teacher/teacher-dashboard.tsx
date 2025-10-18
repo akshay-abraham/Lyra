@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -19,7 +20,6 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from "@/hooks/use-toast";
-import { customizeAiTeachingStyle } from '@/ai/flows/customize-ai-teaching-style';
 import { generateGuidedResponse } from '@/ai/flows/guide-ai-response-generation';
 import { Bot, Loader2, Sparkles, Wand2, X, BrainCircuit, BookCopy } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -27,8 +27,11 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RagManagement } from './rag-management';
+import { useFirebase, useUser } from '@/firebase';
+import { collection, query, where, getDocs, setDoc, doc } from 'firebase/firestore';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
-const formSchema = z.object({
+const settingsSchema = z.object({
   systemPrompt: z.string().min(10, {
     message: 'System prompt must be at least 10 characters.',
   }),
@@ -47,10 +50,16 @@ export function TeacherDashboard() {
   const [isSaving, setIsSaving] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
   const [testResult, setTestResult] = useState('');
-  const { toast } = useToast();
+  const [subjects, setSubjects] = useState<string[]>([]);
+  const [selectedSubject, setSelectedSubject] = useState<string>('');
+  const [isLoadingSettings, setIsLoadingSettings] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const { toast } = useToast();
+  const { firestore } = useFirebase();
+  const { user } = useUser();
+
+  const form = useForm<z.infer<typeof settingsSchema>>({
+    resolver: zodResolver(settingsSchema),
     defaultValues: {
       systemPrompt: defaultSystemPrompt,
       exampleAnswers: [{ value: 'Instead of solving it for you, can you tell me what you\'ve tried so far?' }],
@@ -69,17 +78,69 @@ export function TeacherDashboard() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  useEffect(() => {
+    async function fetchTeacherSubjects() {
+      if (user && firestore) {
+        const userDocRef = doc(firestore, 'users', user.uid);
+        const userDocSnap = await getDocs(query(collection(firestore, 'users'), where('uid', '==', user.uid)));
+        if (!userDocSnap.empty) {
+          const teacherData = userDocSnap.docs[0].data();
+          if (teacherData.subjectsTaught) {
+            setSubjects(teacherData.subjectsTaught);
+            if (teacherData.subjectsTaught.length > 0) {
+              setSelectedSubject(teacherData.subjectsTaught[0]);
+            }
+          }
+        }
+      }
+    }
+    fetchTeacherSubjects();
+  }, [user, firestore]);
+
+  useEffect(() => {
+    async function loadSettings() {
+      if (selectedSubject && user && firestore) {
+        setIsLoadingSettings(true);
+        const settingsQuery = query(
+          collection(firestore, 'teacherSettings'),
+          where('teacherId', '==', user.uid),
+          where('subject', '==', selectedSubject),
+        );
+        const settingsSnapshot = await getDocs(settingsQuery);
+        if (!settingsSnapshot.empty) {
+          const settings = settingsSnapshot.docs[0].data();
+          form.reset({
+            systemPrompt: settings.systemPrompt,
+            exampleAnswers: settings.exampleAnswers.map((e: string) => ({ value: e })),
+          });
+        } else {
+          form.reset({
+            systemPrompt: defaultSystemPrompt,
+            exampleAnswers: [{ value: 'Instead of solving it for you, can you tell me what you\'ve tried so far?' }],
+          });
+        }
+        setIsLoadingSettings(false);
+      }
+    }
+    loadSettings();
+  }, [selectedSubject, user, firestore, form]);
+
+
+  async function onSubmit(values: z.infer<typeof settingsSchema>) {
+    if (!selectedSubject || !user || !firestore) return;
     setIsSaving(true);
     try {
-      const result = await customizeAiTeachingStyle({
-          systemPrompt: values.systemPrompt,
-          exampleGoodAnswers: values.exampleAnswers?.map(e => e.value).join('\n---\n')
-      });
-      console.log('Customization saved:', result);
+        const settingsId = `${user.uid}_${selectedSubject.replace(/\s+/g, '-')}`;
+        await setDoc(doc(firestore, 'teacherSettings', settingsId), {
+            teacherId: user.uid,
+            subject: selectedSubject,
+            systemPrompt: values.systemPrompt,
+            exampleAnswers: values.exampleAnswers.map(e => e.value),
+        });
+
       toast({
         title: "Settings Saved",
-        description: "Your AI tutor customizations have been successfully saved.",
+        description: `Your customizations for ${selectedSubject} have been successfully saved.`,
       });
     } catch(error) {
         console.error(error);
@@ -133,13 +194,27 @@ export function TeacherDashboard() {
           </TabsList>
           
           <TabsContent value="style">
+            <div className="mb-6 animate-fade-in-up">
+              <FormLabel>Select Subject to Customize</FormLabel>
+              <Select onValueChange={setSelectedSubject} value={selectedSubject}>
+                  <SelectTrigger className="w-full md:w-1/3 mt-2">
+                      <SelectValue placeholder="Select a subject..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                      {subjects.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                  </SelectContent>
+              </Select>
+            </div>
+          {isLoadingSettings ? (
+            <div className="flex justify-center items-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>
+          ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start animate-fade-in-up">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 lg:col-span-2">
                         <Card className="bg-card/80 backdrop-blur-sm border-primary/20 shadow-lg animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
                             <CardHeader>
-                                <CardTitle className="font-headline text-2xl flex items-center gap-2"><Wand2 /> AI Personality</CardTitle>
-                                <CardDescription>This is where you tell the AI how to act. Think of it as setting the classroom rules!</CardDescription>
+                                <CardTitle className="font-headline text-2xl flex items-center gap-2"><Wand2 /> AI Personality for {selectedSubject}</CardTitle>
+                                <CardDescription>This is where you tell the AI how to act for this subject. Think of it as setting the classroom rules!</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <FormField
@@ -164,7 +239,7 @@ export function TeacherDashboard() {
                         <Card className="bg-card/80 backdrop-blur-sm border-primary/20 shadow-lg animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
                             <CardHeader>
                                 <CardTitle className="font-headline text-2xl flex items-center gap-2"><Sparkles /> Answer Examples</CardTitle>
-                                <CardDescription>Show the AI what a good response looks like. It learns from your examples.</CardDescription>
+                                <CardDescription>Show the AI what a good response looks like for {selectedSubject}. It learns from your examples.</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-4">
@@ -205,9 +280,9 @@ export function TeacherDashboard() {
                             </CardContent>
                         </Card>
                         
-                        <Button type="submit" disabled={isSaving} size="lg" className="animate-fade-in-up group transition-all duration-300 ease-in-out hover:scale-105" style={{ animationDelay: '0.4s' }}>
-                            {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                            Save Customizations
+                        <Button type="submit" disabled={isSaving || !selectedSubject} size="lg" className="animate-fade-in-up group transition-all duration-300 ease-in-out hover:scale-105" style={{ animationDelay: '0.4s' }}>
+                            {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <BookCopy className="mr-2 h-4 w-4" />}
+                            Save for {selectedSubject}
                         </Button>
                     </form>
                 </Form>
@@ -216,7 +291,7 @@ export function TeacherDashboard() {
                     <Card className="bg-card/80 backdrop-blur-sm border-accent/20 shadow-lg animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
                         <CardHeader>
                             <CardTitle className="font-headline text-2xl">Test Your AI</CardTitle>
-                            <CardDescription>See how the AI will respond with your current settings.</CardDescription>
+                            <CardDescription>See how the AI will respond with your current settings for {selectedSubject}.</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <Form {...testForm}>
@@ -234,7 +309,7 @@ export function TeacherDashboard() {
                                             </FormItem>
                                         )}
                                     />
-                                    <Button type="submit" disabled={isTesting} className="w-full">
+                                    <Button type="submit" disabled={isTesting || !selectedSubject} className="w-full">
                                         {isTesting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                                         Run Test
                                     </Button>
@@ -258,6 +333,7 @@ export function TeacherDashboard() {
                     </Card>
                 </div>
             </div>
+            )}
           </TabsContent>
           
           <TabsContent value="rag">
@@ -267,3 +343,4 @@ export function TeacherDashboard() {
     </div>
   );
 }
+

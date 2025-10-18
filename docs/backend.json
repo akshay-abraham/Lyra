@@ -25,12 +25,26 @@
           "description": "The user's role in the application.",
           "enum": ["student", "teacher"]
         },
-        "grade": {
+        "school": {
+            "type": "string",
+            "description": "The school the user belongs to."
+        },
+        "class": {
           "type": "string",
-          "description": "The grade level of the student (optional)."
+          "description": "The class of the student."
+        },
+        "classesTaught": {
+          "type": "array",
+          "description": "The classes taught by the teacher.",
+          "items": { "type": "string" }
+        },
+        "subjectsTaught": {
+            "type": "array",
+            "description": "The subjects taught by the teacher.",
+            "items": { "type": "string" }
         }
       },
-      "required": ["uid", "name", "email", "role"]
+      "required": ["uid", "name", "email", "role", "school"]
     },
     "Prompt": {
       "$schema": "http://json-schema.org/draft-07/schema#",
@@ -78,6 +92,34 @@
         "guidanceLevel",
         "userId"
       ]
+    },
+    "TeacherSettings": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Teacher Settings",
+      "description": "Stores AI customization settings for a teacher, organized by subject.",
+      "type": "object",
+      "properties": {
+        "teacherId": {
+          "type": "string",
+          "description": "The UID of the teacher these settings belong to."
+        },
+        "subject": {
+          "type": "string",
+          "description": "The subject these settings apply to (e.g., 'Maths', 'Physics')."
+        },
+        "systemPrompt": {
+          "type": "string",
+          "description": "The custom system prompt defined by the teacher for this subject."
+        },
+        "exampleAnswers": {
+          "type": "array",
+          "description": "A list of good answer examples for few-shot prompting.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["teacherId", "subject", "systemPrompt"]
     }
   },
   "auth": {
@@ -101,6 +143,14 @@
               "description": "The Firebase Auth UID of the user."
             }
           ]
+        }
+      },
+      {
+        "path": "/teacherSettings/{settingsId}",
+        "definition": {
+            "entityName": "TeacherSettings",
+            "schema": { "$ref": "#/backend/entities/TeacherSettings"},
+            "description": "Stores customized AI settings for each subject, managed by teachers. The document ID can be a composite key like {teacherId}_{subject} for easy lookup."
         }
       },
       {

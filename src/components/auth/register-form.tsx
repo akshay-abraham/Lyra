@@ -29,17 +29,40 @@ import { useRouter } from 'next/navigation';
 import { useFirebase } from '@/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { MultiSelect } from '@/components/ui/multi-select';
+import { allSubjects, allClasses } from '@/lib/subjects-data';
+
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   role: z.enum(['student', 'teacher']),
-  grade: z.string().optional(),
-}).refine(data => data.role === 'teacher' || !!data.grade, {
-    message: 'Please select a grade',
-    path: ['grade'],
-});
+  school: z.string().min(1, 'Please select a school'),
+  // Student fields
+  class: z.string().optional(),
+  // Teacher fields
+  classesTaught: z.array(z.string()).optional(),
+  subjectsTaught: z.array(z.string()).optional(),
+})
+.refine(data => {
+    if (data.role === 'student') {
+        return !!data.class;
+    }
+    return true;
+}, { message: 'Please select a class', path: ['class'] })
+.refine(data => {
+    if (data.role === 'teacher') {
+        return data.classesTaught && data.classesTaught.length > 0;
+    }
+    return true;
+}, { message: 'Please select at least one class', path: ['classesTaught'] })
+.refine(data => {
+    if (data.role === 'teacher') {
+        return data.subjectsTaught && data.subjectsTaught.length > 0;
+    }
+    return true;
+}, { message: 'Please select at least one subject', path: ['subjectsTaught'] });
 
 
 export function RegisterForm() {
@@ -55,7 +78,10 @@ export function RegisterForm() {
       email: '',
       password: '',
       role: 'student',
-      grade: '',
+      school: 'Girideepam Bethany Central School',
+      class: '',
+      classesTaught: [],
+      subjectsTaught: [],
     },
   });
   
@@ -68,16 +94,25 @@ export function RegisterForm() {
         const user = userCredential.user;
 
         if (user) {
-            await setDoc(doc(firestore, 'users', user.uid), {
+            const userProfileData: any = {
                 uid: user.uid,
                 name: data.name,
                 email: data.email,
                 role: data.role,
-                grade: data.role === 'student' ? data.grade : null,
+                school: data.school,
                 createdAt: serverTimestamp(),
-            });
+            };
 
-            sessionStorage.setItem('lyra-user-info', JSON.stringify({ name: data.name, role: data.role, grade: data.grade }));
+            if (data.role === 'student') {
+                userProfileData.class = data.class;
+            } else {
+                userProfileData.classesTaught = data.classesTaught;
+                userProfileData.subjectsTaught = data.subjectsTaught;
+            }
+            
+            await setDoc(doc(firestore, 'users', user.uid), userProfileData);
+            
+            sessionStorage.setItem('lyra-user-info', JSON.stringify(userProfileData));
 
             toast({
                 title: 'Registration Successful',
@@ -106,10 +141,12 @@ export function RegisterForm() {
     }
   };
 
-  const k12Classes = Array.from({ length: 12 }, (_, i) => `Grade ${i + 1}`);
+  const schoolOptions = ["Girideepam Bethany Central School"];
+  const classOptions = allClasses.map(c => c.name);
+  const subjectOptions = allSubjects.map(s => s.name);
 
   return (
-      <Card className="w-full max-w-md shadow-2xl shadow-primary/10 bg-card/80 backdrop-blur-sm border-primary/20 animate-fade-in-up">
+      <Card className="w-full max-w-lg shadow-2xl shadow-primary/10 bg-card/80 backdrop-blur-sm border-primary/20 animate-fade-in-up">
         <CardHeader className="text-center">
           <CardTitle className="font-headline text-3xl animate-fade-in-down gradient-text" style={{ animationDelay: '0.2s' }}>Create Your Lyra Account</CardTitle>
           <CardDescription className="animate-fade-in-down" style={{ animationDelay: '0.3s' }}>Join the future of AI-powered education.</CardDescription>
@@ -158,6 +195,25 @@ export function RegisterForm() {
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="school"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>School</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                        <SelectTrigger><SelectValue placeholder="Select your school" /></SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                            {schoolOptions.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             
               <FormField
                 control={form.control}
@@ -182,22 +238,59 @@ export function RegisterForm() {
               {selectedRole === 'student' && (
                   <FormField
                       control={form.control}
-                      name="grade"
+                      name="class"
                       render={({ field }) => (
                           <FormItem>
-                          <FormLabel>Grade</FormLabel>
+                          <FormLabel>Class</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                               <FormControl>
-                              <SelectTrigger><SelectValue placeholder="Select your grade" /></SelectTrigger>
+                              <SelectTrigger><SelectValue placeholder="Select your class" /></SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                  {k12Classes.map(c => <SelectItem key={c} value={String(parseInt(c.split(' ')[1]))}>{c}</SelectItem>)}
+                                  {classOptions.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                               </SelectContent>
                           </Select>
                           <FormMessage />
                           </FormItem>
                       )}
                   />
+              )}
+
+              {selectedRole === 'teacher' && (
+                <>
+                    <FormField
+                        control={form.control}
+                        name="classesTaught"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Classes Taught</FormLabel>
+                                <MultiSelect
+                                    options={classOptions.map(c => ({ label: c, value: c }))}
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value || []}
+                                    placeholder="Select classes..."
+                                />
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="subjectsTaught"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Subjects Taught</FormLabel>
+                                <MultiSelect
+                                    options={subjectOptions.map(s => ({ label: s, value: s }))}
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value || []}
+                                    placeholder="Select subjects..."
+                                />
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </>
               )}
 
               <Button type="submit" className="w-full" disabled={isSubmitting}>
