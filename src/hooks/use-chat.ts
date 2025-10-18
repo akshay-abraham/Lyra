@@ -59,12 +59,16 @@ export function useChat(chatId: string | null) {
   const { data: chatSession } = useDoc<ChatSession>(chatSessionRef);
 
   const messagesQuery = useMemoFirebase(() => {
-    if (!user || !firestore || !chatId) return null;
+    // Ensure chatId is present before creating the query
+    if (!user || !firestore || !chatId) {
+      return null;
+    }
     return query(
       collection(firestore, 'users', user.uid, 'chatSessions', chatId, 'messages'),
       orderBy('createdAt', 'asc')
     );
   }, [user, firestore, chatId]);
+  
 
   const { data: messages, error: messagesError } = useCollection<Message>(messagesQuery);
     
@@ -220,5 +224,3 @@ export function useChat(chatId: string | null) {
 
   return { messages, sendMessage, isLoading, chatSubject: chatSession?.subject };
 }
-
-    
