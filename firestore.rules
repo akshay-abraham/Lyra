@@ -10,6 +10,8 @@
  * - /users/{userId}: Stores user profile information, with 'userId' matching the Firebase Auth UID.
  * - /teacherSettings/{settingsId}: Stores customized AI settings for teachers.
  * - /users/{userId}/prompts/{promptId}: Stores prompts created by teachers, nested under their user ID.
+ * - /users/{userId}/chatSessions/{sessionId}: Stores chat sessions for each user.
+ * - /users/{userId}/chatSessions/{sessionId}/messages/{messageId}: Stores messages within chat sessions.
  *
  * Key Security Decisions:
  * - User listing is disallowed.
@@ -48,6 +50,34 @@ service cloud.firestore {
       allow create: if isOwner(userId) && request.resource.data.uid == userId;
       allow update: if isExistingOwner(userId) && resource.data.uid == userId;
       allow delete: if isExistingOwner(userId);
+
+      /**
+       * @description Secure chat sessions. Only the owning user can access their chat sessions.
+       * @path /users/{userId}/chatSessions/{sessionId}
+       * @allow (get, list, create, update, delete) if the request is made by the user with matching UID.
+       * @principle Enforces document ownership for all operations.
+       */
+      match /chatSessions/{sessionId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isExistingOwner(userId) && resource.data.userId == userId;
+        allow delete: if isExistingOwner(userId);
+
+        /**
+         * @description Secure messages within chat sessions. Only the owning user can access their messages.
+         * @path /users/{userId}/chatSessions/{sessionId}/messages/{messageId}
+         * @allow (get, list, create, update, delete) if the request is made by the user with matching UID.
+         * @principle Enforces document ownership for all operations.
+         */
+        match /messages/{messageId} {
+          allow get: if isOwner(userId);
+          allow list: if isOwner(userId);
+          allow create: if isOwner(userId);
+          allow update: if isOwner(userId);
+          allow delete: if isOwner(userId);
+        }
+      }
     }
 
     /**
