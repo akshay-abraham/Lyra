@@ -13,7 +13,6 @@ import {
   getDoc,
   getDocs,
   where,
-  limit
 } from 'firebase/firestore';
 import { useFirebase, useUser, useMemoFirebase } from '@/firebase';
 import { useCollection } from '@/firebase/firestore/use-collection';
@@ -42,6 +41,7 @@ interface UserProfile {
     role: 'student' | 'teacher';
     class?: string;
     school?: string;
+    subjectsTaught?: string[];
 }
 
 export function useChat(chatId: string | null) {
@@ -59,7 +59,6 @@ export function useChat(chatId: string | null) {
   const { data: chatSession } = useDoc<ChatSession>(chatSessionRef);
 
   const messagesQuery = useMemoFirebase(() => {
-    // Ensure chatId is present before creating the query
     if (!user || !firestore || !chatId) {
       return null;
     }
@@ -87,31 +86,35 @@ export function useChat(chatId: string | null) {
       if (!firestore || !studentProfile.class || !studentProfile.school) return null;
 
       try {
-        // Find teachers in the same school who teach the student's class and the selected subject
         const teachersQuery = query(
             collection(firestore, 'users'),
             where('role', '==', 'teacher'),
             where('school', '==', studentProfile.school),
-            where('classesTaught', 'array-contains', studentProfile.class),
-            where('subjectsTaught', 'array-contains', subject),
-            limit(1)
+            where('classesTaught', 'array-contains', studentProfile.class)
         );
         
-        const teacherSnapshot = await getDocs(teachersQuery);
+        const teachersSnapshot = await getDocs(teachersQuery);
         
-        if (teacherSnapshot.empty) {
-            console.log(`No teacher found for class "${studentProfile.class}" and subject "${subject}"`);
+        if (teachersSnapshot.empty) {
+            console.log(`No teachers found for class "${studentProfile.class}"`);
             return null;
         }
 
-        const teacher = teacherSnapshot.docs[0];
-        const teacherId = teacher.id;
+        const teacherDoc = teachersSnapshot.docs.find(doc => {
+            const teacherData = doc.data() as UserProfile;
+            return teacherData.subjectsTaught?.includes(subject);
+        });
 
-        // Fetch the settings for that teacher and subject
+        if (!teacherDoc) {
+             console.log(`No teacher found for class "${studentProfile.class}" who teaches subject "${subject}"`);
+             return null;
+        }
+        
+        const teacherId = teacherDoc.id;
+
         const settingsId = `${teacherId}_${subject.replace(/\s+/g, '-')}`;
         const settingsDocRef = doc(firestore, 'teacherSettings', settingsId);
         const settingsSnapshot = await getDoc(settingsDocRef);
-
 
         if (!settingsSnapshot.exists()) {
              console.log(`No settings found for teacher "${teacherId}" and subject "${subject}"`);
@@ -139,7 +142,6 @@ export function useChat(chatId: string | null) {
     let finalSubject = subject;
 
     try {
-      // If this is an existing chat, the subject is already known
       if(chatSession?.subject) {
           finalSubject = chatSession.subject;
       }
@@ -150,7 +152,6 @@ export function useChat(chatId: string | null) {
           return;
       }
       
-      // If this is a new chat, create it first
       if (!currentChatId) {
         const titleResponse = await generateChatTitle({ firstMessage: content });
         const newTitle = titleResponse.title || 'New Chat';
@@ -172,11 +173,9 @@ export function useChat(chatId: string | null) {
       
       const messagesCol = collection(firestore, 'users', user.uid, 'chatSessions', currentChatId, 'messages');
 
-      // Add user message
       const userMessage: Message = { role: 'user', content };
       addDocumentNonBlocking(messagesCol, { ...userMessage, createdAt: serverTimestamp() });
 
-      // Fetch student profile and teacher settings
       const userDocRef = doc(firestore, 'users', user.uid);
       const userDoc = await getDoc(userDocRef);
 
@@ -188,7 +187,6 @@ export function useChat(chatId: string | null) {
           }
       }
 
-      // Get AI response
       const response = await generateAITutorResponse({ 
           problemStatement: content,
           systemPrompt: teacherSettings?.systemPrompt,
@@ -198,7 +196,6 @@ export function useChat(chatId: string | null) {
         throw new Error("Failed to get a response from the AI tutor.");
       }
       
-      // Add AI message
       const assistantMessage: Message = { role: 'assistant', content: response.tutorResponse };
       addDocumentNonBlocking(messagesCol, { ...assistantMessage, createdAt: serverTimestamp() });
 

@@ -3,96 +3,107 @@
  *
  * Core Philosophy:
  * This ruleset enforces a strict user-ownership model for user profiles and teacher-created prompts,
- * ensuring that only the authenticated user can access or modify their own data. Teacher settings are also
- * protected with ownership checks.  The rules are designed to prevent unauthorized data access and maintain
- * data integrity.
+ * ensuring that only the authenticated user can access their own data. Data managed by teachers
+ * (prompts, settings) are stored under their user ID.
  *
  * Data Structure:
- * - /users/{userId}: Stores user profiles, with each document ID matching the Firebase Auth UID.
- * - /teacherSettings/{settingsId}: Stores teacher-specific AI settings, with document IDs potentially
- *   containing composite keys (e.g., {teacherId}_{subject}).
+ * - /users/{userId}: Stores user profile information, with 'userId' matching the Firebase Auth UID.
+ * - /teacherSettings/{settingsId}: Stores teacher-specific AI settings, document id can be composite key like {teacherId}_{subject}.
  * - /users/{userId}/prompts/{promptId}: Stores prompts created by teachers, nested under their user ID.
  *
  * Key Security Decisions:
- * - User profiles are strictly private; listing all user profiles is disallowed.
- * - Teacher settings are secured by teacher ID
- * - Prompts are owned by the teacher who created them and are stored under the teacher's user ID.
- * - Denormalization is used to improve rule performance and prevent unauthorized access.
+ * - User profiles can only be created by the user themselves (self-creation) and updated only by the owner.
+ * - Prompts can only be created, read, updated, or deleted by the teacher who owns them.
+ * - Listing all users is disallowed.
+ * - Read and Write Permissions for teacher settings are restricted to the corresponding teacher.
+ *
+ * Denormalization for Authorization:
+ * - Prompts store the `userId` of the creating teacher directly within the document. This eliminates the need for
+ *   expensive `get()` calls to a parent `/users/{userId}` document to verify ownership.
+ *
+ * Structural Segregation:
+ * - Prompts are stored as a subcollection under `/users/{userId}`.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Controls access to user profile documents.
-     * @path /users/{userId}
-     * @allow (create) User with UID 'aCm4Q76PrGOSmWsTr1XJHrjbBRP2' can create their own profile.
-     * @allow (get, update, delete) User with UID 'aCm4Q76PrGOSmWsTr1XJHrjbBRP2' can read, update, and delete their own profile.
-     * @deny (create) User with UID 'anotherUser' cannot create a profile with ID 'aCm4Q76PrGOSmWsTr1XJHrjbBRP2'.
-     * @deny (get, update, delete) User with UID 'anotherUser' cannot read, update, or delete the profile with ID 'aCm4Q76PrGOSmWsTr1XJHrjbBRP2'.
-     * @principle Enforces document ownership for writes and restricts access to a user's own data tree.
+     * @description Protects all documents, and sets root-level constraints.
+     * @path /databases/{database}/documents
+     * @allow (get, list) if false - No general reads allowed at the root level.
+     * @allow (create, update, delete) if false - No general writes allowed at the root level.
+     * @principle Prevents broad, unauthenticated access.
      */
-    match /users/{userId} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
-
-      function isOwner(userId) {
-        return request.auth.uid == userId;
-      }
-
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
-
-      allow get: if isSignedIn() && isOwner(userId);
+    match /{document=**} {
+      allow get: if false;
       allow list: if false;
-      allow create: if isSignedIn() && isOwner(userId);
-      allow update: if isSignedIn() && isOwner(userId);
-      allow delete: if isSignedIn() && isOwner(userId);
-
-        match /prompts/{promptId} {
-          allow get: if isSignedIn() && isOwner(userId);
-          allow list: if isSignedIn() && isOwner(userId);
-          allow create: if isSignedIn() && isOwner(userId);
-          allow update: if isSignedIn() && isOwner(userId);
-          allow delete: if isSignedIn() && isOwner(userId);
-        }
-
-        match /chatSessions/{chatSessionId} {
-          allow get: if isSignedIn() && isOwner(userId);
-          allow list: if isSignedIn() && isOwner(userId);
-          allow create: if isSignedIn() && isOwner(userId);
-          allow update: if isSignedIn() && isOwner(userId);
-          allow delete: if isSignedIn() && isOwner(userId);
-        }
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
-      /**
-       * @description Controls access to teacher settings documents.
-       * @path /teacherSettings/{settingsId}
-       * @allow (create, update, delete) Teacher with UID 'aCm4Q76PrGOSmWsTr1XJHrjbBRP2' can create, update, and delete their own settings.
-       * @allow (get, list) Any authenticated user can read teacher settings.
-       * @deny (create, update, delete) User with UID 'anotherUser' cannot create, update, or delete settings for teacher 'aCm4Q76PrGOSmWsTr1XJHrjbBRP2'.
-       * @principle Enforces document ownership for writes, allows public reads.
-       */
-      match /teacherSettings/{settingsId} {
-        function isSignedIn() {
-          return request.auth != null;
-        }
+    /**
+     * @description Manages access to user profiles.  Allows a user to create their own profile, and only the owner can read or modify it.
+     * @path /users/{userId}
+     * @allow (create) if isSignedIn() && request.auth.uid == userId - Allows a user to create their own profile.
+     * @allow (get, update, delete) if isOwner(userId) - Allows the owner to read, update, and delete their profile.
+     * @deny (create) if isSignedIn() && request.auth.uid != userId - Denies creating a profile for another user.
+     * @deny (get, update, delete) if !isSignedIn() - Denies access to anonymous users.
+     * @principle Enforces document ownership.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
 
-        function isOwner() {
-          return request.auth.uid == resource.data.teacherId;
-        }
+    /**
+     * @description Manages access to teacher settings. Allows teachers to create, read, update, and delete their own settings.
+     * @path /teacherSettings/{settingsId}
+     * @allow (create) if isSignedIn() && request.auth.uid == request.resource.data.teacherId - Allows a teacher to create their own settings.
+     * @allow (get, update, delete) if isSignedIn() && request.auth.uid == resource.data.teacherId - Allows the owner to read, update, and delete their settings.
+     * @deny (create) if isSignedIn() && request.auth.uid != request.resource.data.teacherId - Denies creating settings for another teacher.
+     * @deny (get, update, delete) if !isSignedIn() - Denies access to anonymous users.
+     * @principle Enforces document ownership.
+     */
+    match /teacherSettings/{settingsId} {
+      allow get: if isSignedIn() && request.auth.uid == resource.data.teacherId;
+      allow list: if false;
+      allow create: if isSignedIn() && request.auth.uid == request.resource.data.teacherId;
+      allow update: if isSignedIn() && request.auth.uid == resource.data.teacherId && resource != null;
+      allow delete: if isSignedIn() && resource.data.teacherId == request.auth.uid && resource != null;
+    }
 
-        function isCreatingOwner() {
-          return request.auth.uid == request.resource.data.teacherId;
-        }
+    /**
+     * @description Manages access to prompts created by teachers. Only the teacher who created the prompt can access or modify it.
+     * @path /users/{userId}/prompts/{promptId}
+     * @allow (create) if isSignedIn() && request.auth.uid == userId && request.resource.data.userId == userId - Allows a teacher to create a prompt under their own user ID, validating the userId field.
+     * @allow (get, update, delete) if isExistingOwner(userId) && resource.data.userId == userId - Allows the owner to read, update, and delete their own prompts, validating the userId field.
+     * @deny (create) if isSignedIn() && request.auth.uid != userId - Denies creating a prompt under another user's ID.
+     * @principle Enforces document ownership.
+     */
+    match /users/{userId}/prompts/{promptId} {
+      allow get: if isOwner(userId) && resource.data.userId == userId;
+      allow list: if isOwner(userId);
+      allow create: if isSignedIn() && request.auth.uid == userId && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && resource.data.userId == userId;
+      allow delete: if isExistingOwner(userId) && resource.data.userId == userId;
+    }
 
-        allow get, list: if isSignedIn();
-        allow create: if isSignedIn() && isCreatingOwner();
-        allow update: if isSignedIn() && isOwner();
-        allow delete: if isSignedIn() && isOwner();
-      }
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+    }
   }
 }
