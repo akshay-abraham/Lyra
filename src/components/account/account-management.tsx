@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -18,9 +19,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Trash2, User, KeyRound, ShieldAlert } from 'lucide-react';
-import { useFirebase, useUser } from '@/firebase';
+import { useFirebase, useUser, errorEmitter, FirestorePermissionError } from '@/firebase';
 import { updateProfile, sendPasswordResetEmail, updateEmail } from 'firebase/auth';
-import { doc, updateDoc, writeBatch, collection, getDocs } from 'firebase/firestore';
+import { doc, updateDoc, writeBatch, collection, getDocs, query, where } from 'firebase/firestore';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -128,40 +129,34 @@ export function AccountManagement() {
     if (!user) return;
     setIsDeletingChat(true);
 
-    try {
-        const chatSessionsRef = collection(firestore, 'users', user.uid, 'chatSessions');
-        const batch = writeBatch(firestore);
-        const snapshot = await getDocs(chatSessionsRef);
+    const chatSessionsRef = collection(firestore, 'users', user.uid, 'chatSessions');
+    const snapshot = await getDocs(chatSessionsRef);
 
-        if (snapshot.empty) {
-            toast({ title: 'No chats to delete.'});
-            setIsDeletingChat(false);
-            return;
-        }
+    if (snapshot.empty) {
+        toast({ title: 'No chats to delete.'});
+        setIsDeletingChat(false);
+        return;
+    }
 
-        snapshot.forEach(doc => {
-            batch.delete(doc.ref);
-            // Note: This does not delete subcollections (messages). 
-            // For a full clean, a cloud function is better.
-            // This is a "soft" delete of the chat list for the user.
-        });
+    const batch = writeBatch(firestore);
+    snapshot.forEach(doc => {
+        batch.delete(doc.ref);
+    });
 
-        await batch.commit();
-
+    batch.commit().then(() => {
         toast({
             title: 'Chat History Deleted',
             description: 'Your chat sessions have been cleared.',
         });
-    } catch (error: any) {
-         console.error("Chat history deletion failed:", error);
-        toast({
-            variant: 'destructive',
-            title: 'Deletion Failed',
-            description: 'Could not delete your chat history. Please try again.',
+    }).catch(serverError => {
+        const permissionError = new FirestorePermissionError({
+            path: `users/${user.uid}/chatSessions`,
+            operation: 'delete',
         });
-    } finally {
+        errorEmitter.emit('permission-error', permissionError);
+    }).finally(() => {
         setIsDeletingChat(false);
-    }
+    });
   }
 
   return (
