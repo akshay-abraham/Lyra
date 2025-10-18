@@ -7,6 +7,7 @@ import * as z from 'zod';
 import {
     Form,
     FormControl,
+    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -30,14 +31,20 @@ import { useRouter } from 'next/navigation';
 import { useFirebase } from '@/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
-import { MultiSelect, type Option, type GroupedOption } from '@/components/ui/multi-select';
+import { MultiSelect, type GroupedOption } from '@/components/ui/multi-select';
 import { allClasses, getSubjectsForClasses, type ClassData } from '@/lib/subjects-data';
 
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z.string()
+    .min(8, 'Password must be at least 8 characters long.')
+    .regex(/[A-Z]/, 'Must contain at least one uppercase letter.')
+    .regex(/[a-z]/, 'Must contain at least one lowercase letter.')
+    .regex(/[0-9]/, 'Must contain at least one number.')
+    .regex(/[^A-Za-z0-9]/, 'Must contain at least one special character.'),
+  confirmPassword: z.string(),
   role: z.enum(['student', 'teacher']),
   school: z.string().min(1, 'Please select a school'),
   // Student fields
@@ -45,6 +52,10 @@ const formSchema = z.object({
   // Teacher fields
   classesTaught: z.array(z.string()).optional(),
   subjectsTaught: z.array(z.string()).optional(),
+})
+.refine(data => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
 })
 .refine(data => {
     if (data.role === 'student') {
@@ -80,6 +91,7 @@ export function RegisterForm() {
       name: '',
       email: '',
       password: '',
+      confirmPassword: '',
       role: 'student',
       school: 'Girideepam Bethany Central School',
       class: '',
@@ -217,6 +229,23 @@ export function RegisterForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                     <FormDescription>
+                        Password must be at least 8 characters and include an uppercase letter, a lowercase letter, a number, and a special character.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm Password</FormLabel>
                     <FormControl>
                       <Input type="password" placeholder="••••••••" {...field} />
                     </FormControl>
