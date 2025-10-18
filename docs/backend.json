@@ -1,5 +1,37 @@
+
 {
   "entities": {
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User Profile",
+      "type": "object",
+      "description": "Represents a user of the Lyra application, who can be either a student or a teacher.",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "The unique Firebase Authentication user ID."
+        },
+        "name": {
+          "type": "string",
+          "description": "The user's full name."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
+        },
+        "role": {
+          "type": "string",
+          "description": "The user's role in the application.",
+          "enum": ["student", "teacher"]
+        },
+        "grade": {
+          "type": "string",
+          "description": "The grade level of the student (optional)."
+        }
+      },
+      "required": ["uid", "name", "email", "role"]
+    },
     "Prompt": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Prompt",
@@ -33,9 +65,9 @@
             "type": "string"
           }
         },
-        "teacherId": {
+        "userId": {
           "type": "string",
-          "description": "Reference to Teacher. (Relationship: Teacher 1:N Prompt).  The teacher who created or customized the prompt."
+          "description": "Reference to the UserProfile. (Relationship: UserProfile 1:N Prompt). The user (teacher) who created or customized the prompt."
         }
       },
       "required": [
@@ -44,71 +76,44 @@
         "userInstructions",
         "domain",
         "guidanceLevel",
-        "teacherId"
-      ]
-    },
-    "Teacher": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Teacher",
-      "type": "object",
-      "description": "Represents a teacher who can customize AI tutoring settings.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Teacher entity."
-        },
-        "name": {
-          "type": "string",
-          "description": "The teacher's name."
-        },
-        "email": {
-          "type": "string",
-          "description": "The teacher's email address.",
-          "format": "email"
-        }
-      },
-      "required": [
-        "id",
-        "name",
-        "email"
+        "userId"
       ]
     }
   },
   "auth": {
     "providers": [
-      "password",
-      "anonymous"
+      "password"
     ]
   },
   "firestore": {
     "structure": [
       {
-        "path": "/teachers/{teacherId}",
+        "path": "/users/{userId}",
         "definition": {
-          "entityName": "Teacher",
+          "entityName": "UserProfile",
           "schema": {
-            "$ref": "#/backend/entities/Teacher"
+            "$ref": "#/backend/entities/UserProfile"
           },
-          "description": "Stores teacher profiles.  Each teacher document is uniquely identified by their Firebase Auth UID.",
+          "description": "Stores user profiles. Each document is uniquely identified by the user's Firebase Auth UID.",
           "params": [
             {
-              "name": "teacherId",
-              "description": "The Firebase Auth UID of the teacher."
+              "name": "userId",
+              "description": "The Firebase Auth UID of the user."
             }
           ]
         }
       },
       {
-        "path": "/teachers/{teacherId}/prompts/{promptId}",
+        "path": "/users/{userId}/prompts/{promptId}",
         "definition": {
           "entityName": "Prompt",
           "schema": {
             "$ref": "#/backend/entities/Prompt"
           },
-          "description": "Stores prompts created by teachers. Includes denormalized 'teacherId' for authorization independence.",
+          "description": "Stores prompts created by teachers. Includes denormalized 'userId' for authorization independence.",
           "params": [
             {
-              "name": "teacherId",
+              "name": "userId",
               "description": "The Firebase Auth UID of the teacher who owns the prompt."
             },
             {

@@ -1,3 +1,4 @@
+
 import {
     BookOpen,
     Languages,
@@ -68,7 +69,7 @@ export type SubjectName = typeof allSubjects[number]['name'];
 
 
 export function getSubjectsForUser(role: string | null, grade: string | null): SubjectData[] {
-    if (role === 'teacher' || role === 'guest' || !grade) {
+    if (role === 'teacher' || !grade) {
         return allSubjects;
     }
 
@@ -79,5 +80,3 @@ export function getSubjectsForUser(role: string | null, grade: string | null): S
 
     return allSubjects.filter(subject => subject.grades.includes(gradeNumber));
 }
-
-    

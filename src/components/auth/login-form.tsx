@@ -1,3 +1,4 @@
+
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -11,31 +12,20 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { schools, teachersBySchool, studentsBySchool, SchoolName, teacherPassword, getStudentPassword } from '@/lib/school-data';
 import { Input } from '../ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowRight, Contact, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useFirebase } from '@/firebase';
-import { signInAnonymously } from 'firebase/auth';
-import { TermsDialog } from './terms-dialog';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
 const formSchema = z.object({
-  school: z.string().min(1, 'Please select a school'),
-  role: z.enum(['student', 'teacher', 'guest']),
-  class: z.string().optional(),
-  name: z.string().min(1, 'Please select your name'),
-  password: z.string().optional(),
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(1, 'Password is required'),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -48,145 +38,77 @@ const cyclingDescriptions = [
 ];
 
 export function LoginForm() {
-  const [availableNames, setAvailableNames] = useState<string[]>([]);
-  const [showAddUser, setShowAddUser] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [descriptionIndex, setDescriptionIndex] = useState(0);
-  const [typedName, setTypedName] = useState('');
-  const [showTerms, setShowTerms] = useState(false);
-  const [formData, setFormData] = useState<FormData | null>(null);
 
-  const { auth } = useFirebase();
+  const { auth, firestore } = useFirebase();
   const router = useRouter();
   const { toast } = useToast();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      school: '',
-      role: undefined,
-      class: '',
-      name: '',
+      email: '',
       password: '',
     },
   });
 
-  const selectedSchool = form.watch('school') as SchoolName;
-  const selectedRole = form.watch('role');
-  const selectedName = form.watch('name');
-
     useEffect(() => {
         const interval = setInterval(() => {
             setDescriptionIndex(prevIndex => (prevIndex + 1) % cyclingDescriptions.length);
-        }, 3000); // Change text every 3 seconds
+        }, 3000); 
 
         return () => clearInterval(interval);
     }, []);
 
-  useEffect(() => {
-    let currentNames: string[] = [];
-    if (selectedSchool === 'guest') {
-        form.setValue('role', 'guest');
-        form.setValue('name', 'Guest');
-    } else if (selectedSchool && selectedRole === 'teacher') {
-        currentNames = teachersBySchool[selectedSchool] || [];
-    } else if (selectedSchool && selectedRole === 'student') {
-        currentNames = studentsBySchool[selectedSchool] || [];
-    }
-    
-    setAvailableNames(currentNames);
-    
-    if (selectedSchool !== 'guest' && form.getValues('name') !== 'Other') {
-        form.setValue('name', '');
-    }
-
-    setShowAddUser(false);
-  }, [selectedSchool, selectedRole, form]);
-
-  const handleNameChange = (name: string) => {
-    form.setValue('name', name);
-    if (name === 'Other') {
-        setTypedName('');
-        setShowAddUser(true);
-    } else {
-        setShowAddUser(false);
-    }
-  };
-
-  useEffect(() => {
-      if (showAddUser) {
-          form.setValue('name', typedName);
-      }
-  }, [typedName, showAddUser, form]);
   
-  const handleLoginSubmit = (data: FormData) => {
-    setFormData(data);
-    setShowTerms(true);
-  };
-  
-  const proceedToLogin = async (data: FormData | null) => {
-    if (!data) return;
-
+  const handleLoginSubmit = async (data: FormData) => {
     setIsSubmitting(true);
-    setShowTerms(false);
     
-    let passwordCorrect = false;
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
+        const user = userCredential.user;
 
-    if (data.role === 'guest') {
-        passwordCorrect = true;
-    } else if (data.role === 'student' && data.name) {
-        const expectedPassword = getStudentPassword(data.name);
-        passwordCorrect = data.password === expectedPassword;
-    } else if (data.role === 'teacher') {
-        passwordCorrect = data.password === teacherPassword;
-    }
+        if (user) {
+            // Fetch user profile from Firestore
+            const userDocRef = doc(firestore, 'users', user.uid);
+            const userDoc = await getDoc(userDocRef);
 
-    if (passwordCorrect) {
-        try {
-            if (!auth.currentUser) {
-              await signInAnonymously(auth);
-            }
-            // Store user info in session storage for display purposes
-            sessionStorage.setItem('lyra-user-info', JSON.stringify({ name: data.name, role: data.role, grade: data.class }));
-            toast({ title: 'Login Successful', description: `Welcome, ${data.name}! Let the learning begin!` });
-            if (data.role === 'teacher') {
-                router.push('/teacher');
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                sessionStorage.setItem('lyra-user-info', JSON.stringify({ name: userData.name, role: userData.role, grade: userData.grade }));
+                
+                toast({ title: 'Login Successful', description: `Welcome back, ${userData.name}!` });
+                
+                if (userData.role === 'teacher') {
+                    router.push('/teacher');
+                } else {
+                    router.push('/');
+                }
             } else {
-                router.push('/');
+                 throw new Error("User profile not found.");
             }
-        } catch (error) {
-            console.error("Firebase anonymous sign-in failed:", error);
-            toast({
-                variant: 'destructive',
-                title: 'Authentication Failed',
-                description: 'Could not sign in. Please try again.',
-            });
         }
-    } else {
+    } catch (error: any) {
+        console.error("Firebase sign-in failed:", error);
+        let description = 'An unexpected error occurred. Please try again.';
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+            description = 'Invalid email or password. Please try again.';
+        }
         toast({
             variant: 'destructive',
             title: 'Login Failed',
-            description: 'The password you entered is incorrect.',
+            description: description,
         });
+    } finally {
+        setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
   };
 
-  const k12Classes = Array.from({ length: 12 }, (_, i) => `Grade ${i + 1}`);
-  const isGuest = selectedSchool === 'guest';
-  const isFormValid = isGuest || (form.formState.isValid && (showAddUser ? typedName.length > 0 : true));
-
   return (
-    <>
-      <TermsDialog 
-        isOpen={showTerms}
-        onAgree={() => proceedToLogin(formData)}
-        onCancel={() => setShowTerms(false)}
-      />
       <Card className="w-full max-w-md shadow-2xl shadow-primary/10 bg-card/80 backdrop-blur-sm border-primary/20 animate-fade-in-up animate-colorful-border">
         <CardHeader className="text-center">
-          <CardTitle className="font-headline text-3xl animate-fade-in-down gradient-text" style={{ animationDelay: '0.2s' }}>Welcome to Lyra</CardTitle>
+          <CardTitle className="font-headline text-3xl animate-fade-in-down gradient-text" style={{ animationDelay: '0.2s' }}>Welcome back to Lyra</CardTitle>
           <CardDescription key={descriptionIndex} className="animate-fade-in-down transition-all duration-500" style={{ animationDelay: '0.3s' }}>{cyclingDescriptions[descriptionIndex]}</CardDescription>
         </CardHeader>
         <CardContent>
@@ -194,160 +116,51 @@ export function LoginForm() {
             <form onSubmit={form.handleSubmit(handleLoginSubmit)} className="space-y-6">
               <FormField
                 control={form.control}
-                name="school"
+                name="email"
                 render={({ field }) => (
-                  <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-                    <FormLabel>School</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger><SelectValue placeholder="Select your school" /></SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {schools.map(school => <SelectItem key={school} value={school}>{school}</SelectItem>)}
-                        <SelectItem value="guest">Guest User (Full Access)</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="you@example.com" {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              {selectedSchool && selectedSchool !== 'guest' && (
-                  <>
-                      <FormField
-                      control={form.control}
-                      name="role"
-                      render={({ field }) => (
-                          <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
-                          <FormLabel>I am a...</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                              <SelectTrigger><SelectValue placeholder="Select your role" /></SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                  <SelectItem value="student">Student</SelectItem>
-                                  <SelectItem value="teacher">Teacher</SelectItem>
-                              </SelectContent>
-                          </Select>
-                          <FormMessage />
-                          </FormItem>
-                      )}
-                      />
-                  
-                      {selectedRole === 'student' && (
-                          <FormField
-                              control={form.control}
-                              name="class"
-                              render={({ field }) => (
-                                  <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-                                  <FormLabel>Class</FormLabel>
-                                  <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
-                                      <FormControl>
-                                      <SelectTrigger><SelectValue placeholder="Select your grade" /></SelectTrigger>
-                                      </FormControl>
-                                      <SelectContent>
-                                          {k12Classes.map(c => <SelectItem key={c} value={String(parseInt(c.split(' ')[1]))}>{c}</SelectItem>)}
-                                      </SelectContent>
-                                  </Select>
-                                  <FormMessage />
-                                  </FormItem>
-                              )}
-                          />
-                      )}
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                      {(selectedRole === 'student' || selectedRole === 'teacher') && availableNames.length > 0 && (
-                          <FormField
-                          control={form.control}
-                          name="name"
-                          render={({ field }) => (
-                              <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.7s' }}>
-                              <FormLabel>Name</FormLabel>
-                              <Select onValueChange={handleNameChange} value={field.value}>
-                                  <FormControl>
-                                  <SelectTrigger><SelectValue placeholder="Select your name" /></SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                      {availableNames.map(name => <SelectItem key={name} value={name}>{name}</SelectItem>)}
-                                      <SelectItem value="Other">My name is not on this list</SelectItem>
-                                  </SelectContent>
-                              </Select>
-                              <FormMessage />
-                              </FormItem>
-                          )}
-                          />
-                      )}
-
-                      {showAddUser && (
-                          <FormField
-                              control={form.control}
-                              name="name"
-                              render={({ field }) => (
-                                  <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
-                                      <FormLabel>Enter Your Full Name</FormLabel>
-                                      <FormControl>
-                                          <Input placeholder="e.g., Jane Doe" value={typedName} onChange={(e) => setTypedName(e.target.value)} />
-                                      </FormControl>
-                                      <FormMessage />
-                                  </FormItem>
-                              )}
-                          />
-                      )}
-                      
-                      { (selectedName || typedName) && selectedRole !== 'guest' && (
-                          <FormField
-                              control={form.control}
-                              name="password"
-                              render={({ field }) => (
-                                  <FormItem className="animate-fade-in-up" style={{ animationDelay: '0.9s' }}>
-                                      <FormLabel>Password</FormLabel>
-                                      <FormControl>
-                                          <Input type="password" placeholder={selectedRole === 'teacher' ? 'Enter administrator password' : "Enter your provided password"} {...field} className={selectedRole === 'teacher' ? 'border-accent ring-accent focus-visible:ring-accent' : ''} />
-                                      </FormControl>
-                                      <FormMessage />
-                                  </FormItem>
-                              )}
-                          />
-                      )}
-                  </>
-              )}
-
-              <Button type="submit" className="w-full animate-fade-in-up" style={{ animationDelay: '1s' }} disabled={isSubmitting || !isFormValid}>
+              <Button type="submit" className="w-full" disabled={isSubmitting || !form.formState.isValid}>
                 {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                Enter the Classroom <ArrowRight className="ml-2 h-4 w-4" />
+                Login <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </form>
           </Form>
-          <div className="mt-6 text-center text-sm animate-fade-in-up" style={{ animationDelay: '1.1s' }}>
-              <p className="text-muted-foreground">Is your school not listed?</p>
-              <Link href="https://akshayabraham.vercel.app/" target="_blank" rel="noopener noreferrer">
-                  <Button variant="link" className="text-primary group transition-all duration-300 ease-in-out hover:scale-105">
-                      <Contact className="mr-2 h-4 w-4"/> Let's get you set up!
+          <div className="mt-6 text-center text-sm">
+              <p className="text-muted-foreground">Don't have an account?</p>
+              <Link href="/register">
+                  <Button variant="link" className="text-primary">
+                      Create one here
                   </Button>
               </Link>
           </div>
           <div className="mt-4 text-center text-xs text-muted-foreground animate-fade-in-up" style={{ animationDelay: '1.2s' }}>
             <p>
-              By continuing, you agree to our{' '}
-              <button onClick={() => {
-                  form.trigger().then(isValid => {
-                      if (isValid) {
-                          setFormData(form.getValues());
-                          setShowTerms(true);
-                      } else {
-                          toast({
-                              variant: "destructive",
-                              title: "Incomplete Form",
-                              description: "Please fill out all required fields before proceeding.",
-                          })
-                      }
-                  })
-              }} className="underline hover:text-primary">
-                Terms and Conditions
-              </button>
-              .
+                By logging in, you agree to our Terms and Conditions.
             </p>
           </div>
         </CardContent>
       </Card>
-    </>
   );
 }

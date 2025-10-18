@@ -98,12 +98,17 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
   const chatAccentColor = currentSubject ? subjectColorMap.get(currentSubject) || 'hsl(var(--primary))' : 'hsl(var(--primary))';
 
   useEffect(() => {
-    const userInfoStr = sessionStorage.getItem('lyra-user-info');
-    if(userInfoStr) {
-      const userInfo = JSON.parse(userInfoStr);
-      setAvailableSubjects(getSubjectsForUser(userInfo.role, userInfo.grade));
-    } else {
-       setAvailableSubjects(getSubjectsForUser('guest', null));
+    try {
+        const userInfoStr = sessionStorage.getItem('lyra-user-info');
+        if(userInfoStr) {
+          const userInfo = JSON.parse(userInfoStr);
+          setAvailableSubjects(getSubjectsForUser(userInfo.role, userInfo.grade));
+        } else {
+           setAvailableSubjects(getSubjectsForUser(null, null));
+        }
+    } catch(e) {
+        // This might happen if sessionStorage is not available
+        setAvailableSubjects(getSubjectsForUser(null, null));
     }
   }, []);
 
@@ -131,9 +136,7 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
 
   useEffect(() => {
     if (isLoading) {
-      // Set initial loading text right away
       setLocalLoadingText(getLoadingText(currentSubject));
-      // Then cycle through more every few seconds
       const interval = setInterval(() => {
         setLocalLoadingText(getLoadingText(currentSubject));
       }, 2500);
