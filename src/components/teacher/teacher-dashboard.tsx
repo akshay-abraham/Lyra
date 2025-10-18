@@ -194,145 +194,146 @@ export function TeacherDashboard() {
           </TabsList>
           
           <TabsContent value="style">
-            <div className="mb-6 animate-fade-in-up">
-              <FormLabel>Select Subject to Customize</FormLabel>
-              <Select onValueChange={setSelectedSubject} value={selectedSubject}>
-                  <SelectTrigger className="w-full md:w-1/3 mt-2">
-                      <SelectValue placeholder="Select a subject..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                      {subjects.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                  </SelectContent>
-              </Select>
-            </div>
-          {isLoadingSettings ? (
-            <div className="flex justify-center items-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start animate-fade-in-up">
+            {isLoadingSettings ? (
+                <div className="flex justify-center items-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>
+            ) : (
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 lg:col-span-2">
-                        <Card className="bg-card/80 backdrop-blur-sm border-primary/20 shadow-lg animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                            <CardHeader>
-                                <CardTitle className="font-headline text-2xl flex items-center gap-2"><Wand2 /> AI Personality for {selectedSubject}</CardTitle>
-                                <CardDescription>This is where you tell the AI how to act for this subject. Think of it as setting the classroom rules!</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <FormField
-                                    control={form.control}
-                                    name="systemPrompt"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                        <FormLabel>System Prompt</FormLabel>
-                                        <FormControl>
-                                            <Textarea rows={8} placeholder="e.g., You are a friendly math tutor for 5th graders..." {...field} className="animate-glow"/>
-                                        </FormControl>
-                                        <FormDescription>
-                                            This sets the AI's personality, role, and rules. Be explicit. Markdown is supported.
-                                        </FormDescription>
-                                        <FormMessage />
-                                        </FormItem>
-                                    )}
-                                    />
-                            </CardContent>
-                        </Card>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start animate-fade-in-up">
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 lg:col-span-2">
+                            <div className="mb-6 animate-fade-in-up">
+                                <FormLabel>Select Subject to Customize</FormLabel>
+                                <Select onValueChange={setSelectedSubject} value={selectedSubject}>
+                                    <SelectTrigger className="w-full md:w-1/2 mt-2">
+                                        <SelectValue placeholder="Select a subject..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {subjects.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                            </div>
 
-                        <Card className="bg-card/80 backdrop-blur-sm border-primary/20 shadow-lg animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-                            <CardHeader>
-                                <CardTitle className="font-headline text-2xl flex items-center gap-2"><Sparkles /> Answer Examples</CardTitle>
-                                <CardDescription>Show the AI what a good response looks like for {selectedSubject}. It learns from your examples.</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="space-y-4">
-                                    <FormLabel>Example Good Answers</FormLabel>
-                                    <div className="space-y-2">
-                                        {fields.map((field, index) => (
-                                            <div key={field.id} className="flex items-center gap-2">
-                                                <FormField
-                                                    control={form.control}
-                                                    name={`exampleAnswers.${index}.value`}
-                                                    render={({ field }) => (
-                                                    <FormItem className="flex-grow">
+                            <Card className="bg-card/80 backdrop-blur-sm border-primary/20 shadow-lg animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+                                <CardHeader>
+                                    <CardTitle className="font-headline text-2xl flex items-center gap-2"><Wand2 /> AI Personality for {selectedSubject}</CardTitle>
+                                    <CardDescription>This is where you tell the AI how to act for this subject. Think of it as setting the classroom rules!</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <FormField
+                                        control={form.control}
+                                        name="systemPrompt"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                            <FormLabel>System Prompt</FormLabel>
+                                            <FormControl>
+                                                <Textarea rows={8} placeholder="e.g., You are a friendly math tutor for 5th graders..." {...field} className="animate-glow"/>
+                                            </FormControl>
+                                            <FormDescription>
+                                                This sets the AI's personality, role, and rules. Be explicit. Markdown is supported.
+                                            </FormDescription>
+                                            <FormMessage />
+                                            </FormItem>
+                                        )}
+                                        />
+                                </CardContent>
+                            </Card>
+
+                            <Card className="bg-card/80 backdrop-blur-sm border-primary/20 shadow-lg animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+                                <CardHeader>
+                                    <CardTitle className="font-headline text-2xl flex items-center gap-2"><Sparkles /> Answer Examples</CardTitle>
+                                    <CardDescription>Show the AI what a good response looks like for {selectedSubject}. It learns from your examples.</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="space-y-4">
+                                        <FormLabel>Example Good Answers</FormLabel>
+                                        <div className="space-y-2">
+                                            {fields.map((field, index) => (
+                                                <div key={field.id} className="flex items-center gap-2">
+                                                    <FormField
+                                                        control={form.control}
+                                                        name={`exampleAnswers.${index}.value`}
+                                                        render={({ field }) => (
+                                                        <FormItem className="flex-grow">
+                                                            <FormControl>
+                                                                <Input placeholder={`Example ${index + 1}`} {...field} />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                        )}
+                                                    />
+                                                    <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} aria-label="Remove example">
+                                                        <X className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => append({ value: '' })}
+                                        >
+                                            Add Example
+                                        </Button>
+                                        <FormDescription>
+                                            Show the AI what a good hint or guiding question looks like.
+                                        </FormDescription>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                            
+                            <Button type="submit" disabled={isSaving || !selectedSubject} size="lg" className="animate-fade-in-up group transition-all duration-300 ease-in-out hover:scale-105" style={{ animationDelay: '0.4s' }}>
+                                {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <BookCopy className="mr-2 h-4 w-4" />}
+                                Save for {selectedSubject}
+                            </Button>
+                        </form>
+                        
+                        <div className="space-y-6 lg:sticky lg:top-24">
+                            <Card className="bg-card/80 backdrop-blur-sm border-accent/20 shadow-lg animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+                                <CardHeader>
+                                    <CardTitle className="font-headline text-2xl">Test Your AI</CardTitle>
+                                    <CardDescription>See how the AI will respond with your current settings for {selectedSubject}.</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <Form {...testForm}>
+                                        <form onSubmit={testForm.handleSubmit(onTest)} className="space-y-4">
+                                            <FormField
+                                                control={testForm.control}
+                                                name="studentQuestion"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Student's Question</FormLabel>
                                                         <FormControl>
-                                                            <Input placeholder={`Example ${index + 1}`} {...field} />
+                                                            <Textarea placeholder="e.g., How do I solve for x in 2x + 5 = 15?" {...field} className="animate-glow" />
                                                         </FormControl>
                                                         <FormMessage />
                                                     </FormItem>
-                                                    )}
-                                                />
-                                                <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} aria-label="Remove example">
-                                                    <X className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => append({ value: '' })}
-                                    >
-                                        Add Example
-                                    </Button>
-                                    <FormDescription>
-                                        Show the AI what a good hint or guiding question looks like.
-                                    </FormDescription>
-                                </div>
-                            </CardContent>
-                        </Card>
-                        
-                        <Button type="submit" disabled={isSaving || !selectedSubject} size="lg" className="animate-fade-in-up group transition-all duration-300 ease-in-out hover:scale-105" style={{ animationDelay: '0.4s' }}>
-                            {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <BookCopy className="mr-2 h-4 w-4" />}
-                            Save for {selectedSubject}
-                        </Button>
-                    </form>
+                                                )}
+                                            />
+                                            <Button type="submit" disabled={isTesting || !selectedSubject} className="w-full">
+                                                {isTesting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                                                Run Test
+                                            </Button>
+                                        </form>
+                                    </Form>
+                                    { (isTesting || testResult) && <Separator className="my-6" />}
+                                    { testResult && (
+                                        <Alert>
+                                            <Bot className="h-4 w-4" />
+                                            <AlertTitle className="font-headline">AI Response</AlertTitle>
+                                            <AlertDescription>
+                                                <div className="prose-sm dark:prose-invert max-w-none whitespace-pre-wrap">
+                                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                                        {testResult}
+                                                    </ReactMarkdown>
+                                                </div>
+                                            </AlertDescription>
+                                        </Alert>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </div>
                 </Form>
-                
-                <div className="space-y-6 lg:sticky lg:top-24">
-                    <Card className="bg-card/80 backdrop-blur-sm border-accent/20 shadow-lg animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
-                        <CardHeader>
-                            <CardTitle className="font-headline text-2xl">Test Your AI</CardTitle>
-                            <CardDescription>See how the AI will respond with your current settings for {selectedSubject}.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <Form {...testForm}>
-                                <form onSubmit={testForm.handleSubmit(onTest)} className="space-y-4">
-                                    <FormField
-                                        control={testForm.control}
-                                        name="studentQuestion"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Student's Question</FormLabel>
-                                                <FormControl>
-                                                    <Textarea placeholder="e.g., How do I solve for x in 2x + 5 = 15?" {...field} className="animate-glow" />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <Button type="submit" disabled={isTesting || !selectedSubject} className="w-full">
-                                        {isTesting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                                        Run Test
-                                    </Button>
-                                </form>
-                            </Form>
-                            { (isTesting || testResult) && <Separator className="my-6" />}
-                            { testResult && (
-                                <Alert>
-                                    <Bot className="h-4 w-4" />
-                                    <AlertTitle className="font-headline">AI Response</AlertTitle>
-                                    <AlertDescription>
-                                        <div className="prose-sm dark:prose-invert max-w-none whitespace-pre-wrap">
-                                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                                {testResult}
-                                            </ReactMarkdown>
-                                        </div>
-                                    </AlertDescription>
-                                </Alert>
-                            )}
-                        </CardContent>
-                    </Card>
-                </div>
-            </div>
             )}
           </TabsContent>
           
