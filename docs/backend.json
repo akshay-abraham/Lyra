@@ -1,95 +1,124 @@
 {
   "entities": {
-    "User": {
-      "title": "User",
-      "description": "Represents a user of the Lyra application, identified by their Firebase Auth UID.",
+    "Prompt": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Prompt",
       "type": "object",
+      "description": "Represents a prompt used to guide the AI tutor.",
       "properties": {
-        "email": {
+        "id": {
           "type": "string",
-          "format": "email",
-          "description": "The user's email address."
+          "description": "Unique identifier for the Prompt entity."
+        },
+        "systemInstructions": {
+          "type": "string",
+          "description": "Instructions that define the AI's role (e.g., tutor, coding assistant)."
+        },
+        "userInstructions": {
+          "type": "string",
+          "description": "The actual question or problem from the student."
+        },
+        "domain": {
+          "type": "string",
+          "description": "The specific subject area (e.g., math, coding, essays)."
+        },
+        "guidanceLevel": {
+          "type": "string",
+          "description": "Defines the amount of guidance the AI gives (more hints, more direct explanations, etc.)."
+        },
+        "exampleAnswers": {
+          "type": "array",
+          "description": "Examples of good answers to guide the AI's response generation (few-shot prompting).",
+          "items": {
+            "type": "string"
+          }
+        },
+        "teacherId": {
+          "type": "string",
+          "description": "Reference to Teacher. (Relationship: Teacher 1:N Prompt).  The teacher who created or customized the prompt."
+        }
+      },
+      "required": [
+        "id",
+        "systemInstructions",
+        "userInstructions",
+        "domain",
+        "guidanceLevel",
+        "teacherId"
+      ]
+    },
+    "Teacher": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Teacher",
+      "type": "object",
+      "description": "Represents a teacher who can customize AI tutoring settings.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Teacher entity."
         },
         "name": {
           "type": "string",
-          "description": "The user's full name."
+          "description": "The teacher's name."
         },
-        "role": {
-            "type": "string",
-            "enum": ["student", "teacher"],
-            "description": "The role of the user."
-        },
-        "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "description": "The timestamp when the user profile was created."
+        "email": {
+          "type": "string",
+          "description": "The teacher's email address.",
+          "format": "email"
         }
       },
-      "required": ["email", "name", "role", "createdAt"]
-    },
-    "ChatSession": {
-      "title": "ChatSession",
-      "description": "Represents a single chat session between a student and the AI tutor.",
-      "type": "object",
-      "properties": {
-        "userId": {
-          "type": "string",
-          "description": "The UID of the user who owns this chat session."
-        },
-        "subject": {
-          "type": "string",
-          "description": "The subject of the chat session (e.g., Math, Coding)."
-        },
-        "title": {
-          "type": "string",
-          "description": "A short, AI-generated title for the chat session."
-        },
-        "startTime": {
-          "type": "string",
-          "format": "date-time",
-          "description": "The timestamp when the chat session started."
-        }
-      },
-      "required": ["userId", "subject", "title", "startTime"]
-    },
-    "Message": {
-        "title": "Message",
-        "description": "Represents a single message within a chat session.",
-        "type": "object",
-        "properties": {
-            "role": {
-                "type": "string",
-                "enum": ["user", "assistant"],
-                "description": "The role of the message sender."
-            },
-            "content": {
-                "type": "string",
-                "description": "The text content of the message."
-            },
-            "createdAt": {
-                "type": "string",
-                "format": "date-time",
-                "description": "The timestamp when the message was created."
-            }
-        },
-        "required": ["role", "content", "createdAt"]
+      "required": [
+        "id",
+        "name",
+        "email"
+      ]
     }
   },
   "auth": {
-    "providers": ["password", "anonymous"]
+    "providers": [
+      "password",
+      "anonymous"
+    ]
   },
   "firestore": {
-    "/users/{userId}": {
-        "schema": { "$ref": "#/entities/User" },
-        "description": "Stores public profile information for each user, keyed by their Firebase Auth UID."
-    },
-    "/users/{userId}/chatSessions/{chatSessionId}": {
-        "schema": { "$ref": "#/entities/ChatSession" },
-        "description": "Stores metadata for each chat session belonging to a user."
-    },
-    "/users/{userId}/chatSessions/{chatSessionId}/messages/{messageId}": {
-        "schema": { "$ref": "#/entities/Message" },
-        "description": "Stores all messages within a specific chat session."
-    }
+    "structure": [
+      {
+        "path": "/teachers/{teacherId}",
+        "definition": {
+          "entityName": "Teacher",
+          "schema": {
+            "$ref": "#/backend/entities/Teacher"
+          },
+          "description": "Stores teacher profiles.  Each teacher document is uniquely identified by their Firebase Auth UID.",
+          "params": [
+            {
+              "name": "teacherId",
+              "description": "The Firebase Auth UID of the teacher."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/teachers/{teacherId}/prompts/{promptId}",
+        "definition": {
+          "entityName": "Prompt",
+          "schema": {
+            "$ref": "#/backend/entities/Prompt"
+          },
+          "description": "Stores prompts created by teachers. Includes denormalized 'teacherId' for authorization independence.",
+          "params": [
+            {
+              "name": "teacherId",
+              "description": "The Firebase Auth UID of the teacher who owns the prompt."
+            },
+            {
+              "name": "promptId",
+              "description": "Unique identifier for the prompt."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to support the Lyra application, focusing on ethical AI tutoring. It prioritizes authorization independence and simplifies security rules using denormalization. The structure enables teachers to create and customize prompts that guide the AI's tutoring style. Since users log in with Firebase Authentication, all data will be secured by `request.auth.uid`. \n\nThe structure is segregated to ensure each collection has a homogeneous security posture.  Specifically, prompts are stored under the teacher's ID to ensure that prompts are isolated between teachers and that list operations are safe. This prevents unauthorized access and maintains data integrity.\n\nAuthorization Independence is achieved by storing the `teacherId` within the prompt document, eliminating the need for `get()` calls to verify ownership.\n\nQAPs are supported by the path-based ownership model for the prompts. Only the teacher associated with a prompt (via `teacherId`) can access or modify it."
   }
 }
