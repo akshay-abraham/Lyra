@@ -1,3 +1,4 @@
+
 import {
     BookOpen,
     Languages,
@@ -35,6 +36,37 @@ export type ClassData = {
     stream?: Stream;
 };
 
+// Function to convert number to Roman numeral for grades 1-12
+const toRoman = (num: number): string => {
+    const roman: { [key: string]: number } = { X: 10, IX: 9, V: 5, IV: 4, I: 1 };
+    let result = '';
+    if (num > 10) {
+        result += 'X' + toRoman(num - 10);
+    } else {
+        for (let key in roman) {
+            while (num >= roman[key]) {
+                result += key;
+                num -= roman[key];
+            }
+        }
+    }
+    return result;
+};
+
+const createClass = (grade: number, division: string, stream?: Stream): ClassData => {
+    const romanGrade = toRoman(grade);
+    const streamName = stream ? ` (${stream})` : '';
+    return {
+        name: `${romanGrade}-${division.toUpperCase()}${streamName}`,
+        grade,
+        stream,
+    };
+};
+
+const createClassesForGrade = (grade: number, divisions: string[]): ClassData[] => {
+    return divisions.map(div => createClass(grade, div));
+}
+
 export const allSubjects: SubjectData[] = [
     { name: 'English', icon: BookOpen, color: '#4A90E2' },
     { name: 'Malayalam', icon: PenTool, color: '#D0021B' },
@@ -65,26 +97,26 @@ export const allSubjects: SubjectData[] = [
 ];
 
 export const allClasses: ClassData[] = [
-    { name: '1a', grade: 1 }, { name: '1b', grade: 1 },
-    { name: '2a', grade: 2 }, { name: '2b', grade: 2 },
-    { name: '3a', grade: 3 }, { name: '3b', grade: 3 },
-    { name: '4a', grade: 4 }, { name: '4b', grade: 4 },
-    { name: '5a', grade: 5 }, { name: '5b', grade: 5 },
-    { name: '6a', grade: 6 }, { name: '6b', grade: 6 }, { name: '6c', grade: 6 },
-    { name: '7a', grade: 7 }, { name: '7b', grade: 7 }, { name: '7c', grade: 7 },
-    { name: '8a', grade: 8 }, { name: '8b', grade: 8 }, { name: '8c', grade: 8 },
-    { name: '9a', grade: 9 }, { name: '9b', grade: 9 }, { name: '9c', grade: 9 },
-    { name: '10a', grade: 10 }, { name: '10b', grade: 10 }, { name: '10c', grade: 10 },
-    { name: '11a (Bio-Maths)', grade: 11, stream: 'Bio-Maths' },
-    { name: '11b (CS)', grade: 11, stream: 'CS' },
-    { name: '11c (Bio-CS/Bio-IP)', grade: 11, stream: 'Bio-CS/Bio-IP' },
-    { name: '11D (Commerce)', grade: 11, stream: 'Commerce' },
-    { name: '11E (Humanities)', grade: 11, stream: 'Humanities' },
-    { name: '12a (Bio-Maths)', grade: 12, stream: 'Bio-Maths' },
-    { name: '12b (CS)', grade: 12, stream: 'CS' },
-    { name: '12c (Bio-CS/Bio-IP)', grade: 12, stream: 'Bio-CS/Bio-IP' },
-    { name: '12D (Commerce)', grade: 12, stream: 'Commerce' },
-    { name: '12E (Humanities)', grade: 12, stream: 'Humanities' },
+    ...createClassesForGrade(1, ['a', 'b']),
+    ...createClassesForGrade(2, ['a', 'b']),
+    ...createClassesForGrade(3, ['a', 'b']),
+    ...createClassesForGrade(4, ['a', 'b']),
+    ...createClassesForGrade(5, ['a', 'b']),
+    ...createClassesForGrade(6, ['a', 'b', 'c']),
+    ...createClassesForGrade(7, ['a', 'b', 'c']),
+    ...createClassesForGrade(8, ['a', 'b', 'c']),
+    ...createClassesForGrade(9, ['a', 'b', 'c']),
+    ...createClassesForGrade(10, ['a', 'b', 'c']),
+    createClass(11, 'a', 'Bio-Maths'),
+    createClass(11, 'b', 'CS'),
+    createClass(11, 'c', 'Bio-CS/Bio-IP'),
+    createClass(11, 'd', 'Commerce'),
+    createClass(11, 'e', 'Humanities'),
+    createClass(12, 'a', 'Bio-Maths'),
+    createClass(12, 'b', 'CS'),
+    createClass(12, 'c', 'Bio-CS/Bio-IP'),
+    createClass(12, 'd', 'Commerce'),
+    createClass(12, 'e', 'Humanities'),
 ];
 
 export const streamSubjects: Record<Stream, string[]> = {
@@ -92,7 +124,7 @@ export const streamSubjects: Record<Stream, string[]> = {
     'CS': ['Physics', 'Chemistry', 'Maths', 'Computer Science', 'English'],
     'Bio-CS/Bio-IP': ['Physics', 'Chemistry', 'Biology', 'Computer Science', 'Informatics Practices', 'English'],
     'Commerce': ['Business Studies', 'Accountancy', 'Economics', 'Maths', 'Computer Science', 'Informatics Practices', 'English'],
-    'Humanities': ['History', 'Economics', 'Political Science & Legal Studies', 'English'],
+    'Humanities': ['History', 'Economics', 'Political Science', 'Law Studies', 'English'],
 };
 
 export const gradeSubjects: Record<number, string[]> = {
@@ -110,7 +142,6 @@ export const gradeSubjects: Record<number, string[]> = {
 
 
 export type SubjectName = typeof allSubjects[number]['name'];
-
 
 export function getSubjectsForUser(role: string | null, className: string | null): SubjectData[] {
     if (role === 'teacher') {
@@ -137,3 +168,28 @@ export function getSubjectsForUser(role: string | null, className: string | null
 
     return allSubjects.filter(subject => subjectNames.includes(subject.name));
 }
+
+export function getSubjectsForClasses(classNames: string[]): SubjectData[] {
+    if (!classNames || classNames.length === 0) {
+        return [];
+    }
+
+    const subjectNameSet = new Set<string>();
+
+    classNames.forEach(className => {
+        const selectedClass = allClasses.find(c => c.name === className);
+        if (selectedClass) {
+            let subjects: string[] = [];
+            if (selectedClass.grade >= 11 && selectedClass.stream) {
+                subjects = streamSubjects[selectedClass.stream];
+            } else if (gradeSubjects[selectedClass.grade]) {
+                subjects = gradeSubjects[selectedClass.grade];
+            }
+            subjects.forEach(sub => subjectNameSet.add(sub));
+        }
+    });
+
+    return allSubjects.filter(subject => subjectNameSet.has(subject.name));
+}
+
+    

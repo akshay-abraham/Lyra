@@ -1,6 +1,6 @@
 
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -15,6 +15,7 @@ import {
 import {
     Select,
     SelectContent,
+    SelectGroup,
     SelectItem,
     SelectTrigger,
     SelectValue,
@@ -30,7 +31,7 @@ import { useFirebase } from '@/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { MultiSelect } from '@/components/ui/multi-select';
-import { allSubjects, allClasses } from '@/lib/subjects-data';
+import { allClasses, getSubjectsForClasses, type ClassData } from '@/lib/subjects-data';
 
 
 const formSchema = z.object({
@@ -67,6 +68,8 @@ const formSchema = z.object({
 
 export function RegisterForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [availableSubjects, setAvailableSubjects] = useState<string[]>([]);
+
   const { auth, firestore } = useFirebase();
   const router = useRouter();
   const { toast } = useToast();
@@ -86,6 +89,19 @@ export function RegisterForm() {
   });
   
   const selectedRole = form.watch('role');
+  const selectedClasses = form.watch('classesTaught');
+
+  useEffect(() => {
+    if (selectedRole === 'teacher' && selectedClasses && selectedClasses.length > 0) {
+      const subjects = getSubjectsForClasses(selectedClasses);
+      setAvailableSubjects(subjects.map(s => s.name));
+    } else {
+      setAvailableSubjects([]);
+    }
+    // Reset subjects taught if classes change
+    form.setValue('subjectsTaught', []);
+  }, [selectedClasses, selectedRole, form]);
+
 
   const handleRegisterSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
@@ -142,8 +158,16 @@ export function RegisterForm() {
   };
 
   const schoolOptions = ["Girideepam Bethany Central School"];
-  const classOptions = allClasses.map(c => c.name);
-  const subjectOptions = allSubjects.map(s => s.name);
+  
+  const groupedClasses = allClasses.reduce((acc, currentClass) => {
+    const grade = `Grade ${currentClass.grade}`;
+    if (!acc[grade]) {
+      acc[grade] = [];
+    }
+    acc[grade].push(currentClass);
+    return acc;
+  }, {} as Record<string, ClassData[]>);
+
 
   return (
       <Card className="w-full max-w-lg shadow-2xl shadow-primary/10 bg-card/80 backdrop-blur-sm border-primary/20 animate-fade-in-up">
@@ -247,7 +271,12 @@ export function RegisterForm() {
                               <SelectTrigger><SelectValue placeholder="Select your class" /></SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                  {classOptions.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                                {Object.entries(groupedClasses).map(([grade, classes]) => (
+                                    <SelectGroup key={grade}>
+                                        <FormLabel className='px-2 text-xs'>{grade}</FormLabel>
+                                        {classes.map(c => <SelectItem key={c.name} value={c.name}>{c.name}</SelectItem>)}
+                                    </SelectGroup>
+                                ))}
                               </SelectContent>
                           </Select>
                           <FormMessage />
@@ -265,7 +294,7 @@ export function RegisterForm() {
                             <FormItem>
                                 <FormLabel>Classes Taught</FormLabel>
                                 <MultiSelect
-                                    options={classOptions.map(c => ({ label: c, value: c }))}
+                                    options={allClasses.map(c => ({ label: c.name, value: c.name }))}
                                     onValueChange={field.onChange}
                                     defaultValue={field.value || []}
                                     placeholder="Select classes..."
@@ -274,22 +303,24 @@ export function RegisterForm() {
                             </FormItem>
                         )}
                     />
-                    <FormField
-                        control={form.control}
-                        name="subjectsTaught"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Subjects Taught</FormLabel>
-                                <MultiSelect
-                                    options={subjectOptions.map(s => ({ label: s, value: s }))}
-                                    onValueChange={field.onChange}
-                                    defaultValue={field.value || []}
-                                    placeholder="Select subjects..."
-                                />
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                    {availableSubjects.length > 0 && (
+                        <FormField
+                            control={form.control}
+                            name="subjectsTaught"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Subjects Taught</FormLabel>
+                                    <MultiSelect
+                                        options={availableSubjects.map(s => ({ label: s, value: s }))}
+                                        onValueChange={field.onChange}
+                                        defaultValue={field.value || []}
+                                        placeholder="Select subjects..."
+                                    />
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    )}
                 </>
               )}
 
@@ -311,3 +342,5 @@ export function RegisterForm() {
       </Card>
   );
 }
+
+    

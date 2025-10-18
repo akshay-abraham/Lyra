@@ -10,6 +10,7 @@ import {
   addDoc,
   serverTimestamp,
   doc,
+  getDoc,
   getDocs,
   where,
   limit
@@ -38,6 +39,7 @@ interface TeacherSettings {
 }
 
 interface UserProfile {
+    role: 'student' | 'teacher';
     class?: string;
     school?: string;
 }
@@ -102,21 +104,17 @@ export function useChat(chatId: string | null) {
         const teacherId = teacher.id;
 
         // Fetch the settings for that teacher and subject
-        const settingsQuery = query(
-            collection(firestore, 'teacherSettings'),
-            where('teacherId', '==', teacherId),
-            where('subject', '==', subject),
-            limit(1)
-        );
+        const settingsId = `${teacherId}_${subject.replace(/\s+/g, '-')}`;
+        const settingsDocRef = doc(firestore, 'teacherSettings', settingsId);
+        const settingsSnapshot = await getDoc(settingsDocRef);
 
-        const settingsSnapshot = await getDocs(settingsQuery);
 
-        if (settingsSnapshot.empty) {
+        if (!settingsSnapshot.exists()) {
              console.log(`No settings found for teacher "${teacherId}" and subject "${subject}"`);
             return null;
         }
         
-        return settingsSnapshot.docs[0].data() as TeacherSettings;
+        return settingsSnapshot.data() as TeacherSettings;
 
       } catch (error) {
           console.error("Error fetching teacher settings:", error);
@@ -172,17 +170,17 @@ export function useChat(chatId: string | null) {
 
       // Add user message
       const userMessage: Message = { role: 'user', content };
-      await addDocumentNonBlocking(messagesCol, { ...userMessage, createdAt: serverTimestamp() });
+      addDocumentNonBlocking(messagesCol, { ...userMessage, createdAt: serverTimestamp() });
 
       // Fetch student profile and teacher settings
       const userDocRef = doc(firestore, 'users', user.uid);
-      const userDoc = await getDocs(query(collection(firestore, 'users'), where('uid', '==', user.uid), limit(1)));
+      const userDoc = await getDoc(userDocRef);
 
       let teacherSettings: TeacherSettings | null = null;
-      if (!userDoc.empty) {
-          const studentProfile = userDoc.docs[0].data() as UserProfile;
-          if(studentProfile.role === 'student') {
-             teacherSettings = await getTeacherSettings(studentProfile, finalSubject);
+      if (userDoc.exists()) {
+          const userProfile = userDoc.data() as UserProfile;
+          if(userProfile.role === 'student') {
+             teacherSettings = await getTeacherSettings(userProfile, finalSubject);
           }
       }
 
@@ -198,7 +196,7 @@ export function useChat(chatId: string | null) {
       
       // Add AI message
       const assistantMessage: Message = { role: 'assistant', content: response.tutorResponse };
-      await addDocumentNonBlocking(messagesCol, { ...assistantMessage, createdAt: serverTimestamp() });
+      addDocumentNonBlocking(messagesCol, { ...assistantMessage, createdAt: serverTimestamp() });
 
     } catch (error) {
       console.error("Error sending message:", error);
@@ -207,7 +205,7 @@ export function useChat(chatId: string | null) {
       if (currentChatId) {
           const messagesCol = collection(firestore, 'users', user.uid, 'chatSessions', currentChatId, 'messages');
           const errorResponseMessage: Message = { role: 'assistant', content: errorMessage };
-          await addDocumentNonBlocking(messagesCol, { ...errorResponseMessage, createdAt: serverTimestamp() });
+          addDocumentNonBlocking(messagesCol, { ...errorResponseMessage, createdAt: serverTimestamp() });
       }
       
       toast({
@@ -222,3 +220,5 @@ export function useChat(chatId: string | null) {
 
   return { messages, sendMessage, isLoading, chatSubject: chatSession?.subject };
 }
+
+    
