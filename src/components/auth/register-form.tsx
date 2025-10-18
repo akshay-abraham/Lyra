@@ -33,6 +33,8 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { MultiSelect, type GroupedOption } from '@/components/ui/multi-select';
 import { allClasses, getSubjectsForClasses, type ClassData } from '@/lib/subjects-data';
+import { Progress } from '../ui/progress';
+import { cn } from '@/lib/utils';
 
 
 const formSchema = z.object({
@@ -80,6 +82,8 @@ const formSchema = z.object({
 export function RegisterForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [availableSubjects, setAvailableSubjects] = useState<string[]>([]);
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [strengthColor, setStrengthColor] = useState('bg-destructive');
 
   const { auth, firestore } = useFirebase();
   const router = useRouter();
@@ -98,10 +102,40 @@ export function RegisterForm() {
       classesTaught: [],
       subjectsTaught: [],
     },
+    mode: 'onChange'
   });
   
   const selectedRole = form.watch('role');
   const selectedClasses = form.watch('classesTaught');
+  const password = form.watch('password');
+
+  const calculatePasswordStrength = (password: string) => {
+    let score = 0;
+    if (!password) return 0;
+
+    // Award points for different criteria
+    if (password.length >= 8) score += 20;
+    if (password.match(/[a-z]/)) score += 20;
+    if (password.match(/[A-Z]/)) score += 20;
+    if (password.match(/[0-9]/)) score += 20;
+    if (password.match(/[^A-Za-z0-9]/)) score += 20;
+
+    return score;
+  };
+
+  useEffect(() => {
+    const strength = calculatePasswordStrength(password);
+    setPasswordStrength(strength);
+
+    if (strength < 40) {
+        setStrengthColor('bg-red-500');
+    } else if (strength < 80) {
+        setStrengthColor('bg-orange-500');
+    } else {
+        setStrengthColor('bg-green-500');
+    }
+  }, [password]);
+
 
   useEffect(() => {
     if (selectedRole === 'teacher' && selectedClasses && selectedClasses.length > 0) {
@@ -232,9 +266,14 @@ export function RegisterForm() {
                     <FormControl>
                       <Input type="password" placeholder="••••••••" {...field} />
                     </FormControl>
-                     <FormDescription>
-                        Password must be at least 8 characters and include an uppercase letter, a lowercase letter, a number, and a special character.
-                    </FormDescription>
+                    {password && (
+                        <div className="space-y-2 pt-1">
+                            <Progress value={passwordStrength} className="h-2" indicatorClassName={strengthColor} />
+                            <FormDescription>
+                                Password must be at least 8 characters and include an uppercase letter, a lowercase letter, a number, and a special character.
+                            </FormDescription>
+                        </div>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
