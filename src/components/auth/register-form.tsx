@@ -28,7 +28,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useFirebase } from '@/firebase';
+import { useFirebase, errorEmitter, FirestorePermissionError } from '@/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { MultiSelect, type GroupedOption } from '@/components/ui/multi-select';
@@ -174,7 +174,15 @@ export function RegisterForm() {
                 userProfileData.subjectsTaught = data.subjectsTaught;
             }
             
-            await setDoc(doc(firestore, 'users', user.uid), userProfileData);
+            const userDocRef = doc(firestore, 'users', user.uid);
+            setDoc(userDocRef, userProfileData).catch(serverError => {
+                const permissionError = new FirestorePermissionError({
+                    path: userDocRef.path,
+                    operation: 'create',
+                    requestResourceData: userProfileData,
+                });
+                errorEmitter.emit('permission-error', permissionError);
+            });
             
             sessionStorage.setItem('lyra-user-info', JSON.stringify(userProfileData));
 
@@ -428,3 +436,5 @@ export function RegisterForm() {
       </Card>
   );
 }
+
+    
