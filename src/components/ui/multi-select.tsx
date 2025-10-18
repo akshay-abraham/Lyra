@@ -1,11 +1,12 @@
 
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-import { X, ChevronDown } from "lucide-react";
+import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "./badge";
 import { Command, CommandGroup, CommandItem, CommandList } from "./command";
 import { Command as CommandPrimitive } from "cmdk";
+import { FormLabel } from "./form";
 
 export type Option = {
   value: string;
@@ -15,19 +16,38 @@ export type Option = {
   fixed?: boolean;
 };
 
-type MultiSelectProps = {
+export type GroupedOption = {
+  label: string;
   options: Option[];
+};
+
+
+type MultiSelectProps = {
+  options: (Option[] | GroupedOption[]);
   defaultValue?: string[];
   placeholder?: string;
   onValueChange: (value: string[]) => void;
+  isGrouped?: boolean;
 };
 
-export function MultiSelect({ options, defaultValue = [], placeholder = "Select...", onValueChange }: MultiSelectProps) {
+export function MultiSelect({ options, defaultValue = [], placeholder = "Select...", onValueChange, isGrouped = false }: MultiSelectProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
+  
+  const getOptionsFromValue = (value: string[], opts: (Option[] | GroupedOption[])) => {
+      let flatOptions: Option[] = [];
+      if (isGrouped) {
+          flatOptions = (opts as GroupedOption[]).flatMap(group => group.options);
+      } else {
+          flatOptions = opts as Option[];
+      }
+      return value.map(v => flatOptions.find(option => option.value === v)).filter(Boolean) as Option[];
+  }
+
   const [selected, setSelected] = useState<Option[]>(
-    defaultValue.map(value => options.find(option => option.value === value)).filter(Boolean) as Option[]
+    getOptionsFromValue(defaultValue, options)
   );
+  
   const [inputValue, setInputValue] = useState("");
 
   const handleUnselect = (option: Option) => {
@@ -37,10 +57,8 @@ export function MultiSelect({ options, defaultValue = [], placeholder = "Select.
   };
 
   useEffect(() => {
-    if (defaultValue.length > 0) {
-      setSelected(defaultValue.map(value => options.find(option => option.value === value)).filter(Boolean) as Option[]);
-    }
-  }, [defaultValue, options]);
+    setSelected(getOptionsFromValue(defaultValue, options));
+  }, [defaultValue, options, isGrouped]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     const input = inputRef.current;
@@ -59,7 +77,12 @@ export function MultiSelect({ options, defaultValue = [], placeholder = "Select.
     }
   };
 
-  const selectables = options.filter(option => !selected.some(s => s.value === option.value));
+  const getSelectables = () => {
+      const flatOptions = isGrouped ? (options as GroupedOption[]).flatMap(g => g.options) : (options as Option[]);
+      return flatOptions.filter(option => !selected.some(s => s.value === option.value));
+  }
+  
+  const selectables = getSelectables();
 
   return (
     <Command onKeyDown={handleKeyDown} className="overflow-visible bg-transparent">
@@ -103,26 +126,55 @@ export function MultiSelect({ options, defaultValue = [], placeholder = "Select.
         <CommandList>
           {open && selectables.length > 0 ? (
             <div className="absolute top-0 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
-              <CommandGroup className="h-full overflow-auto">
-                {selectables.map(option => (
-                  <CommandItem
-                    key={option.value}
-                    onMouseDown={e => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }}
-                    onSelect={() => {
-                      setInputValue("");
-                      const newSelected = [...selected, option];
-                      setSelected(newSelected);
-                      onValueChange(newSelected.map(s => s.value));
-                    }}
-                    className={"cursor-pointer"}
-                  >
-                    {option.label}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
+              {isGrouped ? (
+                (options as GroupedOption[]).map(group => {
+                    const filteredOptions = group.options.filter(option => !selected.some(s => s.value === option.value));
+                    if (filteredOptions.length === 0) return null;
+                    return (
+                        <CommandGroup key={group.label} heading={<FormLabel className="px-2 text-xs">{group.label}</FormLabel>}>
+                        {filteredOptions.map(option => (
+                            <CommandItem
+                            key={option.value}
+                            onMouseDown={e => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }}
+                            onSelect={() => {
+                                setInputValue("");
+                                const newSelected = [...selected, option];
+                                setSelected(newSelected);
+                                onValueChange(newSelected.map(s => s.value));
+                            }}
+                            className={"cursor-pointer"}
+                            >
+                            {option.label}
+                            </CommandItem>
+                        ))}
+                        </CommandGroup>
+                    )
+                })
+              ) : (
+                <CommandGroup className="h-full overflow-auto">
+                    {(options as Option[]).filter(option => !selected.some(s => s.value === option.value)).map(option => (
+                        <CommandItem
+                        key={option.value}
+                        onMouseDown={e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }}
+                        onSelect={() => {
+                            setInputValue("");
+                            const newSelected = [...selected, option];
+                            setSelected(newSelected);
+                            onValueChange(newSelected.map(s => s.value));
+                        }}
+                        className={"cursor-pointer"}
+                        >
+                        {option.label}
+                        </CommandItem>
+                    ))}
+                </CommandGroup>
+              )}
             </div>
           ) : null}
         </CommandList>
@@ -130,4 +182,3 @@ export function MultiSelect({ options, defaultValue = [], placeholder = "Select.
     </Command>
   );
 }
-

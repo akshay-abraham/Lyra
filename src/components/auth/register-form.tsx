@@ -30,7 +30,7 @@ import { useRouter } from 'next/navigation';
 import { useFirebase } from '@/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
-import { MultiSelect } from '@/components/ui/multi-select';
+import { MultiSelect, type Option, type GroupedOption } from '@/components/ui/multi-select';
 import { allClasses, getSubjectsForClasses, type ClassData } from '@/lib/subjects-data';
 
 
@@ -168,6 +168,11 @@ export function RegisterForm() {
     return acc;
   }, {} as Record<string, ClassData[]>);
 
+  const teacherClassOptions: GroupedOption[] = Object.entries(groupedClasses).map(([grade, classes]) => ({
+      label: grade,
+      options: classes.map(c => ({ label: c.name, value: c.name }))
+  }));
+
 
   return (
       <Card className="w-full max-w-lg shadow-2xl shadow-primary/10 bg-card/80 backdrop-blur-sm border-primary/20 animate-fade-in-up">
@@ -294,10 +299,11 @@ export function RegisterForm() {
                             <FormItem>
                                 <FormLabel>Classes Taught</FormLabel>
                                 <MultiSelect
-                                    options={allClasses.map(c => ({ label: c.name, value: c.name }))}
+                                    options={teacherClassOptions}
                                     onValueChange={field.onChange}
                                     defaultValue={field.value || []}
                                     placeholder="Select classes..."
+                                    isGrouped
                                 />
                                 <FormMessage />
                             </FormItem>
