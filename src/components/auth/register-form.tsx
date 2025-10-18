@@ -25,7 +25,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '../ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useFirebase } from '@/firebase';
@@ -84,6 +84,8 @@ export function RegisterForm() {
   const [availableSubjects, setAvailableSubjects] = useState<string[]>([]);
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [strengthColor, setStrengthColor] = useState('bg-destructive');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { auth, firestore } = useFirebase();
   const router = useRouter();
@@ -263,9 +265,14 @@ export function RegisterForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
-                    </FormControl>
+                    <div className="relative">
+                        <FormControl>
+                            <Input type={showPassword ? "text" : "password"} placeholder="••••••••" {...field} />
+                        </FormControl>
+                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 flex items-center pr-3" aria-label="Toggle password visibility">
+                           {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                        </button>
+                    </div>
                     {password && (
                         <div className="space-y-2 pt-1">
                             <Progress value={passwordStrength} className="h-2" indicatorClassName={strengthColor} />
@@ -285,9 +292,14 @@ export function RegisterForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Confirm Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
-                    </FormControl>
+                    <div className="relative">
+                        <FormControl>
+                        <Input type={showConfirmPassword ? "text" : "password"} placeholder="••••••••" {...field} />
+                        </FormControl>
+                        <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute inset-y-0 right-0 flex items-center pr-3" aria-label="Toggle confirm password visibility">
+                           {showConfirmPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                        </button>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}

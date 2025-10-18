@@ -17,7 +17,7 @@ import {
 import { Logo } from "@/components/layout/logo"
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { BookOpen, GraduationCap, LogOut, PlusCircle } from 'lucide-react';
+import { BookOpen, GraduationCap, LogOut, PlusCircle, User } from 'lucide-react';
 import React from "react";
 import { useFirebase } from "@/firebase";
 import { Button } from "../ui/button";
@@ -69,6 +69,14 @@ function SidebarMenuItems() {
                     </Link>
                 </SidebarMenuItem>
             )}
+             <SidebarMenuItem>
+                <Link href="/account" onClick={handleLinkClick}>
+                <SidebarMenuButton isActive={pathname.startsWith('/account')} tooltip="Account">
+                    <User />
+                    <span>Account</span>
+                </SidebarMenuButton>
+                </Link>
+            </SidebarMenuItem>
             <SidebarMenuItem>
                 <Link href="/about" onClick={handleLinkClick}>
                 <SidebarMenuButton isActive={pathname.startsWith('/about')} tooltip="About">
