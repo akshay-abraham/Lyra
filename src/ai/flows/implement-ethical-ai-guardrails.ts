@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Akshay K Rooben abraham
 /**
  * @fileoverview Flow to Implement Ethical AI Guardrails (`implement-ethical-ai-guardrails.ts`)
  *

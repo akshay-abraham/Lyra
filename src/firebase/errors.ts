@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Akshay K Rooben abraham
 /**
  * @fileoverview Custom Firebase Permission Error (`errors.ts`)
  *

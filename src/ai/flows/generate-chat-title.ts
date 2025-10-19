@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Akshay K Rooben abraham
 /**
  * @fileoverview Flow to Generate a Chat Title (`generate-chat-title.ts`)
  *

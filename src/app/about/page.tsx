@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Akshay K Rooben abraham
 /**
  * @fileoverview About Page (`/about`)
  *
@@ -102,28 +103,21 @@ export default function AboutPage() {
             <Card className="bg-card/80 backdrop-blur-sm border-accent/20 animate-fade-in-up" style={{ animationDelay: '1.2s' }}>
               <CardHeader className="flex flex-row items-center gap-4">
                 <Scale className="h-8 w-8 text-accent"/>
-                <CardTitle className="font-headline text-2xl">Proprietary License</CardTitle>
+                <CardTitle className="font-headline text-2xl">Open Source License</CardTitle>
               </CardHeader>
               <CardContent className="prose prose-sm max-w-none dark:prose-invert">
                 <p>
-                  <strong>Copyright © 2025 Akshay K. Rooben Abraham. All rights reserved.</strong>
+                  <strong>Copyright © 2025 Akshay K. Rooben Abraham.</strong>
                 </p>
                 <p>
-                  This software and all associated materials, including but not limited to the codebase, design, architecture, content, and branding of “Lyra”, are proprietary intellectual property owned by Akshay K. Rooben Abraham.
+                  This project is licensed under the <strong>GNU Affero General Public License v3.0</strong>. This license is designed to ensure that the software remains free and open-source, and that any modifications made available over a network are also shared back with the community.
                 </p>
-                <p>
-                  <strong>Unauthorized reproduction, distribution, modification, or deployment of this system, in whole or in part, is strictly prohibited.</strong>
-                </p>
-                <p>
-                  Usage of Lyra is limited to verified and registered educational institutions with explicit written authorization.
-                  Any other usage — including installations, trials, demonstrations, or derivative works — must be approved in writing by the author.
-                </p>
-                <p>
-                  Violators will be subject to legal action under applicable intellectual property and cyber laws.
-                </p>
-                <p>
-                  For licensing and partnership inquiries, please contact: 📧 akshayroobenabraham@gmail.com
-                </p>
+                <p>You can view the full license text on GitHub:</p>
+                <Button asChild>
+                    <a href="https://github.com/akshay-abraham/Lyra/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">
+                        View AGPL-3.0 License <ArrowRight className="ml-2 h-4 w-4" />
+                    </a>
+                </Button>
               </CardContent>
             </Card>
 
@@ -131,12 +125,12 @@ export default function AboutPage() {
           {/* This is the footer section of the main card. */}
           <div className="bg-primary/5 p-6 text-center animate-fade-in border-t border-primary/10" style={{ animationDelay: '1.3s' }}>
               <div className="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-4 text-sm text-muted-foreground mb-4">
-                  <span className="flex items-center gap-1.5"><Shield className="h-4 w-4" /> Copyright © 2025 Akshay K. Rooben Abraham. All rights reserved.</span>
+                  <span className="flex items-center gap-1.5"><Shield className="h-4 w-4" /> Copyright © 2025 Akshay K. Rooben Abraham.</span>
               </div>
               {/* This button links to an external website. */}
               <Button asChild className="group transition-all duration-300 ease-in-out hover:scale-105">
                   <a href="https://akshayabraham.vercel.app/" target="_blank" rel="noopener noreferrer">
-                      Contact for Licensing <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      Contact Developer <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </a>
               </Button>
           </div>

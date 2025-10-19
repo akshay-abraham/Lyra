@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Akshay K Rooben abraham
 /**
  * @fileoverview Generates an AI Tutor Response (`generate-ai-tutor-response.ts`)
  *

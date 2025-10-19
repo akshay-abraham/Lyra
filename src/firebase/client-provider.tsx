@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Akshay K Rooben abraham
 /**
  * @fileoverview Firebase Client-Side Provider (`client-provider.tsx`)
  *

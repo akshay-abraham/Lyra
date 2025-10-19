@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Akshay K Rooben abraham
 /**
  * @fileoverview `useDoc` Real-time Firestore Hook (`use-doc.tsx`)
  *

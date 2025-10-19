@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Akshay K Rooben abraham
 /**
  * @fileoverview Registration Form Component (`register-form.tsx`)
  *
@@ -429,9 +430,12 @@ export function RegisterForm() {
                   </Button>
               </Link>
           </div>
+          <div className="mt-4 text-center text-xs text-muted-foreground">
+            <p>
+                By creating an account, you agree to our Terms and Conditions.
+            </p>
+          </div>
         </CardContent>
       </Card>
   );
 }
-
-    

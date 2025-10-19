@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Akshay K Rooben abraham
 /**
  * @fileoverview Account Page (`/account`)
  *
@@ -53,7 +54,7 @@ function AccountPageContent() {
     // has rendered. It's perfect for actions that interact with the outside world,
     // like redirecting a user.
     useEffect(() => {
-        // C-like pseudocode for this effect:
+        // C-like pseudocode:
         //
         // void onComponentUpdate() {
         //   // This function is automatically called when `isUserLoading` or `user` changes.

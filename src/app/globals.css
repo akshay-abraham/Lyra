@@ -129,7 +129,7 @@
     inside your CSS.
   */
   * {
-    border-color: hsl(var(--border));
+    @apply border-border;
   }
   /*
     This applies default background and text colors to the entire `<body>` of the page.
@@ -137,8 +137,7 @@
     light or dark mode.
   */
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    @apply bg-background text-foreground;
   }
 
   /*

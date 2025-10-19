@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Akshay K Rooben abraham
 /**
  * @fileoverview Main Entry Point for Development AI Server (`dev.ts`)
  *

@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Akshay K Rooben abraham
 /**
  * @fileoverview Main Firebase Context Provider (`provider.tsx`)
  *

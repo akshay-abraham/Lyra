@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Akshay K Rooben abraham
 /**
  * @fileoverview Chat Interface Component (`chat-interface.tsx`)
  *

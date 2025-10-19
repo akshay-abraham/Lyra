@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Akshay K Rooben abraham
 /**
  * @fileoverview Flow to Customize AI Teaching Style (`customize-ai-teaching-style.ts`)
  *

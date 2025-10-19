@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Akshay K Rooben abraham
 /**
  * @fileoverview Login Form Component (`login-form.tsx`)
  *
@@ -250,11 +251,6 @@ export function LoginForm() {
                       Create one here
                   </Button>
               </Link>
-          </div>
-          <div className="mt-4 text-center text-xs text-muted-foreground animate-fade-in-up" style={{ animationDelay: '1.2s' }}>
-            <p>
-                By logging in, you agree to our Terms and Conditions.
-            </p>
           </div>
         </CardContent>
       </Card>

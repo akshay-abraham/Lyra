@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Akshay K Rooben abraham
 /**
  * @fileoverview Flow for Guided AI Response Generation (`guide-ai-response-generation.ts`)
  *
