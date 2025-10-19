@@ -1,6 +1,7 @@
 /**
- * @fileoverview FILE SUMMARY
+ * @fileoverview Chat Interface Component (`chat-interface.tsx`)
  *
+ * C-like Analogy:
  * This file defines the main user interface for the chat screen.
  * Think of this as the `main()` function for the chat window. It's responsible for:
  * 1.  Displaying the chat messages.
@@ -11,7 +12,8 @@
  *
  * It uses a "custom hook" called `useChat` (defined in `src/hooks/use-chat.ts`)
  * to handle all the complex logic like sending messages to the server and
- * receiving responses. This component focuses only on the "View" part of the app.
+ * receiving responses. This component focuses only on the "View" part of the app,
+ * following a Model-View-Controller like pattern where `useChat` is the Controller.
  */
 'use client';
 
@@ -32,15 +34,18 @@ import { useChat } from '@/hooks/use-chat';
 import { useToast } from "@/hooks/use-toast";
 import { getLoadingText } from '@/lib/loading-texts';
 import { getSubjectsForUser, type SubjectData, allSubjects } from '@/lib/subjects-data';
-import { calculatePasswordStrength } from '@/lib/utils';
 
 /**
- * C-like Explanation:
+ * C-like Explanation: Mermaid Component
  *
  * This is a small helper component, like a utility function.
  * Its only job is to render diagrams using the Mermaid library.
  * The AI can generate text in the Mermaid format, and this component
  * turns that text into a visual diagram.
+ *
+ * `React.memo` is an optimization. It's like saying: "If the inputs (props) to this
+ * function haven't changed, don't bother re-running it. Just use the last result."
+ * This saves processing time for static diagrams.
  *
  * function Mermaid(props):
  *     // props is like a C struct: struct { char* chart; }
@@ -75,7 +80,7 @@ Mermaid.displayName = 'Mermaid';
 
 
 /**
- * C-like Explanation:
+ * C-like Explanation: CodeBlock Component
  *
  * Another small helper component. Its job is to decide how to display
  * code blocks in the AI's response.
@@ -114,15 +119,11 @@ CodeBlock.displayName = 'CodeBlock';
 
 
 /**
- * C-like Explanation:
+ * C-like Explanation: NewChatView Component
  *
  * This component is shown only when a new chat is started.
  * It's a simple view with a welcome message and a dropdown menu
  * for the user to select a subject.
- *
- * `React.memo` is an optimization. It's like saying: "If the inputs (props) to this
- * function haven't changed, don't bother re-running it. Just use the last result."
- * This saves processing time.
  *
  * function NewChatView(props):
  *    // props is a struct: struct { function_pointer onSubjectSelect; char* subject; SubjectData[] availableSubjects; }
@@ -229,19 +230,21 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
   // Its job is to figure out which subjects the current student should see.
   useEffect(() => {
     // PSEUDOCODE:
-    // try {
-    //   string userInfoJson = sessionStorage.getItem("lyra-user-info");
-    //   if (userInfoJson exists) {
-    //     UserInfo userInfo = parseJson(userInfoJson);
-    //     SubjectData[] subjects = getSubjectsForUser(userInfo.role, userInfo.grade);
-    //     setAvailableSubjects(subjects);
-    //   } else {
-    //     // If no user info, show all subjects as a fallback.
+    // void onComponentMount() {
+    //   try {
+    //     string userInfoJson = sessionStorage.getItem("lyra-user-info");
+    //     if (userInfoJson exists) {
+    //       UserInfo userInfo = parseJson(userInfoJson);
+    //       SubjectData[] subjects = getSubjectsForUser(userInfo.role, userInfo.class);
+    //       setAvailableSubjects(subjects);
+    //     } else {
+    //       // If no user info, show all subjects as a fallback.
+    //       setAvailableSubjects(getSubjectsForUser(null, null));
+    //     }
+    //   } catch (error) {
+    //     // Fallback in case of any error.
     //     setAvailableSubjects(getSubjectsForUser(null, null));
     //   }
-    // } catch (error) {
-    //   // Fallback in case of any error.
-    //   setAvailableSubjects(getSubjectsForUser(null, null));
     // }
     try {
         const userInfoStr = sessionStorage.getItem('lyra-user-info');
@@ -304,19 +307,19 @@ export function ChatInterface({ chatId: currentChatId }: { chatId: string | null
 
 
   /**
-   * C-like Explanation:
+   * C-like Explanation: `async function handleSendMessage()`
    *
-   * function handleSendMessage():
-   *    // This function is called when the user hits "Enter" or clicks the send button.
+   * This function is called when the user hits "Enter" or clicks the send button.
    *
-   *    1.  Check if the input box is empty. If so, do nothing (`return`).
-   *    2.  Check if this is a brand new chat (`currentChatId` is null) AND the user
-   *        hasn't selected a subject yet. If so, show an error toast and stop.
-   *    3.  Store the current input text in a temporary variable.
-   *    4.  Clear the input box on the screen immediately for a responsive feel. `setInput("")`.
-   *    5.  Call the `sendMessage` function from our `useChat` hook, passing it the
-   *        user's message and the selected subject. This is an `async` call, meaning
-   *        it runs in the background. We `await` it to wait for it to finish.
+   * PSEUDOCODE:
+   * 1.  Check if the input box is empty. If so, do nothing (`return`).
+   * 2.  Check if this is a brand new chat (`currentChatId` is null) AND the user
+   *     hasn't selected a subject yet. If so, show an error toast and stop.
+   * 3.  Store the current input text in a temporary variable.
+   * 4.  Clear the input box on the screen immediately for a responsive feel. `setInput("")`.
+   * 5.  Call the `sendMessage` function from our `useChat` hook, passing it the
+   *     user's message and the selected subject. This is an `async` call, meaning
+   *     it runs in the background. We `await` it to wait for it to finish.
    */
   const handleSendMessage = async () => {
     if (!input.trim()) return;
