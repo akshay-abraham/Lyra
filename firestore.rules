@@ -1,120 +1,50 @@
-/**
- * @fileoverview Firestore Security Rules for the Lyra application.
- *
- * Core Philosophy:
- * This ruleset enforces a strict user-ownership model for user profiles and teacher-created prompts.
- * It ensures that only the authenticated user can access and modify their own profile data,
- * and teachers can manage the prompts they create.
- *
- * Data Structure:
- * - /users/{userId}: Stores user profile information, with 'userId' matching the Firebase Auth UID.
- * - /teacherSettings/{settingsId}: Stores customized AI settings for teachers.
- * - /users/{userId}/prompts/{promptId}: Stores prompts created by teachers, nested under their user ID.
- * - /users/{userId}/chatSessions/{sessionId}: Stores chat sessions for each user.
- * - /users/{userId}/chatSessions/{sessionId}/messages/{messageId}: Stores messages within chat sessions.
- *
- * Key Security Decisions:
- * - User listing is disallowed.
- * - Authorization independence is achieved by storing ownership information (e.g., teacherId) directly
- *   within documents to avoid costly `get()` calls in security rules.
- * - Data validation is limited to critical fields required for authorization and relational integrity.
- *
- * Denormalization for Authorization:
- * - The `Prompt` entity stores the `userId` of the creating teacher directly within the document,
- *   allowing for efficient ownership checks without additional database reads.
- */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    /**
-     * @description Secure user profiles.  Only the authenticated user can read or write their own profile.
-     * @path /users/{userId}
-     * @allow (get, create, update, delete, list) if the request is made by the user with matching UID.
-     *   Example (create): A user with UID "user123" can create a profile document with id "user123".
-     * @deny (create) if the UID in the path does not match the authenticated user's UID.
-     *   Example: A user with UID "user123" cannot create a profile document with id "user456".
-     * @principle Enforces document ownership for all operations.
-     */
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isUser(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // User profiles
     match /users/{userId} {
-      function isOwner(userId) {
-        return request.auth != null && request.auth.uid == userId;
-      }
-
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
-
-      allow get: if isOwner(userId);
+      allow get: if isUser(userId);
       allow list: if false;
-      allow create: if isOwner(userId) && request.resource.data.uid == userId;
-      allow update: if isExistingOwner(userId) && resource.data.uid == userId;
-      allow delete: if isExistingOwner(userId);
+      allow create: if isUser(userId) && request.resource.data.uid == userId;
+      allow update: if isUser(userId) && resource.data.uid == userId;
+      allow delete: if isUser(userId);
 
-      /**
-       * @description Secure chat sessions. Only the owning user can access their chat sessions.
-       * @path /users/{userId}/chatSessions/{sessionId}
-       * @allow all operations if the request is made by the user with matching UID.
-       * @principle Enforces document ownership for all operations.
-       */
+      // Chat sessions - LIBERAL ACCESS
       match /chatSessions/{sessionId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read, write: if isUser(userId);
 
-        /**
-         * @description Secure messages within chat sessions. Only the owning user can access their messages.
-         * @path /users/{userId}/chatSessions/{sessionId}/messages/{messageId}
-         * @allow all operations if the request is made by the user with matching UID.
-         * @principle Enforces document ownership for all operations.
-         */
+        // Messages in chat sessions - LIBERAL ACCESS
         match /messages/{messageId} {
-          allow read, write: if request.auth != null && request.auth.uid == userId;
+          allow read, write: if isUser(userId);
         }
+      }
+
+      // Teacher prompts
+      match /prompts/{promptId} {
+        allow get: if isUser(userId);
+        allow list: if isUser(userId);
+        allow create: if isUser(userId) && request.resource.data.userId == userId;
+        allow update: if isUser(userId) && resource.data.userId == userId;
+        allow delete: if isUser(userId);
       }
     }
 
-    /**
-     * @description Secure teacher settings. Anyone should be able to read them. Only a teacher can create, update or delete their own settings.
-     * @path /teacherSettings/{settingsId}
-     * @allow (get, list) if true (public read).
-     * @allow (create) if the request is made by a teacher and the teacherId matches the authenticated user's UID.
-     * @allow (update, delete) if the request is made by a teacher, the teacherId matches the authenticated user's UID, and the document exists.
-     * @deny (create, update, delete) if the teacherId does not match the authenticated user's UID.
-     * @principle Enforces document ownership for writes. Allows anyone to view the settings.
-     */
+    // Teacher settings - PUBLIC READ, OWNER WRITE
     match /teacherSettings/{settingsId} {
-        function isSignedIn() {
-            return request.auth != null;
-        }
-        allow get, list: if true; // Public read for teacher settings
-
-        allow create: if isSignedIn() && request.resource.data.teacherId == request.auth.uid;
-        allow update: if isSignedIn() && request.resource.data.teacherId == request.auth.uid && resource != null;
-        allow delete: if isSignedIn() && request.resource.data.teacherId == request.auth.uid && resource != null;
-    }
-
-    /**
-     * @description Secure prompts created by teachers.  Only the creating teacher can manage their own prompts.
-     * @path /users/{userId}/prompts/{promptId}
-     * @allow (get, list) if the request is made by the teacher with matching UID.
-     *   Example (get): A teacher with UID "teacher123" can read the prompt document with id "prompt456" under /users/teacher123/prompts/prompt456.
-     * @deny (create) if the userId in the prompt data does not match the authenticated user's UID.
-     *   Example: A teacher with UID "teacher123" cannot create a prompt document with userId "teacher456".
-     * @principle Enforces document ownership for all operations.
-     */
-    match /users/{userId}/prompts/{promptId} {
-        function isOwner(userId) {
-            return request.auth != null && request.auth.uid == userId;
-        }
-
-        function isExistingOwner(userId) {
-            return isOwner(userId) && resource != null;
-        }
-
-        allow get: if isOwner(userId);
-        allow list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.userId == userId;
-        allow update: if isExistingOwner(userId) && resource.data.userId == userId;
-        allow delete: if isExistingOwner(userId);
+      allow get, list: if true;
+      allow create: if isSignedIn() && request.resource.data.teacherId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.teacherId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.teacherId == request.auth.uid;
     }
   }
 }
