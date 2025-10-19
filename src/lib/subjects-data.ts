@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Akshay K Rooben abraham
 
 import {
     BookOpen,
@@ -191,5 +192,7 @@ export function getSubjectsForClasses(classNames: string[]): SubjectData[] {
 
     return allSubjects.filter(subject => subjectNameSet.has(subject.name));
 }
-
+export function getSubjectsByStream(stream: Stream): string[] {
+    return streamSubjects[stream] || [];
+}
     

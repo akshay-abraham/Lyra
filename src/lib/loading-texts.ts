@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Akshay K Rooben abraham
 import { allSubjects, type SubjectName } from './subjects-data';
 
 const loadingTexts: Record<SubjectName, string[]> = {

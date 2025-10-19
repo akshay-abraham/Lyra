@@ -1,3 +1,35 @@
+// Copyright (C) 2025 Akshay K Rooben abraham
+/**
+ * @fileoverview Logo Component (`logo.tsx`)
+ *
+ * C-like Analogy:
+ * This file defines a very simple, reusable UI component. Think of it as a
+ * small, self-contained C function that prints a specific, pre-defined ASCII art
+ * to the console.
+ *
+ * `void printLogo() { ... }`
+ *
+ * In this case, instead of ASCII art, it returns an SVG (Scalable Vector Graphic)
+ * which is a standard way to draw images and icons on the web. This component
+ * can be imported and used anywhere in the application to display the Lyra logo.
+ *
+ * It's a "stateless" component, meaning it doesn't have any internal variables
+ * that change. It always renders the same thing every time it's called.
+ */
+
+/**
+ * C-like Explanation: `function Logo() -> returns JSX_Element`
+ *
+ * This is the main function for this component. It takes no arguments (props)
+ * and returns a JSX element representing the SVG logo.
+ *
+ * The SVG code itself defines the shape, color, and stroke of the logo.
+ * The `className="text-primary"` is a Tailwind CSS class that makes the logo's
+ * color inherit from the `--primary` CSS variable defined in `globals.css`.
+ * The `stroke="currentColor"` property within the SVG means the lines of the
+ * SVG will take on the color of the parent element's text color, which we set
+ * to be the primary theme color.
+ */
 export function Logo() {
   return (
     <svg

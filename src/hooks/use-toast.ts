@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Akshay K Rooben abraham
 "use client"
 
 // Inspired by react-hot-toast library

@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Akshay K Rooben abraham
 import data from './placeholder-images.json';
 
 export type ImagePlaceholder = {

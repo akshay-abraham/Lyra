@@ -1,3 +1,4 @@
+// Copyright (C) 2025 Akshay K Rooben abraham
 import * as React from "react"
 
 const MOBILE_BREAKPOINT = 768
