@@ -64,9 +64,9 @@
  *   return state;
  *
  */
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import {
   Query,
   onSnapshot,
@@ -74,22 +74,22 @@ import {
   FirestoreError,
   QuerySnapshot,
   CollectionReference,
-} from 'firebase/firestore';
-import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError } from '@/firebase/errors';
+} from 'firebase/firestore'
+import { errorEmitter } from '@/firebase/error-emitter'
+import { FirestorePermissionError } from '@/firebase/errors'
 
 /** Utility type. In C, this would be like taking a struct `T` and adding a new
  * `char* id` member to it. */
-export type WithId<T> = T & { id: string };
+export type WithId<T> = T & { id: string }
 
 /**
  * C-like Analogy: `typedef struct { ... } UseCollectionResult;`
  * This defines the shape of the object that our `useCollection` hook will return.
  */
 export interface UseCollectionResult<T> {
-  data: WithId<T>[] | null; // A pointer to an array of structs, or NULL.
-  isLoading: boolean;       // `true` if we're waiting for the first response.
-  error: FirestoreError | Error | null; // A pointer to an error object, or NULL.
+  data: WithId<T>[] | null // A pointer to an array of structs, or NULL.
+  isLoading: boolean // `true` if we're waiting for the first response.
+  error: FirestoreError | Error | null // A pointer to an error object, or NULL.
 }
 
 /*
@@ -98,12 +98,12 @@ export interface UseCollectionResult<T> {
  * to access its internal fields. This interface does something similar, giving us
  * typed access to `_query.path` which is not part of the public API but is needed
  * to create detailed error messages.
-*/
+ */
 export interface InternalQuery extends Query<DocumentData> {
   _query: {
     path: {
-      canonicalString(): string;
-      toString(): string;
+      canonicalString(): string
+      toString(): string
     }
   }
 }
@@ -118,46 +118,51 @@ export interface InternalQuery extends Query<DocumentData> {
  * @returns {UseCollectionResult<T>} An object with the data, loading state, and error.
  */
 export function useCollection<T = any>(
-    memoizedTargetRefOrQuery: ((CollectionReference<DocumentData> | Query<DocumentData>) & {__memo?: boolean})  | null | undefined,
+  memoizedTargetRefOrQuery:
+    | ((CollectionReference<DocumentData> | Query<DocumentData>) & {
+        __memo?: boolean
+      })
+    | null
+    | undefined,
 ): UseCollectionResult<T> {
   // Define types for our state variables.
-  type ResultItemType = WithId<T>;
-  type StateDataType = ResultItemType[] | null;
+  type ResultItemType = WithId<T>
+  type StateDataType = ResultItemType[] | null
 
   // `useState` declares a state variable. It's like a local variable in a C
   // function, but its value persists across re-renders.
-  const [data, setData] = useState<StateDataType>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<FirestoreError | Error | null>(null);
+  const [data, setData] = useState<StateDataType>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [error, setError] = useState<FirestoreError | Error | null>(null)
 
   // `useEffect` contains the "side effect" logic – in this case, interacting with the database.
   useEffect(() => {
     // If the query is null (e.g., waiting for user to log in), do nothing.
     if (!memoizedTargetRefOrQuery) {
-      setData(null);
-      setIsLoading(false);
-      setError(null);
-      return;
+      setData(null)
+      setIsLoading(false)
+      setError(null)
+      return
     }
 
-    setIsLoading(true);
-    setError(null);
+    setIsLoading(true)
+    setError(null)
 
     // This is the core of the hook. `onSnapshot` creates the real-time subscription.
     const unsubscribe = onSnapshot(
       memoizedTargetRefOrQuery,
       // 1. Success Callback
       (snapshot: QuerySnapshot<DocumentData>) => {
-        const results: ResultItemType[] = [];
+        const results: ResultItemType[] = []
         // Loop through the documents in the result snapshot.
         for (const doc of snapshot.docs) {
           // Create a new object with the document's data and add its ID.
-          results.push({ ...(doc.data() as T), id: doc.id });
+          results.push({ ...(doc.data() as T), id: doc.id })
         }
         // Update our state with the new data. React will re-render the UI.
-        setData(results);
-        setError(null);
-        setIsLoading(false);
+        setData(results)
+        setError(null)
+        setIsLoading(false)
       },
       // 2. Error Callback
       (error: FirestoreError) => {
@@ -166,36 +171,40 @@ export function useCollection<T = any>(
         const path: string =
           memoizedTargetRefOrQuery.type === 'collection'
             ? (memoizedTargetRefOrQuery as CollectionReference).path
-            : (memoizedTargetRefOrQuery as unknown as InternalQuery)._query.path.canonicalString();
+            : (
+                memoizedTargetRefOrQuery as unknown as InternalQuery
+              )._query.path.canonicalString()
 
         // Create our custom, detailed error object.
         const contextualError = new FirestorePermissionError({
           operation: 'list',
           path,
-        });
+        })
 
         // Update the state to reflect the error.
-        setError(contextualError);
-        setData(null);
-        setIsLoading(false);
+        setError(contextualError)
+        setData(null)
+        setIsLoading(false)
 
         // Emit a global event so other parts of the app can react to this error.
-        errorEmitter.emit('permission-error', contextualError);
-      }
-    );
+        errorEmitter.emit('permission-error', contextualError)
+      },
+    )
 
     // The `useEffect` hook can return a "cleanup function". This function is called
     // when the component is removed from the screen or when the hook re-runs.
     // Here, we return the `unsubscribe` function provided by `onSnapshot` to
     // close the database connection and prevent memory leaks. It's like `fclose()` or `free()`.
-    return () => unsubscribe();
-  }, [memoizedTargetRefOrQuery]); // Dependency array: only re-run the effect if the query object changes.
+    return () => unsubscribe()
+  }, [memoizedTargetRefOrQuery]) // Dependency array: only re-run the effect if the query object changes.
 
   // A safety check to enforce memoization of the query, preventing infinite loops.
-  if(memoizedTargetRefOrQuery && !memoizedTargetRefOrQuery.__memo) {
-    throw new Error('useCollection query was not properly memoized using useMemoFirebase. This will cause infinite loops.');
+  if (memoizedTargetRefOrQuery && !memoizedTargetRefOrQuery.__memo) {
+    throw new Error(
+      'useCollection query was not properly memoized using useMemoFirebase. This will cause infinite loops.',
+    )
   }
 
   // Return the current state to the component that called the hook.
-  return { data, isLoading, error };
+  return { data, isLoading, error }
 }

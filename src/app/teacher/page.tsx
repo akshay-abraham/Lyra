@@ -19,14 +19,14 @@
  * Like the account page, this is a "Client Component" (`'use client'`) because it
  * needs to check the user's role, which is stored in the browser's `sessionStorage`.
  */
-'use client';
+'use client'
 
 // Import necessary components and hooks.
-import { TeacherDashboard } from '@/components/teacher/teacher-dashboard';
-import { useUser } from '@/firebase'; // Hook to get user authentication status.
-import { useRouter } from 'next/navigation'; // Hook for redirects.
-import { useEffect, useState } from 'react'; // React's core hooks.
-import { SidebarLayout } from '@/components/layout/sidebar-layout';
+import { TeacherDashboard } from '@/components/teacher/teacher-dashboard'
+import { useUser } from '@/firebase' // Hook to get user authentication status.
+import { useRouter } from 'next/navigation' // Hook for redirects.
+import { useEffect, useState } from 'react' // React's core hooks.
+import { SidebarLayout } from '@/components/layout/sidebar-layout'
 
 /**
  * C-like Explanation: `function TeacherPage() -> returns JSX_Element`
@@ -41,74 +41,74 @@ import { SidebarLayout } from '@/components/layout/sidebar-layout';
  *   - `router`: An object for handling redirects.
  */
 export default function TeacherPage() {
-    // Get user authentication status.
-    const { user, isUserLoading } = useUser();
-    const router = useRouter();
-    // State to hold the user's profile info (especially the role).
-    // `useState` initializes it to `null`.
-    const [userInfo, setUserInfo] = useState<{role?: string} | null>(null);
+  // Get user authentication status.
+  const { user, isUserLoading } = useUser()
+  const router = useRouter()
+  // State to hold the user's profile info (especially the role).
+  // `useState` initializes it to `null`.
+  const [userInfo, setUserInfo] = useState<{ role?: string } | null>(null)
 
-    // This `useEffect` hook handles both authentication and authorization.
-    // It runs after the component renders and when `user` or `isUserLoading` changes.
-    useEffect(() => {
-        // C-like pseudocode:
-        // void onComponentUpdate() {
-        //   // 1. Check Auth: If loading is done and user is NULL, redirect.
-        //   if (!isUserLoading && !user) {
-        //     redirectTo('/login');
-        //     return; // Stop further execution.
-        //   }
-        //
-        //   // 2. Check Authorization: If user exists, check their role.
-        //   if (user) {
-        //     // Read the user's profile from browser session storage.
-        //     // This was saved here during the login process for quick access.
-        //     string storedInfoJson = sessionStorage.getItem('lyra-user-info');
-        //     if (storedInfoJson) {
-        //       // Parse the JSON string into a struct-like object.
-        //       UserInfo info = JSON.parse(storedInfoJson);
-        //       // Update our component's state with this info.
-        //       setUserInfo(info);
-        //     }
-        //   }
-        // }
-        if (!isUserLoading && !user) {
-            router.push('/login');
-        }
-        if (user) {
-            // Fetch the user's role from session storage for a quick authorization check.
-            const storedInfo = sessionStorage.getItem('lyra-user-info');
-            if (storedInfo) {
-                setUserInfo(JSON.parse(storedInfo));
-            }
-        }
-    }, [isUserLoading, user, router]); // Dependency array.
-
-    // This is the combined loading and authorization check.
-    // Render a "Loading..." or "Access Denied" message if:
-    // 1. We are still checking the user's login status (`isUserLoading`).
-    // 2. The user is not logged in (`!user`).
-    // 3. The user's role is not 'teacher' (`userInfo?.role !== 'teacher'`).
-    // The `?.` is optional chaining: it safely accesses `role` only if `userInfo` is not null.
-    if (isUserLoading || !user || userInfo?.role !== 'teacher') {
-        return (
-            <div className="flex items-center justify-center h-screen">
-                <p>Loading or unauthorized...</p>
-            </div>
-        );
+  // This `useEffect` hook handles both authentication and authorization.
+  // It runs after the component renders and when `user` or `isUserLoading` changes.
+  useEffect(() => {
+    // C-like pseudocode:
+    // void onComponentUpdate() {
+    //   // 1. Check Auth: If loading is done and user is NULL, redirect.
+    //   if (!isUserLoading && !user) {
+    //     redirectTo('/login');
+    //     return; // Stop further execution.
+    //   }
+    //
+    //   // 2. Check Authorization: If user exists, check their role.
+    //   if (user) {
+    //     // Read the user's profile from browser session storage.
+    //     // This was saved here during the login process for quick access.
+    //     string storedInfoJson = sessionStorage.getItem('lyra-user-info');
+    //     if (storedInfoJson) {
+    //       // Parse the JSON string into a struct-like object.
+    //       UserInfo info = JSON.parse(storedInfoJson);
+    //       // Update our component's state with this info.
+    //       setUserInfo(info);
+    //     }
+    //   }
+    // }
+    if (!isUserLoading && !user) {
+      router.push('/login')
     }
+    if (user) {
+      // Fetch the user's role from session storage for a quick authorization check.
+      const storedInfo = sessionStorage.getItem('lyra-user-info')
+      if (storedInfo) {
+        setUserInfo(JSON.parse(storedInfo))
+      }
+    }
+  }, [isUserLoading, user, router]) // Dependency array.
 
-    // If all checks pass, render the teacher dashboard.
+  // This is the combined loading and authorization check.
+  // Render a "Loading..." or "Access Denied" message if:
+  // 1. We are still checking the user's login status (`isUserLoading`).
+  // 2. The user is not logged in (`!user`).
+  // 3. The user's role is not 'teacher' (`userInfo?.role !== 'teacher'`).
+  // The `?.` is optional chaining: it safely accesses `role` only if `userInfo` is not null.
+  if (isUserLoading || !user || userInfo?.role !== 'teacher') {
     return (
-        <SidebarLayout>
-            <div className="p-4 sm:p-6 lg:p-8 animate-fade-in">
-                {/*
+      <div className='flex items-center justify-center h-screen'>
+        <p>Loading or unauthorized...</p>
+      </div>
+    )
+  }
+
+  // If all checks pass, render the teacher dashboard.
+  return (
+    <SidebarLayout>
+      <div className='p-4 sm:p-6 lg:p-8 animate-fade-in'>
+        {/*
                   This renders the main dashboard component. All the complex UI and logic
                   for AI customization is encapsulated in `<TeacherDashboard />`.
                   This keeps the page-level component clean and focused on authorization.
                 */}
-                <TeacherDashboard />
-            </div>
-        </SidebarLayout>
-    );
+        <TeacherDashboard />
+      </div>
+    </SidebarLayout>
+  )
 }

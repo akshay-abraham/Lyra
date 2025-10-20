@@ -10,7 +10,7 @@
  *
  * Imagine in C you have a global struct, `g_firebase_services`, that holds your
  * database connection and user information. Any function in your program can
-* access this global variable. React Context provides a safer, more structured
+ * access this global variable. React Context provides a safer, more structured
  * way to achieve the same result.
  *
  * This `<FirebaseProvider>` does two main things:
@@ -30,66 +30,76 @@
  *     user's auth status) into the "Context", making it available to any other
  *     component in the app that wants to use it via the `useFirebase()` or `useUser()` hooks.
  */
-'use client';
+'use client'
 
-import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
-import { FirebaseApp } from 'firebase/app';
-import { Firestore } from 'firebase/firestore';
-import { Auth, User, onAuthStateChanged } from 'firebase/auth';
+import React, {
+  DependencyList,
+  createContext,
+  useContext,
+  ReactNode,
+  useMemo,
+  useState,
+  useEffect,
+} from 'react'
+import { FirebaseApp } from 'firebase/app'
+import { Firestore } from 'firebase/firestore'
+import { Auth, User, onAuthStateChanged } from 'firebase/auth'
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener'
 
 // C-like Analogy: `typedef struct { ... } FirebaseProviderProps;`
 // The inputs to our main provider component.
 interface FirebaseProviderProps {
-  children: ReactNode;
-  firebaseApp: FirebaseApp;
-  firestore: Firestore;
-  auth: Auth;
+  children: ReactNode
+  firebaseApp: FirebaseApp
+  firestore: Firestore
+  auth: Auth
 }
 
 // C-like Analogy: `typedef struct { ... } UserAuthState;`
 // A struct to hold the user's authentication status.
 interface UserAuthState {
-  user: User | null;      // Pointer to the User object, or NULL.
-  isUserLoading: boolean; // True while we're waiting for the first auth check.
-  userError: Error | null;  // Any error from the auth listener.
+  user: User | null // Pointer to the User object, or NULL.
+  isUserLoading: boolean // True while we're waiting for the first auth check.
+  userError: Error | null // Any error from the auth listener.
 }
 
 // C-like Analogy: `typedef struct { ... } FirebaseContextState;`
 // The main struct that defines all the data our Context will provide.
 export interface FirebaseContextState {
-  areServicesAvailable: boolean; // A flag to check if Firebase was initialized correctly.
-  firebaseApp: FirebaseApp | null;
-  firestore: Firestore | null;
-  auth: Auth | null;
+  areServicesAvailable: boolean // A flag to check if Firebase was initialized correctly.
+  firebaseApp: FirebaseApp | null
+  firestore: Firestore | null
+  auth: Auth | null
   // User authentication state is nested here.
-  user: User | null;
-  isUserLoading: boolean;
-  userError: Error | null;
+  user: User | null
+  isUserLoading: boolean
+  userError: Error | null
 }
 
 // C-like Analogy: `typedef struct { ... } FirebaseServicesAndUser;`
 // The return type of our `useFirebase()` hook.
 export interface FirebaseServicesAndUser {
-  firebaseApp: FirebaseApp;
-  firestore: Firestore;
-  auth: Auth;
-  user: User | null;
-  isUserLoading: boolean;
-  userError: Error | null;
+  firebaseApp: FirebaseApp
+  firestore: Firestore
+  auth: Auth
+  user: User | null
+  isUserLoading: boolean
+  userError: Error | null
 }
 
 // C-like Analogy: `typedef struct { ... } UserHookResult;`
 // The return type of our `useUser()` hook, focused only on auth state.
 export interface UserHookResult {
-  user: User | null;
-  isUserLoading: boolean;
-  userError: Error | null;
+  user: User | null
+  isUserLoading: boolean
+  userError: Error | null
 }
 
 // `createContext` is the React function that creates the actual context object.
 // It's like declaring the global pointer: `FirebaseContextState* g_firebase_context = NULL;`
-export const FirebaseContext = createContext<FirebaseContextState | undefined>(undefined);
+export const FirebaseContext = createContext<FirebaseContextState | undefined>(
+  undefined,
+)
 
 /**
  * The provider component itself. It manages and provides Firebase services and auth state.
@@ -106,18 +116,22 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
     user: null,
     isUserLoading: true, // Start in a loading state.
     userError: null,
-  });
+  })
 
   // `useEffect` is for side effects. Subscribing to an external service like Firebase Auth is a side effect.
   useEffect(() => {
     // If there's no `auth` service, we can't do anything.
     if (!auth) {
-      setUserAuthState({ user: null, isUserLoading: false, userError: new Error("Auth service not provided.") });
-      return;
+      setUserAuthState({
+        user: null,
+        isUserLoading: false,
+        userError: new Error('Auth service not provided.'),
+      })
+      return
     }
 
     // Reset state when the auth instance changes (this is rare but good practice).
-    setUserAuthState({ user: null, isUserLoading: true, userError: null });
+    setUserAuthState({ user: null, isUserLoading: true, userError: null })
 
     // This is the core of auth management. `onAuthStateChanged` registers a callback.
     // Firebase will call this function whenever the user's login state changes.
@@ -127,26 +141,30 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       (firebaseUser) => {
         // We received an update from Firebase. `firebaseUser` is either a User object or null.
         // Update our state. React will then re-render any components that use this state.
-        setUserAuthState({ user: firebaseUser, isUserLoading: false, userError: null });
+        setUserAuthState({
+          user: firebaseUser,
+          isUserLoading: false,
+          userError: null,
+        })
       },
       // 2. Error Callback
       (error) => {
         // If the listener itself fails.
-        console.error("FirebaseProvider: onAuthStateChanged error:", error);
-        setUserAuthState({ user: null, isUserLoading: false, userError: error });
-      }
-    );
+        console.error('FirebaseProvider: onAuthStateChanged error:', error)
+        setUserAuthState({ user: null, isUserLoading: false, userError: error })
+      },
+    )
 
     // Return the `unsubscribe` function. React will call this when the component is removed,
     // which cleans up the listener and prevents memory leaks. It's like `free()`.
-    return () => unsubscribe();
-  }, [auth]); // Dependency array: Re-run this effect only if the `auth` object itself changes.
+    return () => unsubscribe()
+  }, [auth]) // Dependency array: Re-run this effect only if the `auth` object itself changes.
 
   // `useMemo` is an optimization. It ensures the `contextValue` object is only
   // recreated when its contents actually change. This prevents unnecessary re-renders
   // in child components.
   const contextValue = useMemo((): FirebaseContextState => {
-    const servicesAvailable = !!(firebaseApp && firestore && auth);
+    const servicesAvailable = !!(firebaseApp && firestore && auth)
     // This is the big struct of data that we will make available to the whole app.
     return {
       areServicesAvailable: servicesAvailable,
@@ -156,8 +174,8 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       user: userAuthState.user,
       isUserLoading: userAuthState.isUserLoading,
       userError: userAuthState.userError,
-    };
-  }, [firebaseApp, firestore, auth, userAuthState]); // Dependencies for the memoization.
+    }
+  }, [firebaseApp, firestore, auth, userAuthState]) // Dependencies for the memoization.
 
   // Render the actual React Context Provider.
   // Any component rendered as `{children}` can now access `contextValue`.
@@ -167,8 +185,8 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       <FirebaseErrorListener />
       {children}
     </FirebaseContext.Provider>
-  );
-};
+  )
+}
 
 /**
  * C-like Explanation: `FirebaseServicesAndUser* useFirebase()`
@@ -180,15 +198,22 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
  */
 export const useFirebase = (): FirebaseServicesAndUser => {
   // `useContext` is the React hook that reads the value from the nearest Provider.
-  const context = useContext(FirebaseContext);
+  const context = useContext(FirebaseContext)
 
   // Error handling: if used outside a provider, `context` will be undefined.
   if (context === undefined) {
-    throw new Error('useFirebase must be used within a FirebaseProvider.');
+    throw new Error('useFirebase must be used within a FirebaseProvider.')
   }
 
-  if (!context.areServicesAvailable || !context.firebaseApp || !context.firestore || !context.auth) {
-    throw new Error('Firebase core services not available. Check FirebaseProvider props.');
+  if (
+    !context.areServicesAvailable ||
+    !context.firebaseApp ||
+    !context.firestore ||
+    !context.auth
+  ) {
+    throw new Error(
+      'Firebase core services not available. Check FirebaseProvider props.',
+    )
   }
 
   // Return the full set of services and user data.
@@ -199,29 +224,29 @@ export const useFirebase = (): FirebaseServicesAndUser => {
     user: context.user,
     isUserLoading: context.isUserLoading,
     userError: context.userError,
-  };
-};
+  }
+}
 
 /** Hook to access just the Firebase Auth instance. A convenient shortcut. */
 export const useAuth = (): Auth => {
-  const { auth } = useFirebase();
-  return auth;
-};
+  const { auth } = useFirebase()
+  return auth
+}
 
 /** Hook to access just the Firestore instance. */
 export const useFirestore = (): Firestore => {
-  const { firestore } = useFirebase();
-  return firestore;
-};
+  const { firestore } = useFirebase()
+  return firestore
+}
 
 /** Hook to access just the Firebase App instance. */
 export const useFirebaseApp = (): FirebaseApp => {
-  const { firebaseApp } = useFirebase();
-  return firebaseApp;
-};
+  const { firebaseApp } = useFirebase()
+  return firebaseApp
+}
 
 // A helper type for the memoization hook below.
-type MemoFirebase <T> = T & {__memo?: boolean};
+type MemoFirebase<T> = T & { __memo?: boolean }
 
 /**
  * C-like Explanation: `void* useMemoFirebase(callback_fn, dependencies)`
@@ -234,14 +259,18 @@ type MemoFirebase <T> = T & {__memo?: boolean};
  * checks for this tag to ensure that developers have correctly memoized their queries.
  * It's a developer-facing safety check.
  */
-export function useMemoFirebase<T>(factory: () => T, deps: DependencyList): T | (MemoFirebase<T>) {
-  const memoized = useMemo(factory, deps);
+export function useMemoFirebase<T>(
+  factory: () => T,
+  deps: DependencyList,
+): T | MemoFirebase<T> {
+  const memoized = useMemo(factory, deps)
 
-  if(typeof memoized !== 'object' || memoized === null) return memoized;
-  // Add our special tag to the memoized object.
-  (memoized as MemoFirebase<T>).__memo = true;
+  if (typeof memoized !== 'object' || memoized === null)
+    return memoized
+    // Add our special tag to the memoized object.
+  ;(memoized as MemoFirebase<T>).__memo = true
 
-  return memoized;
+  return memoized
 }
 
 /**
@@ -252,6 +281,6 @@ export function useMemoFirebase<T>(factory: () => T, deps: DependencyList): T | 
  * It calls the main `useFirebase` hook and returns just a subset of the data.
  */
 export const useUser = (): UserHookResult => {
-  const { user, isUserLoading, userError } = useFirebase(); // Leverages the main hook.
-  return { user, isUserLoading, userError };
-};
+  const { user, isUserLoading, userError } = useFirebase() // Leverages the main hook.
+  return { user, isUserLoading, userError }
+}

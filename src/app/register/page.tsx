@@ -14,8 +14,8 @@
  *     pages that might have complex components.
  */
 
-import { RegisterForm } from '@/components/auth/register-form';
-import { Suspense } from 'react';
+import { RegisterForm } from '@/components/auth/register-form'
+import { Suspense } from 'react'
 
 /**
  * C-like Explanation: `function RegisterPage() -> returns JSX_Element`
@@ -30,7 +30,7 @@ export default function RegisterPage() {
   return (
     // This `div` is the main container for the page.
     // It uses Tailwind CSS classes to center its content both vertically and horizontally.
-    <div className="flex items-center justify-center min-h-screen bg-background p-4">
+    <div className='flex items-center justify-center min-h-screen bg-background p-4'>
       {/*
         The `<Suspense>` component wraps the `RegisterForm`.
         If `RegisterForm` had to load data or code before rendering, the `fallback`
@@ -47,5 +47,5 @@ export default function RegisterPage() {
         <RegisterForm />
       </Suspense>
     </div>
-  );
+  )
 }

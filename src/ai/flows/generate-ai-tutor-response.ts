@@ -12,13 +12,12 @@
  *
  * The primary exported function is `generateAITutorResponse`.
  */
-'use server';
+'use server'
 
 // Import necessary libraries.
 // C-like analogy: #include <genkit_lib.h> and #include <zod_struct_lib.h>
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-
+import { ai } from '@/ai/genkit'
+import { z } from 'genkit'
 
 /**
  * C-like Analogy: Input Struct Definition
@@ -30,13 +29,22 @@ import {z} from 'genkit';
  * } GenerateAITutorResponseInput;
  */
 const GenerateAITutorResponseInputSchema = z.object({
-  problemStatement: z.string().describe('The problem statement from the student.'),
-  systemPrompt: z.string().optional().describe('The system prompt to guide the AI tutor.'),
-  exampleGoodAnswers: z.array(z.string()).optional().describe('Examples of good answers to guide the AI.'),
-});
+  problemStatement: z
+    .string()
+    .describe('The problem statement from the student.'),
+  systemPrompt: z
+    .string()
+    .optional()
+    .describe('The system prompt to guide the AI tutor.'),
+  exampleGoodAnswers: z
+    .array(z.string())
+    .optional()
+    .describe('Examples of good answers to guide the AI.'),
+})
 // Create a TypeScript "type" from the schema.
-export type GenerateAITutorResponseInput = z.infer<typeof GenerateAITutorResponseInputSchema>;
-
+export type GenerateAITutorResponseInput = z.infer<
+  typeof GenerateAITutorResponseInputSchema
+>
 
 /**
  * C-like Analogy: Output Struct Definition
@@ -46,11 +54,16 @@ export type GenerateAITutorResponseInput = z.infer<typeof GenerateAITutorRespons
  * } GenerateAITutorResponseOutput;
  */
 const GenerateAITutorResponseOutputSchema = z.object({
-  tutorResponse: z.string().describe('The AI tutor response, providing hints, analogies, and questions.'),
-});
+  tutorResponse: z
+    .string()
+    .describe(
+      'The AI tutor response, providing hints, analogies, and questions.',
+    ),
+})
 // Create a TypeScript "type" from the schema.
-export type GenerateAITutorResponseOutput = z.infer<typeof GenerateAITutorResponseOutputSchema>;
-
+export type GenerateAITutorResponseOutput = z.infer<
+  typeof GenerateAITutorResponseOutputSchema
+>
 
 /**
  * C-like Analogy: `GenerateAITutorResponseOutput* generateAITutorResponse(GenerateAITutorResponseInput* input)`
@@ -58,11 +71,12 @@ export type GenerateAITutorResponseOutput = z.infer<typeof GenerateAITutorRespon
  * This is the main exported function that our application UI will call. It's a clean
  * wrapper around the internal Genkit flow.
  */
-export async function generateAITutorResponse(input: GenerateAITutorResponseInput): Promise<GenerateAITutorResponseOutput> {
+export async function generateAITutorResponse(
+  input: GenerateAITutorResponseInput,
+): Promise<GenerateAITutorResponseOutput> {
   // It simply calls the internal flow function and returns whatever it returns.
-  return generateAITutorResponseFlow(input);
+  return generateAITutorResponseFlow(input)
 }
-
 
 /**
  * C-like Analogy: The AI Prompt Template (like a `printf` format string)
@@ -79,11 +93,10 @@ export async function generateAITutorResponse(input: GenerateAITutorResponseInpu
  */
 const prompt = ai.definePrompt({
   name: 'generateAITutorResponsePrompt',
-  input: {schema: GenerateAITutorResponseInputSchema}, // Links to the input struct.
-  output: {schema: GenerateAITutorResponseOutputSchema}, // Tells the AI the output struct format.
+  input: { schema: GenerateAITutorResponseInputSchema }, // Links to the input struct.
+  output: { schema: GenerateAITutorResponseOutputSchema }, // Tells the AI the output struct format.
   prompt: `{{#if systemPrompt}} {{systemPrompt}} {{else}} You are Lyra, an AI tutor. Your goal is to help the student verbalize their problem and guide them towards the solution by providing hints, analogies, and questions instead of direct answers. You should never give the direct answer. Emulate the Socratic method. Be patient and encouraging. You can use Markdown for formatting, including MermaidJS for diagrams (using \`\`\`mermaid code blocks). {{/if}}\n\n{{#if exampleGoodAnswers}} Here are some examples of good answers: {{#each exampleGoodAnswers}} - {{{this}}} {{/each}} {{/if}}\n\nProblem Statement: {{{problemStatement}}}`,
-});
-
+})
 
 /**
  * C-like Analogy: The Core Logic Function
@@ -97,17 +110,17 @@ const generateAITutorResponseFlow = ai.defineFlow(
     outputSchema: GenerateAITutorResponseOutputSchema,
   },
   // This is the function body of the flow.
-  async input => {
+  async (input) => {
     // PSEUDOCODE:
     // 1. Call the AI prompt template, filling it in with the `input` data.
     //    `result = ai_call(prompt, input);`
     //    This is an asynchronous call, so we `await` its completion.
-    const {output} = await prompt(input);
+    const { output } = await prompt(input)
 
     // 2. The `result.output` will automatically be in the format of our
     //    `GenerateAITutorResponseOutput` struct because we defined it in the prompt.
     //    We can just return it directly. The `!` is a TypeScript thing that means
     //    "I'm sure this value is not null".
-    return output!;
-  }
-);
+    return output!
+  },
+)

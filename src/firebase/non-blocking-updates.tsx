@@ -15,7 +15,7 @@
  * For example, when a user sends a chat message, we can call `addDocumentNonBlocking`.
  * The message appears in the UI instantly, even though it might take a few hundred
  * milliseconds for it to actually be saved to the database. This is called
-* "optimistic UI".
+ * "optimistic UI".
  *
  * What about errors?
  * Each of these functions includes a `.catch()` block. This is the modern
@@ -30,7 +30,7 @@
  * This ensures that even though we're not waiting for the result, we still have a
  * robust way to handle failures when they occur.
  */
-'use client';
+'use client'
 
 import {
   setDoc,
@@ -40,9 +40,9 @@ import {
   CollectionReference,
   DocumentReference,
   SetOptions,
-} from 'firebase/firestore';
-import { errorEmitter } from '@/firebase/error-emitter';
-import {FirestorePermissionError} from '@/firebase/errors';
+} from 'firebase/firestore'
+import { errorEmitter } from '@/firebase/error-emitter'
+import { FirestorePermissionError } from '@/firebase/errors'
 
 /**
  * C-like Explanation: `void setDocumentNonBlocking(DocRef* docRef, void* data, SetOptions options)`
@@ -50,23 +50,26 @@ import {FirestorePermissionError} from '@/firebase/errors';
  * Initiates a `setDoc` operation (create or overwrite a document).
  * This function is non-blocking. It returns immediately.
  */
-export function setDocumentNonBlocking(docRef: DocumentReference, data: any, options: SetOptions) {
+export function setDocumentNonBlocking(
+  docRef: DocumentReference,
+  data: any,
+  options: SetOptions,
+) {
   // `setDoc` returns a "Promise", which represents a future result.
   // We attach an error handler to this Promise using `.catch()`.
-  setDoc(docRef, data, options).catch(error => {
+  setDoc(docRef, data, options).catch((error) => {
     // If an error occurs in the background, this code runs.
     // We create our detailed error object.
     const permissionError = new FirestorePermissionError({
-        path: docRef.path,
-        operation: 'write', // 'set' can be a create or update.
-        requestResourceData: data,
-      });
+      path: docRef.path,
+      operation: 'write', // 'set' can be a create or update.
+      requestResourceData: data,
+    })
     // And emit it globally.
-    errorEmitter.emit('permission-error', permissionError);
-  });
+    errorEmitter.emit('permission-error', permissionError)
+  })
   // Execution continues immediately after the setDoc call is initiated.
 }
-
 
 /**
  * C-like Explanation: `Promise<DocRef*> addDocumentNonBlocking(ColRef* colRef, void* data)`
@@ -77,23 +80,21 @@ export function setDocumentNonBlocking(docRef: DocumentReference, data: any, opt
  * reference to the newly created document.
  */
 export function addDocumentNonBlocking(colRef: CollectionReference, data: any) {
-  const promise = addDoc(colRef, data)
-    .catch(error => {
-      // The error handling is the same as above.
-      errorEmitter.emit(
-        'permission-error',
-        new FirestorePermissionError({
-          path: colRef.path,
-          operation: 'create',
-          requestResourceData: data,
-        })
-      )
-    });
+  const promise = addDoc(colRef, data).catch((error) => {
+    // The error handling is the same as above.
+    errorEmitter.emit(
+      'permission-error',
+      new FirestorePermissionError({
+        path: colRef.path,
+        operation: 'create',
+        requestResourceData: data,
+      }),
+    )
+  })
   // Return the promise. The caller could optionally wait for it, but the typical
   // use case in this app is "fire-and-forget".
-  return promise;
+  return promise
 }
-
 
 /**
  * C-like Explanation: `void updateDocumentNonBlocking(DocRef* docRef, void* data)`
@@ -101,20 +102,21 @@ export function addDocumentNonBlocking(colRef: CollectionReference, data: any) {
  * Initiates an `updateDoc` operation (update fields in an existing document).
  * This function is non-blocking.
  */
-export function updateDocumentNonBlocking(docRef: DocumentReference, data: any) {
-  updateDoc(docRef, data)
-    .catch(error => {
-      errorEmitter.emit(
-        'permission-error',
-        new FirestorePermissionError({
-          path: docRef.path,
-          operation: 'update',
-          requestResourceData: data,
-        })
-      )
-    });
+export function updateDocumentNonBlocking(
+  docRef: DocumentReference,
+  data: any,
+) {
+  updateDoc(docRef, data).catch((error) => {
+    errorEmitter.emit(
+      'permission-error',
+      new FirestorePermissionError({
+        path: docRef.path,
+        operation: 'update',
+        requestResourceData: data,
+      }),
+    )
+  })
 }
-
 
 /**
  * C-like Explanation: `void deleteDocumentNonBlocking(DocRef* docRef)`
@@ -123,14 +125,13 @@ export function updateDocumentNonBlocking(docRef: DocumentReference, data: any) 
  * This function is non-blocking.
  */
 export function deleteDocumentNonBlocking(docRef: DocumentReference) {
-  deleteDoc(docRef)
-    .catch(error => {
-      errorEmitter.emit(
-        'permission-error',
-        new FirestorePermissionError({
-          path: docRef.path,
-          operation: 'delete',
-        })
-      )
-    });
+  deleteDoc(docRef).catch((error) => {
+    errorEmitter.emit(
+      'permission-error',
+      new FirestorePermissionError({
+        path: docRef.path,
+        operation: 'delete',
+      }),
+    )
+  })
 }

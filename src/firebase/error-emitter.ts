@@ -40,8 +40,8 @@
  *
  * The `errorEmitter` instance is a "singleton" — a single, global instance used by the entire application.
  */
-'use client';
-import { FirestorePermissionError } from '@/firebase/errors';
+'use client'
+import { FirestorePermissionError } from '@/firebase/errors'
 
 /**
  * C-like Analogy: `typedef enum` or a set of `#define` constants.
@@ -54,12 +54,12 @@ import { FirestorePermissionError } from '@/firebase/errors';
  * Here, we only have one event: 'permission-error', which sends a `FirestorePermissionError` object.
  */
 export interface AppEvents {
-  'permission-error': FirestorePermissionError;
+  'permission-error': FirestorePermissionError
 }
 
 // C-like Analogy: `typedef void (*Callback)(T data);`
 // This is a generic type for a callback function that takes one argument of type T.
-type Callback<T> = (data: T) => void;
+type Callback<T> = (data: T) => void
 
 /**
  * A strongly-typed pub/sub event emitter.
@@ -69,7 +69,7 @@ function createEventEmitter<T extends Record<string, any>>() {
   // The `events` object is like a hash map or dictionary.
   // The keys are event names (e.g., "permission-error").
   // The values are arrays of callback functions (`Callback<T[K]>[]`).
-  const events: { [K in keyof T]?: Array<Callback<T[K]>> } = {};
+  const events: { [K in keyof T]?: Array<Callback<T[K]>> } = {}
 
   return {
     /**
@@ -80,10 +80,10 @@ function createEventEmitter<T extends Record<string, any>>() {
     on<K extends keyof T>(eventName: K, callback: Callback<T[K]>) {
       // If no one is listening to this event yet, create an empty array.
       if (!events[eventName]) {
-        events[eventName] = [];
+        events[eventName] = []
       }
       // Add the new callback to the array for this event.
-      events[eventName]?.push(callback);
+      events[eventName]?.push(callback)
     },
 
     /**
@@ -93,10 +93,10 @@ function createEventEmitter<T extends Record<string, any>>() {
      */
     off<K extends keyof T>(eventName: K, callback: Callback<T[K]>) {
       if (!events[eventName]) {
-        return; // Nothing to remove.
+        return // Nothing to remove.
       }
       // Filter the array, keeping only the callbacks that are NOT the one we want to remove.
-      events[eventName] = events[eventName]?.filter(cb => cb !== callback);
+      events[eventName] = events[eventName]?.filter((cb) => cb !== callback)
     },
 
     /**
@@ -106,14 +106,14 @@ function createEventEmitter<T extends Record<string, any>>() {
      */
     emit<K extends keyof T>(eventName: K, data: T[K]) {
       if (!events[eventName]) {
-        return; // No one is listening.
+        return // No one is listening.
       }
       // Loop through all registered callbacks for this event and call each one with the data.
-      events[eventName]?.forEach(callback => callback(data));
+      events[eventName]?.forEach((callback) => callback(data))
     },
-  };
+  }
 }
 
 // Create and export a singleton instance of the emitter, typed with our AppEvents interface.
 // This `errorEmitter` is the global object that other parts of the app will import and use.
-export const errorEmitter = createEventEmitter<AppEvents>();
+export const errorEmitter = createEventEmitter<AppEvents>()

@@ -14,13 +14,12 @@
  *
  * The primary exported function is `implementEthicalAIGuardrails`.
  */
-'use server';
+'use server'
 
 // Import necessary libraries.
 // C-like analogy: #include <genkit_lib.h> and #include <zod_struct_lib.h>
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-
+import { ai } from '@/ai/genkit'
+import { z } from 'genkit'
 
 /**
  * C-like Analogy: Input Struct Definition
@@ -32,11 +31,16 @@ import {z} from 'genkit';
  */
 const ImplementEthicalAIGuardrailsInputSchema = z.object({
   userInput: z.string().describe('The user input or question.'),
-  systemPrompt: z.string().describe('The system prompt defining the AI tutor\'s behavior and ethical guidelines.'),
-});
+  systemPrompt: z
+    .string()
+    .describe(
+      "The system prompt defining the AI tutor's behavior and ethical guidelines.",
+    ),
+})
 // Create a TypeScript "type" from the schema.
-export type ImplementEthicalAIGuardrailsInput = z.infer<typeof ImplementEthicalAIGuardrailsInputSchema>;
-
+export type ImplementEthicalAIGuardrailsInput = z.infer<
+  typeof ImplementEthicalAIGuardrailsInputSchema
+>
 
 /**
  * C-like Analogy: Output Struct Definition
@@ -46,21 +50,25 @@ export type ImplementEthicalAIGuardrailsInput = z.infer<typeof ImplementEthicalA
  * } ImplementEthicalAIGuardrailsOutput;
  */
 const ImplementEthicalAIGuardrailsOutputSchema = z.object({
-  aiResponse: z.string().describe('The AI tutor\'s response, adhering to ethical guidelines.'),
-});
+  aiResponse: z
+    .string()
+    .describe("The AI tutor's response, adhering to ethical guidelines."),
+})
 // Create a TypeScript "type" from the schema.
-export type ImplementEthicalAIGuardrailsOutput = z.infer<typeof ImplementEthicalAIGuardrailsOutputSchema>;
-
+export type ImplementEthicalAIGuardrailsOutput = z.infer<
+  typeof ImplementEthicalAIGuardrailsOutputSchema
+>
 
 /**
  * C-like Analogy: `ImplementEthicalAIGuardrailsOutput* implementEthicalAIGuardrails(ImplementEthicalAIGuardrailsInput* input)`
  *
  * This is the main exported function. It's a simple wrapper that calls the internal Genkit flow.
  */
-export async function implementEthicalAIGuardrails(input: ImplementEthicalAIGuardrailsInput): Promise<ImplementEthicalAIGuardrailsOutput> {
-  return implementEthicalAIGuardrailsFlow(input);
+export async function implementEthicalAIGuardrails(
+  input: ImplementEthicalAIGuardrailsInput,
+): Promise<ImplementEthicalAIGuardrailsOutput> {
+  return implementEthicalAIGuardrailsFlow(input)
 }
-
 
 /**
  * C-like Analogy: The AI Prompt Template (like a `printf` format string)
@@ -73,11 +81,10 @@ export async function implementEthicalAIGuardrails(input: ImplementEthicalAIGuar
  */
 const ethicalAIGuardrailsPrompt = ai.definePrompt({
   name: 'ethicalAIGuardrailsPrompt',
-  input: {schema: ImplementEthicalAIGuardrailsInputSchema},
-  output: {schema: ImplementEthicalAIGuardrailsOutputSchema},
+  input: { schema: ImplementEthicalAIGuardrailsInputSchema },
+  output: { schema: ImplementEthicalAIGuardrailsOutputSchema },
   prompt: `{{systemPrompt}}\n\nUser Input: {{{userInput}}}`,
-});
-
+})
 
 /**
  * C-like Analogy: The Core Logic Function
@@ -91,15 +98,15 @@ const implementEthicalAIGuardrailsFlow = ai.defineFlow(
     outputSchema: ImplementEthicalAIGuardrailsOutputSchema,
   },
   // This is the function body of the flow.
-  async input => {
+  async (input) => {
     // PSEUDOCODE:
     // 1. Call the AI with our prompt, providing the rules and the user's input.
     //    `result = ai_call(ethicalAIGuardrailsPrompt, input);`
     //    We `await` its completion.
-    const {output} = await ethicalAIGuardrailsPrompt(input);
+    const { output } = await ethicalAIGuardrailsPrompt(input)
 
     // 2. Return the AI's response, which should now conform to the ethical guardrails.
     //    The `!` tells TypeScript we are sure the output is not null.
-    return output!;
-  }
-);
+    return output!
+  },
+)

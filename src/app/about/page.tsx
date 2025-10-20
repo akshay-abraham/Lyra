@@ -15,12 +15,18 @@
 
 // Like `#include` in C, these lines import necessary "libraries" or components.
 // We are importing UI components (like Card, Button) and icons.
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, BrainCircuit, Database, Languages, ArrowRight, Shield, Scale } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link'; // The component for creating hyperlinks.
-import { SidebarLayout } from '@/components/layout/sidebar-layout'; // The main layout with the navigation sidebar.
-import Image from 'next/image'; // Next.js's optimized image component.
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  BrainCircuit,
+  Database,
+  Languages,
+  ArrowRight,
+  Shield,
+  Scale,
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { SidebarLayout } from '@/components/layout/sidebar-layout' // The main layout with the navigation sidebar.
+import Image from 'next/image' // Next.js's optimized image component.
 
 /**
  * C-like Explanation: `function AboutPage() -> returns JSX_Element`
@@ -47,95 +53,180 @@ export default function AboutPage() {
         (e.g., `container` for centering, `p-4` for padding, `animate-fade-in-down`
         for a simple animation).
       */}
-      <div className="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8 animate-fade-in-down">
+      <div className='container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8 animate-fade-in-down'>
         {/* A `<Card>` component is used to group content in a visually distinct box. */}
-        <Card className="overflow-hidden shadow-2xl shadow-primary/10 bg-card/80 backdrop-blur-sm border-primary/20">
-          <CardHeader className="text-center bg-primary/5 p-10 animate-fade-in-down" style={{ animationDelay: '0.2s' }}>
+        <Card className='overflow-hidden shadow-2xl shadow-primary/10 bg-card/80 backdrop-blur-sm border-primary/20'>
+          <CardHeader
+            className='text-center bg-primary/5 p-10 animate-fade-in-down'
+            style={{ animationDelay: '0.2s' }}
+          >
             {/* Display the Lyra logo image. */}
-            <div className="flex justify-center items-center mb-4 animate-scale-in" style={{ animationDelay: '0.3s' }}>
-                <Image src="/logo.webp" alt="Lyra AI Tutor Logo" width={80} height={80} />
+            <div
+              className='flex justify-center items-center mb-4 animate-scale-in'
+              style={{ animationDelay: '0.3s' }}
+            >
+              <Image
+                src='/logo.webp'
+                alt='Lyra AI Tutor Logo'
+                width={80}
+                height={80}
+              />
             </div>
             {/* The main title of the card. */}
-            <CardTitle className="font-headline text-5xl">Lyra</CardTitle>
-            <p className="text-muted-foreground text-lg">An Ethical AI Tutor, Customizable by Teachers</p>
+            <CardTitle className='font-headline text-5xl'>Lyra</CardTitle>
+            <p className='text-muted-foreground text-lg'>
+              An Ethical AI Tutor, Customizable by Teachers
+            </p>
           </CardHeader>
-          <CardContent className="p-6 md:p-10 space-y-12">
+          <CardContent className='p-6 md:p-10 space-y-12'>
             {/* Section explaining the motivation behind Lyra. */}
-            <div className="prose prose-lg max-w-none dark:prose-invert animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-                <h2 className="font-headline text-3xl">Our Motivation</h2>
-                <p>
-                  In today’s classrooms, AI is often met with suspicion. Educators fear that students will outsource thinking. The real challenge is not to ban AI, but to integrate it as a tool for critical thinking. Lyra is designed to be a smart, pedagogical assistant that guides students through problems with hints and Socratic questioning, much like a real tutor. It encourages students to verbalize their thought processes—a technique known as rubber duck debugging—to help them arrive at solutions on their own.
-                </p>
+            <div
+              className='prose prose-lg max-w-none dark:prose-invert animate-fade-in-up'
+              style={{ animationDelay: '0.4s' }}
+            >
+              <h2 className='font-headline text-3xl'>Our Motivation</h2>
+              <p>
+                In today’s classrooms, AI is often met with suspicion. Educators
+                fear that students will outsource thinking. The real challenge
+                is not to ban AI, but to integrate it as a tool for critical
+                thinking. Lyra is designed to be a smart, pedagogical assistant
+                that guides students through problems with hints and Socratic
+                questioning, much like a real tutor. It encourages students to
+                verbalize their thought processes—a technique known as rubber
+                duck debugging—to help them arrive at solutions on their own.
+              </p>
             </div>
 
             {/* Section describing the core technical components. */}
-            <div className="animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-              <h2 className="font-headline text-3xl text-center mb-8">Core Components</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div
+              className='animate-fade-in-up'
+              style={{ animationDelay: '0.6s' }}
+            >
+              <h2 className='font-headline text-3xl text-center mb-8'>
+                Core Components
+              </h2>
+              <div className='grid grid-cols-1 md:grid-cols-3 gap-8 text-center'>
                 {/* Each item uses an icon, a heading, and a short description. */}
-                <div className="flex flex-col items-center p-6 rounded-xl transition-all duration-500 hover:bg-primary/5 hover:shadow-xl hover:-translate-y-2 animate-fade-in-up" style={{ animationDelay: '0.7s' }}>
-                  <BrainCircuit className="h-12 w-12 text-primary mb-4" />
-                  <h3 className="font-headline text-xl mb-2">Retrieval-Augmented Generation</h3>
-                  <p className="text-muted-foreground">Lyra uses RAG to ground its responses in factual, course-specific information, reducing the risk of hallucination.</p>
+                <div
+                  className='flex flex-col items-center p-6 rounded-xl transition-all duration-500 hover:bg-primary/5 hover:shadow-xl hover:-translate-y-2 animate-fade-in-up'
+                  style={{ animationDelay: '0.7s' }}
+                >
+                  <BrainCircuit className='h-12 w-12 text-primary mb-4' />
+                  <h3 className='font-headline text-xl mb-2'>
+                    Retrieval-Augmented Generation
+                  </h3>
+                  <p className='text-muted-foreground'>
+                    Lyra uses RAG to ground its responses in factual,
+                    course-specific information, reducing the risk of
+                    hallucination.
+                  </p>
                 </div>
-                <div className="flex flex-col items-center p-6 rounded-xl transition-all duration-500 hover:bg-primary/5 hover:shadow-xl hover:-translate-y-2 animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
-                  <Database className="h-12 w-12 text-primary mb-4" />
-                  <h3 className="font-headline text-xl mb-2">Vector Databases</h3>
-                  <p className="text-muted-foreground">For fast and semantically relevant information retrieval from lecture notes and documents.</p>
+                <div
+                  className='flex flex-col items-center p-6 rounded-xl transition-all duration-500 hover:bg-primary/5 hover:shadow-xl hover:-translate-y-2 animate-fade-in-up'
+                  style={{ animationDelay: '0.8s' }}
+                >
+                  <Database className='h-12 w-12 text-primary mb-4' />
+                  <h3 className='font-headline text-xl mb-2'>
+                    Vector Databases
+                  </h3>
+                  <p className='text-muted-foreground'>
+                    For fast and semantically relevant information retrieval
+                    from lecture notes and documents.
+                  </p>
                 </div>
-                <div className="flex flex-col items-center p-6 rounded-xl transition-all duration-500 hover:bg-primary/5 hover:shadow-xl hover:-translate-y-2 animate-fade-in-up" style={{ animationDelay: '0.9s' }}>
-                  <Languages className="h-12 w-12 text-primary mb-4" />
-                  <h3 className="font-headline text-xl mb-2">Prompt Engineering</h3>
-                  <p className="text-muted-foreground">Carefully crafted prompts ensure the AI follows pedagogical rules, adapting to different teaching styles.</p>
+                <div
+                  className='flex flex-col items-center p-6 rounded-xl transition-all duration-500 hover:bg-primary/5 hover:shadow-xl hover:-translate-y-2 animate-fade-in-up'
+                  style={{ animationDelay: '0.9s' }}
+                >
+                  <Languages className='h-12 w-12 text-primary mb-4' />
+                  <h3 className='font-headline text-xl mb-2'>
+                    Prompt Engineering
+                  </h3>
+                  <p className='text-muted-foreground'>
+                    Carefully crafted prompts ensure the AI follows pedagogical
+                    rules, adapting to different teaching styles.
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* A summary of the project's vision. */}
-            <div className="text-center animate-fade-in-up" style={{ animationDelay: '1s' }}>
-              <h2 className="font-headline text-3xl">The Vision</h2>
-              <p className="text-muted-foreground text-lg max-w-2xl mx-auto mt-4">
-                Lyra aims to be a customizable and scalable AI tutoring platform with educational ethics at its core. It's a tool for learning, not just for getting answers.
+            <div
+              className='text-center animate-fade-in-up'
+              style={{ animationDelay: '1s' }}
+            >
+              <h2 className='font-headline text-3xl'>The Vision</h2>
+              <p className='text-muted-foreground text-lg max-w-2xl mx-auto mt-4'>
+                Lyra aims to be a customizable and scalable AI tutoring platform
+                with educational ethics at its core. It's a tool for learning,
+                not just for getting answers.
               </p>
             </div>
 
             {/* A card dedicated to displaying the license information. */}
-            <Card className="bg-card/80 backdrop-blur-sm border-accent/20 animate-fade-in-up" style={{ animationDelay: '1.2s' }}>
-              <CardHeader className="flex flex-row items-center gap-4">
-                <Scale className="h-8 w-8 text-accent"/>
-                <CardTitle className="font-headline text-2xl">Open Source License</CardTitle>
+            <Card
+              className='bg-card/80 backdrop-blur-sm border-accent/20 animate-fade-in-up'
+              style={{ animationDelay: '1.2s' }}
+            >
+              <CardHeader className='flex flex-row items-center gap-4'>
+                <Scale className='h-8 w-8 text-accent' />
+                <CardTitle className='font-headline text-2xl'>
+                  Open Source License
+                </CardTitle>
               </CardHeader>
-              <CardContent className="prose prose-sm max-w-none dark:prose-invert">
+              <CardContent className='prose prose-sm max-w-none dark:prose-invert'>
                 <p>
                   <strong>Copyright © 2025 Akshay K. Rooben Abraham.</strong>
                 </p>
                 <p>
-                  This project is licensed under the <strong>GNU Affero General Public License v3.0</strong>. This license is designed to ensure that the software remains free and open-source, and that any modifications made available over a network are also shared back with the community.
+                  This project is licensed under the{' '}
+                  <strong>GNU Affero General Public License v3.0</strong>. This
+                  license is designed to ensure that the software remains free
+                  and open-source, and that any modifications made available
+                  over a network are also shared back with the community.
                 </p>
                 <p>You can view the full license text on GitHub:</p>
                 <Button asChild>
-                    <a href="https://github.com/akshay-abraham/Lyra/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">
-                        View AGPL-3.0 License <ArrowRight className="ml-2 h-4 w-4" />
-                    </a>
+                  <a
+                    href='https://github.com/akshay-abraham/Lyra/blob/main/LICENSE'
+                    target='_blank'
+                    rel='noopener noreferrer'
+                  >
+                    View AGPL-3.0 License{' '}
+                    <ArrowRight className='ml-2 h-4 w-4' />
+                  </a>
                 </Button>
               </CardContent>
             </Card>
-
           </CardContent>
           {/* This is the footer section of the main card. */}
-          <div className="bg-primary/5 p-6 text-center animate-fade-in border-t border-primary/10" style={{ animationDelay: '1.3s' }}>
-              <div className="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-4 text-sm text-muted-foreground mb-4">
-                  <span className="flex items-center gap-1.5"><Shield className="h-4 w-4" /> Copyright © 2025 Akshay K. Rooben Abraham.</span>
-              </div>
-              {/* This button links to an external website. */}
-              <Button asChild className="group transition-all duration-300 ease-in-out hover:scale-105">
-                  <a href="https://akshayabraham.vercel.app/" target="_blank" rel="noopener noreferrer">
-                      Contact Developer <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </a>
-              </Button>
+          <div
+            className='bg-primary/5 p-6 text-center animate-fade-in border-t border-primary/10'
+            style={{ animationDelay: '1.3s' }}
+          >
+            <div className='flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-4 text-sm text-muted-foreground mb-4'>
+              <span className='flex items-center gap-1.5'>
+                <Shield className='h-4 w-4' /> Copyright © 2025 Akshay K.
+                Rooben Abraham.
+              </span>
+            </div>
+            {/* This button links to an external website. */}
+            <Button
+              asChild
+              className='group transition-all duration-300 ease-in-out hover:scale-105'
+            >
+              <a
+                href='https://akshayabraham.vercel.app/'
+                target='_blank'
+                rel='noopener noreferrer'
+              >
+                Contact Developer{' '}
+                <ArrowRight className='ml-2 h-4 w-4 transition-transform group-hover:translate-x-1' />
+              </a>
+            </Button>
           </div>
         </Card>
       </div>
     </SidebarLayout>
-  );
+  )
 }

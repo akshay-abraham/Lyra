@@ -15,8 +15,8 @@
  *     needs to load any data asynchronously (though in this case, it's very fast).
  */
 
-import { LoginForm } from '@/components/auth/login-form';
-import { Suspense } from 'react';
+import { LoginForm } from '@/components/auth/login-form'
+import { Suspense } from 'react'
 
 /**
  * C-like Explanation: `function LoginPage() -> returns JSX_Element`
@@ -35,7 +35,7 @@ export default function LoginPage() {
     // - `min-h-screen`: Makes the container take up at least the full height of the browser screen.
     // - `bg-background`: Sets the background color using the CSS variable defined in `globals.css`.
     // - `p-4`: Applies padding.
-    <div className="flex items-center justify-center min-h-screen bg-background p-4">
+    <div className='flex items-center justify-center min-h-screen bg-background p-4'>
       {/*
         The `<Suspense>` component is a React feature for handling loading states.
         It tells React: "Try to render the component inside me (`LoginForm`). While it's
@@ -51,5 +51,5 @@ export default function LoginPage() {
         <LoginForm />
       </Suspense>
     </div>
-  );
+  )
 }

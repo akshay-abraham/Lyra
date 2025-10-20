@@ -11,13 +11,12 @@
  *
  * The primary exported function is `generateChatTitle`.
  */
-'use server';
-
+'use server'
 
 // Import necessary libraries.
 // C-like analogy: #include <genkit_lib.h> and #include <zod_struct_lib.h>
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from '@/ai/genkit'
+import { z } from 'genkit'
 
 /**
  * C-like Analogy: Input Struct Definition
@@ -27,11 +26,14 @@ import {z} from 'genkit';
  * } GenerateChatTitleInput;
  */
 const GenerateChatTitleInputSchema = z.object({
-  firstMessage: z.string().describe('The first message from the user in a chat session.'),
-});
+  firstMessage: z
+    .string()
+    .describe('The first message from the user in a chat session.'),
+})
 // Create a TypeScript "type" from the schema.
-export type GenerateChatTitleInput = z.infer<typeof GenerateChatTitleInputSchema>;
-
+export type GenerateChatTitleInput = z.infer<
+  typeof GenerateChatTitleInputSchema
+>
 
 /**
  * C-like Analogy: Output Struct Definition
@@ -41,11 +43,14 @@ export type GenerateChatTitleInput = z.infer<typeof GenerateChatTitleInputSchema
  * } GenerateChatTitleOutput;
  */
 const GenerateChatTitleOutputSchema = z.object({
-  title: z.string().describe('A short, descriptive title for the chat session (5 words max).'),
-});
+  title: z
+    .string()
+    .describe('A short, descriptive title for the chat session (5 words max).'),
+})
 // Create a TypeScript "type" from the schema.
-export type GenerateChatTitleOutput = z.infer<typeof GenerateChatTitleOutputSchema>;
-
+export type GenerateChatTitleOutput = z.infer<
+  typeof GenerateChatTitleOutputSchema
+>
 
 /**
  * C-like Analogy: `GenerateChatTitleOutput* generateChatTitle(GenerateChatTitleInput* input)`
@@ -53,11 +58,12 @@ export type GenerateChatTitleOutput = z.infer<typeof GenerateChatTitleOutputSche
  * This is the main exported function that our application UI will call when a new
  * chat is started.
  */
-export async function generateChatTitle(input: GenerateChatTitleInput): Promise<GenerateChatTitleOutput> {
+export async function generateChatTitle(
+  input: GenerateChatTitleInput,
+): Promise<GenerateChatTitleOutput> {
   // It's a simple wrapper that calls the internal Genkit flow.
-  return generateChatTitleFlow(input);
+  return generateChatTitleFlow(input)
 }
-
 
 /**
  * C-like Analogy: The AI Prompt Template (like a `printf` format string)
@@ -69,15 +75,14 @@ export async function generateChatTitle(input: GenerateChatTitleInput): Promise<
  */
 const prompt = ai.definePrompt({
   name: 'generateChatTitlePrompt',
-  input: {schema: GenerateChatTitleInputSchema},   // Input data format.
-  output: {schema: GenerateChatTitleOutputSchema}, // Expected output format.
+  input: { schema: GenerateChatTitleInputSchema }, // Input data format.
+  output: { schema: GenerateChatTitleOutputSchema }, // Expected output format.
   prompt: `Based on the following user message, generate a short, descriptive title for the chat session (max 5 words).
 
 User Message: {{{firstMessage}}}
 
 Title:`,
-});
-
+})
 
 /**
  * C-like Analogy: The Core Logic Function
@@ -91,15 +96,15 @@ const generateChatTitleFlow = ai.defineFlow(
     outputSchema: GenerateChatTitleOutputSchema,
   },
   // This is the function body of the flow.
-  async input => {
+  async (input) => {
     // PSEUDOCODE:
     // 1. Call the AI with our prompt, filling in the `input` data.
     //    `result = ai_call(prompt, input);`
     //    This is an asynchronous call, so we `await` its completion.
-    const {output} = await prompt(input);
+    const { output } = await prompt(input)
 
     // 2. The `result.output` is guaranteed by Genkit to match our `GenerateChatTitleOutputSchema`.
     //    We can simply return it. The `!` tells TypeScript we are sure it's not null.
-    return output!;
-  }
-);
+    return output!
+  },
+)

@@ -1,4 +1,5 @@
 # 🪐 Lyra
+
 ## 📖 Motivation
 
 ### 1. The Current Dilemma in Education and AI
@@ -47,7 +48,6 @@ Thus, Lyra was born — as a **central [AI](https://en.wikipedia.org/wiki/Artifi
 - Guide students to learn through hints, analogies, and questions.
 - Enable scalable AI tutoring with **educational ethics at the core**.
 - Allow **customization for each school, class, or teacher**:
-
   - A school can adjust the system prompts to match its teaching philosophy.
   - A teacher can fine-tune how the AI responds — more hints, more examples, or more Socratic questioning.
   - Different classes can configure domain-specific prompts (e.g., math problem-solving vs. essay writing).
@@ -155,7 +155,6 @@ Well-crafted prompts guide the [AI](https://en.wikipedia.org/wiki/Artificial_int
 2. Convert to embeddings (OpenAI API).
 3. Store in vector database (ChromaDB).
 4. On query:
-
    - Convert question to embedding.
    - Retrieve most relevant chunks.
    - Pass to GPT with prompts (system prompt sets rules, user prompt is query).
@@ -178,4 +177,3 @@ Well-crafted prompts guide the [AI](https://en.wikipedia.org/wiki/Artificial_int
 ---
 
 👉 [Read More in `EXPANDABILITY.md`](./EXPANDABILITY.md)
-

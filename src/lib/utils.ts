@@ -8,8 +8,8 @@
  * and makes the main component files cleaner.
  */
 
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 
 /**
  * C-like Explanation: `function cn(...inputs) -> returns string`
@@ -35,7 +35,6 @@ import { twMerge } from "tailwind-merge"
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
-
 
 /**
  * C-like Explanation: `function calculatePasswordStrength(password) -> returns int`
@@ -78,18 +77,18 @@ export function cn(...inputs: ClassValue[]) {
  * @returns {number} A score from 0 to 100 representing the password's strength.
  */
 export const calculatePasswordStrength = (password: string): number => {
-    let score = 0;
-    if (!password) return 0;
+  let score = 0
+  if (!password) return 0
 
-    // Use regular expressions (regex) to test for character types.
-    // A regex is a powerful pattern-matching tool.
+  // Use regular expressions (regex) to test for character types.
+  // A regex is a powerful pattern-matching tool.
 
-    // Award points for different criteria
-    if (password.length >= 8) score += 20;
-    if (/[a-z]/.test(password)) score += 20; // Tests for a lowercase letter
-    if (/[A-Z]/.test(password)) score += 20; // Tests for an uppercase letter
-    if (/[0-9]/.test(password)) score += 20; // Tests for a number
-    if (/[^A-Za-z0-9]/.test(password)) score += 20; // Tests for a non-alphanumeric character
+  // Award points for different criteria
+  if (password.length >= 8) score += 20
+  if (/[a-z]/.test(password)) score += 20 // Tests for a lowercase letter
+  if (/[A-Z]/.test(password)) score += 20 // Tests for an uppercase letter
+  if (/[0-9]/.test(password)) score += 20 // Tests for a number
+  if (/[^A-Za-z0-9]/.test(password)) score += 20 // Tests for a non-alphanumeric character
 
-    return score;
-};
+  return score
+}

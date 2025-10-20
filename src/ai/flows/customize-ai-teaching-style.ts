@@ -10,12 +10,12 @@
  *
  * The primary exported function is `customizeAiTeachingStyle`.
  */
-'use server';
+'use server'
 
 // Import necessary libraries. `ai` is our main Genkit instance, and `z` is for defining data structures.
 // C-like analogy: #include <genkit_lib.h> and #include <zod_struct_lib.h>
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from '@/ai/genkit'
+import { z } from 'genkit'
 
 /**
  * C-like Analogy:
@@ -33,20 +33,19 @@ const CustomizeAiTeachingStyleInputSchema = z.object({
   systemPrompt: z
     .string()
     .describe(
-      'The system prompt to customize the AI teaching style, guidance level, and domain-specific knowledge.'
+      'The system prompt to customize the AI teaching style, guidance level, and domain-specific knowledge.',
     ),
   exampleGoodAnswers: z
     .string()
     .optional()
     .describe(
-      'Examples of good answers to guide the AI response generation, to be used in few-shot prompting.'
+      'Examples of good answers to guide the AI response generation, to be used in few-shot prompting.',
     ),
-});
+})
 // This creates a TypeScript "type" from the schema, similar to using the `typedef` struct.
 export type CustomizeAiTeachingStyleInput = z.infer<
   typeof CustomizeAiTeachingStyleInputSchema
->;
-
+>
 
 /**
  * C-like Analogy:
@@ -62,11 +61,11 @@ const CustomizeAiTeachingStyleOutputSchema = z.object({
   updatedSystemPrompt: z
     .string()
     .describe('The updated system prompt after customization.'),
-});
+})
 // Create the TypeScript type from the schema.
 export type CustomizeAiTeachingStyleOutput = z.infer<
   typeof CustomizeAiTeachingStyleOutputSchema
->;
+>
 
 /**
  * C-like Analogy: `CustomizeAiTeachingStyleOutput* customizeAiTeachingStyle(CustomizeAiTeachingStyleInput* input)`
@@ -80,12 +79,11 @@ export type CustomizeAiTeachingStyleOutput = z.infer<
  * for the eventual result.
  */
 export async function customizeAiTeachingStyle(
-  input: CustomizeAiTeachingStyleInput
+  input: CustomizeAiTeachingStyleInput,
 ): Promise<CustomizeAiTeachingStyleOutput> {
   // Call the internal flow function and return its result.
-  return customizeAiTeachingStyleFlow(input);
+  return customizeAiTeachingStyleFlow(input)
 }
-
 
 /**
  * C-like Analogy: This defines the template for the AI prompt.
@@ -100,12 +98,12 @@ export async function customizeAiTeachingStyle(
  */
 const customizeAiTeachingStylePrompt = ai.definePrompt({
   name: 'customizeAiTeachingStylePrompt',
-  input: {schema: CustomizeAiTeachingStyleInputSchema},
-  output: {schema: CustomizeAiTeachingStyleOutputSchema},
+  input: { schema: CustomizeAiTeachingStyleInputSchema },
+  output: { schema: CustomizeAiTeachingStyleOutputSchema },
   prompt: `You are customizing the system prompt for an AI tutor. The current system prompt is: {{{systemPrompt}}}.  Update the system prompt based on teacher customizations. If applicable, incorporate the following examples of good answers: {{{exampleGoodAnswers}}}. Return the updated system prompt.
 
 Updated System Prompt:`,
-});
+})
 
 /**
  * C-like Analogy: This is the core logic of the AI flow.
@@ -126,12 +124,12 @@ const customizeAiTeachingStyleFlow = ai.defineFlow(
     outputSchema: CustomizeAiTeachingStyleOutputSchema,
   },
   // This is the function body of the flow.
-  async input => {
+  async (input) => {
     // PSEUDOCODE:
     // 1. Call the AI prompt with the provided input data.
     //    `result = ai_call(customizeAiTeachingStylePrompt, input);`
     //    This is an asynchronous call, so we `await` the result.
-    const {output} = await customizeAiTeachingStylePrompt(input);
+    const { output } = await customizeAiTeachingStylePrompt(input)
 
     // 2. Create the output struct.
     //    `CustomizeAiTeachingStyleOutput response;`
@@ -139,6 +137,6 @@ const customizeAiTeachingStyleFlow = ai.defineFlow(
     // 3. Return the response.
     return {
       updatedSystemPrompt: output!.updatedSystemPrompt,
-    };
-  }
-);
+    }
+  },
+)

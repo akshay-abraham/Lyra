@@ -14,11 +14,11 @@
  * This acts as a "public interface" for the Firebase module, hiding the internal
  * file structure from the rest of the application.
  */
-'use client';
+'use client'
 
-import { firebaseConfig } from '@/firebase/config';
-import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { firebaseConfig } from '@/firebase/config'
+import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app'
+import { getAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 
 /**
@@ -34,7 +34,7 @@ import { getFirestore } from 'firebase/firestore'
  * IMPORTANT: Firebase App Hosting Integration
  * The `try...catch` block is special. Firebase App Hosting can automatically provide
  * Firebase configuration via environment variables on the server. The `initializeApp()`
-* function (when called with no arguments) is designed to detect and use these variables.
+ * function (when called with no arguments) is designed to detect and use these variables.
  * - `try`: We first attempt to initialize using this automatic method. This is the
  *   preferred way for production environments.
  * - `catch`: If that fails (which is normal in a local development environment), we
@@ -51,27 +51,30 @@ export function initializeFirebase() {
     // integrates with the initializeApp() function to provide the environment variables needed to
     // populate the FirebaseOptions in production. It is critical that we attempt to call initializeApp()
     // without arguments.
-    let firebaseApp;
+    let firebaseApp
     try {
       // Attempt to initialize via Firebase App Hosting environment variables. This is for production.
-      firebaseApp = initializeApp();
+      firebaseApp = initializeApp()
     } catch (e) {
       // This `catch` block will typically run during local development.
       // Only warn in production because it's normal to use the firebaseConfig to initialize
       // during development.
-      if (process.env.NODE_ENV === "production") {
-        console.warn('Automatic initialization failed. Falling back to firebase config object.', e);
+      if (process.env.NODE_ENV === 'production') {
+        console.warn(
+          'Automatic initialization failed. Falling back to firebase config object.',
+          e,
+        )
       }
       // Initialize using the hard-coded config from `config.ts`.
-      firebaseApp = initializeApp(firebaseConfig);
+      firebaseApp = initializeApp(firebaseConfig)
     }
 
     // Once the app is initialized, get the handles to the other services (Auth, Firestore).
-    return getSdks(firebaseApp);
+    return getSdks(firebaseApp)
   }
 
   // If already initialized, just get the existing app instance and return the service handles.
-  return getSdks(getApp());
+  return getSdks(getApp())
 }
 
 /**
@@ -87,8 +90,8 @@ export function getSdks(firebaseApp: FirebaseApp) {
   return {
     firebaseApp,
     auth: getAuth(firebaseApp),
-    firestore: getFirestore(firebaseApp)
-  };
+    firestore: getFirestore(firebaseApp),
+  }
 }
 
 // This section uses `export * from ...` to re-export everything from the other
@@ -96,11 +99,11 @@ export function getSdks(firebaseApp: FirebaseApp) {
 // through a single import path, e.g., `import { useUser } from '@/firebase';`.
 // It's like having a master `include "firebase.h"` that itself includes
 // `auth.h`, `firestore.h`, `errors.h`, etc.
-export * from './provider';
-export * from './client-provider';
-export * from './firestore/use-collection';
-export * from './firestore/use-doc';
-export * from './non-blocking-updates';
-export * from './non-blocking-login';
-export * from './errors';
-export * from './error-emitter';
+export * from './provider'
+export * from './client-provider'
+export * from './firestore/use-collection'
+export * from './firestore/use-doc'
+export * from './non-blocking-updates'
+export * from './non-blocking-login'
+export * from './errors'
+export * from './error-emitter'

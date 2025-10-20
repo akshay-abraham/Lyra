@@ -20,29 +20,29 @@
  */
 
 // Import necessary types and components.
-import type { Metadata } from 'next';
-import { Inter, Sora } from 'next/font/google'; // Google font loading utility.
-import './globals.css'; // The global stylesheet we just looked at.
-import { Toaster } from "@/components/ui/toaster"; // Component to display pop-up notifications.
-import { FirebaseClientProvider } from '@/firebase/client-provider'; // The global Firebase provider.
+import type { Metadata } from 'next'
+import { Inter, Sora } from 'next/font/google' // Google font loading utility.
+import './globals.css' // The global stylesheet we just looked at.
+import { Toaster } from '@/components/ui/toaster' // Component to display pop-up notifications.
+import { FirebaseClientProvider } from '@/firebase/client-provider' // The global Firebase provider.
 
 // Load the 'Inter' font. This function from Next.js is highly optimized.
 // It downloads the font at build time and serves it with the rest of the app,
 // preventing layout shifts and improving performance.
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 // Load the 'Sora' font, used for headlines.
 const sora = Sora({
   subsets: ['latin'],
   weight: ['400', '600', '700'],
   variable: '--font-sora',
-});
+})
 
 // This is metadata for Search Engine Optimization (SEO) and browser tabs.
 // It's like setting the title of your console window.
 export const metadata: Metadata = {
   title: 'Lyra: Ethical AI Tutor',
   description: 'An ethical AI tutor for students, customizable by teachers.',
-};
+}
 
 /**
  * C-like Explanation: `function RootLayout(props) -> returns JSX_Element`
@@ -61,12 +61,12 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     // The `<html>` tag, with the language set to English.
     // `suppressHydrationWarning` is a technical setting to avoid warnings in some cases.
-    <html lang="en" suppressHydrationWarning>
+    <html lang='en' suppressHydrationWarning>
       <head>
         {/* The <head> tag can contain metadata, links to stylesheets, etc. */}
         {/* Next.js automatically handles much of this for us. */}
@@ -77,7 +77,9 @@ export default function RootLayout({
         that we can use in our Tailwind CSS configuration.
         `antialiased` is a common class for smoother font rendering.
       */}
-      <body className={`${inter.variable} ${sora.variable} font-body antialiased bg-background text-foreground`}>
+      <body
+        className={`${inter.variable} ${sora.variable} font-body antialiased bg-background text-foreground`}
+      >
         {/*
           This is a Context Provider. It's a critical concept.
           C-like Analogy: Imagine `FirebaseClientProvider` is a function that initializes
@@ -102,5 +104,5 @@ export default function RootLayout({
         <Toaster />
       </body>
     </html>
-  );
+  )
 }
