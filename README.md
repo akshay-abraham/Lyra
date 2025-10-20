@@ -177,14 +177,5 @@ Well-crafted prompts guide the [AI](https://en.wikipedia.org/wiki/Artificial_int
 
 ---
 
-## 🔮 Read More on Future Possibilities
-
-We are drafting a **long-form expansion** on future directions (multi-agent tutors, smartwatch integrations, personalized dashboards, etc.).
-
 👉 [Read More in `EXPANDABILITY.md`](./EXPANDABILITY.md)
 
----
-
-## 🌐 Connected Projects
-
-- Frontend Partner: [Zia (React Web App)](https://github.com/akshay-abraham/zia)
