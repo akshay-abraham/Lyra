@@ -66,7 +66,7 @@ export default function AboutPage() {
               style={{ animationDelay: '0.3s' }}
             >
               <Image
-                src='/logo.webp'
+                src='/logo.png'
                 alt='Lyra AI Tutor Logo'
                 width={80}
                 height={80}
