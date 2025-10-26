@@ -1,24 +1,26 @@
-// Copyright (C) 2025 Akshay K Rooben abraham
+// Copyright (C) 2025 Akshay K Rooben Abraham
 /**
  * @fileoverview Login Form Component (`login-form.tsx`)
+ * @copyright Copyright (C) 2025 Akshay K Rooben Abraham
+ *
+ * @description
+ * This file defines the UI and logic for the login screen. It's a self-contained
+ * module responsible for:
+ * 1.  Displaying input fields for email and password.
+ * 2.  Handling user input and validation.
+ * 3.  Calling the Firebase authentication service on submission.
+ * 4.  Handling success (redirecting) and error (showing a notification) scenarios.
+ * 5.  Displaying a link to the registration page.
  *
  * C-like Analogy:
- * This file defines the UI and logic for the login screen. It's a self-contained
- * module (`login_ui.c`) responsible for:
- * 1.  Displaying input fields for email and password.
- * 2.  Handling user input.
- * 3.  Validating that the fields are not empty.
- * 4.  Calling the Firebase authentication service when the user clicks "Login".
- * 5.  Handling success (redirecting the user) and error (showing a notification)
- *     scenarios from the authentication service.
- * 6.  Displaying a link to the registration page.
- *
- * It uses `react-hook-form` to manage the form state, which simplifies validation
- * and data handling, much like using a library for handling user input in a C GUI application.
+ * Think of this as a self-contained module (`login_ui.c`) that handles the entire
+ * login screen. It uses a library (`react-hook-form`) to manage the form state,
+ * simplifying validation and data handling, much like using a GUI library in a
+ * C application to avoid manual input management.
  */
 
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, 'useState', useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -67,20 +69,16 @@ const cyclingDescriptions = [
 ];
 
 /**
- * C-like Explanation: `function LoginForm() -> returns JSX_Element`
+ * The main component function for the login form.
  *
- * This is the main component function for the login form.
+ * C-like Analogy:
+ * This is the main function for the login UI.
  *
  * Internal State (Global Variables for this function):
  *   - `isSubmitting`: A boolean flag to show a loading spinner on the button.
  *   - `descriptionIndex`: An integer to track which description string is currently shown.
  *
- * Hooks (Special Lifecycle Functions):
- *   - `useFirebase`: Gets access to the Firebase `auth` and `firestore` services.
- *   - `useRouter`: Gets access to the navigation/redirect functions.
- *   - `useToast`: Gets a function to display pop-up notifications.
- *   - `useForm`: Manages all the state and logic for the input form.
- *   - `useEffect`: Used here to set up a timer that cycles through the descriptions.
+ * @returns {JSX.Element} The JSX for the login form.
  */
 export function LoginForm() {
   // `useState` hook to manage simple state variables.
@@ -131,9 +129,11 @@ export function LoginForm() {
   }, []); // The empty `[]` means this effect runs only once.
 
   /**
-   * C-like Explanation: `async function handleLoginSubmit(data)`
-   * This function is called when the form is successfully validated and submitted.
-   * `data` is a struct (`FormData`) containing the user's email and password.
+   * Handles the form submission event.
+   * C-like Analogy: This function is the callback that gets executed when the
+   * user clicks the "Login" button and the form data is valid.
+   *
+   * @param {FormData} data - A struct (`FormData`) containing the user's email and password.
    */
   const handleLoginSubmit = async (data: FormData) => {
     setIsSubmitting(true);

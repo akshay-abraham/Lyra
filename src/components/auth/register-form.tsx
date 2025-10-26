@@ -1,22 +1,23 @@
-// Copyright (C) 2025 Akshay K Rooben abraham
+// Copyright (C) 2025 Akshay K Rooben Abraham
 /**
  * @fileoverview Registration Form Component (`register-form.tsx`)
+ * @copyright Copyright (C) 2025 Akshay K Rooben Abraham
  *
- * C-like Analogy:
+ * @description
  * This file defines the UI and logic for the user registration screen. It's a more
- * complex form than the login form. Think of it as a dedicated module (`register_ui.c`)
- * responsible for:
+ * complex form than the login form. It is responsible for:
  * 1.  Displaying input fields for name, email, password, role, school, class, etc.
- * 2.  Conditionally showing/hiding fields based on the user's selected role (e.g.,
- *     showing "Class" for students and "Classes Taught" for teachers).
+ * 2.  Conditionally showing/hiding fields based on the user's selected role.
  * 3.  Performing real-time password strength validation and providing feedback.
  * 4.  Validating all inputs against a complex set of rules.
- * 5.  Calling the Firebase authentication service to create a new user account.
+ * 5.  Creating a new user account with Firebase Authentication.
  * 6.  Creating a corresponding user profile document in the Firestore database.
- * 7.  Handling success (redirecting the user) and error (showing a notification) scenarios.
+ * 7.  Handling success (redirecting) and error (showing a notification) scenarios.
  *
+ * C-like Analogy:
+ * Think of it as a dedicated module (`register_ui.c`) for the registration screen.
  * Like the login form, it relies heavily on `react-hook-form` and `zod` to manage
- * the form's complexity.
+ * the form's complexity, abstracting away much of the manual state and validation logic.
  */
 
 'use client';
@@ -126,9 +127,10 @@ const formSchema = z
   );
 
 /**
- * C-like Explanation: `function RegisterForm() -> returns JSX_Element`
+ * The main component function for the registration form.
  *
- * This is the main component function for the registration form.
+ * C-like Analogy:
+ * This is the main function for the registration UI.
  *
  * Internal State (Global Variables for this function):
  *   - `isSubmitting`: A boolean flag for the submit button's loading state.
@@ -137,11 +139,7 @@ const formSchema = z
  *   - `strengthColor`: A string for the color of the password strength bar.
  *   - `showPassword`, `showConfirmPassword`: Booleans to toggle password visibility.
  *
- * Hooks (Special Lifecycle Functions):
- *   - `useForm`: Manages the entire complex form state.
- *   - `useEffect`: Used for two main side effects:
- *     1.  To recalculate password strength whenever the password input changes.
- *     2.  To update the list of `availableSubjects` whenever the teacher changes their selected `classesTaught`.
+ * @returns {JSX.Element} The JSX for the registration form.
  */
 export function RegisterForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -210,9 +208,11 @@ export function RegisterForm() {
   }, [selectedClasses, selectedRole, form]);
 
   /**
-   * C-like Explanation: `async function handleRegisterSubmit(data)`
-   * This is the callback for form submission.
+   * Handles the form submission for registration.
+   * C-like Analogy: This is the callback for form submission.
    * `data` is a struct (`z.infer<typeof formSchema>`) containing the validated form data.
+   *
+   * @param {z.infer<typeof formSchema>} data - The validated form data.
    */
   const handleRegisterSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);

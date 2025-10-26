@@ -1,12 +1,16 @@
-// Copyright (C) 2025 Akshay K Rooben abraham
+// Copyright (C) 2025 Akshay K Rooben Abraham
 /**
  * @fileoverview About Page (`/about`)
+ * @copyright Copyright (C) 2025 Akshay K Rooben Abraham
+ *
+ * @description
+ * This file renders the static "About Lyra" page, which explains the project's
+ * motivation, the technology it uses, and its open-source license.
  *
  * C-like Analogy:
  * This file is like a very simple C program that only uses `printf` statements
  * to display static information to the console. It doesn't take any user input
- * or have complex logic. Its sole purpose is to render the "About Lyra" page,
- * which explains the project's motivation, technology, and licensing.
+ * or have complex logic. Its sole purpose is to render a pre-defined screen.
  *
  * It's a "Server Component" by default in Next.js, meaning it runs on the server
  * to generate the HTML, which is then sent to the user's browser. This is very
@@ -29,17 +33,15 @@ import { SidebarLayout } from '@/components/layout/sidebar-layout'; // The main 
 import Image from 'next/image'; // Next.js's optimized image component.
 
 /**
- * C-like Explanation: `function AboutPage() -> returns JSX_Element`
+ * The main component function for the About Page.
+ * In Next.js, a file named `page.tsx` inside a folder (like `/about`)
+ * automatically becomes a page accessible at that URL (e.g., your-website.com/about).
  *
- * This is the main function for this page. In Next.js, a file named `page.tsx`
- * inside a folder (like `/about`) automatically becomes a page accessible at
- * that URL (e.g., your-website.com/about).
- *
- * This function returns JSX, which is a syntax that looks like HTML but is
- * actually JavaScript. It describes the structure and content of the page.
- * Think of this as the `main()` function for this specific page, and its
-return
+ * C-like Analogy:
+ * Think of this as the `main()` function for this specific page. Its `return`
  * value is what gets "printed" to the user's screen.
+ *
+ * @returns {JSX.Element} The JSX code that represents the page's structure and content.
  */
 export default function AboutPage() {
   // The `return` statement contains the JSX that defines the page's structure.

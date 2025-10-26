@@ -1,50 +1,167 @@
+/**
+ * @fileoverview Firestore Security Rules for the Lyra application.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a strict user-ownership model for user profiles and teacher-created prompts,
+ * ensuring that only the authenticated user can access or modify their own data.  Teacher settings
+ * are secured based on the teacher's ID.
+ *
+ * Data Structure:
+ * - /users/{userId}: Stores user profile information, with 'userId' matching the Firebase Auth UID.
+ * - /teacherSettings/{settingsId}: Stores AI customization settings for teachers, with 'settingsId' as a composite key.
+ * - /users/{userId}/prompts/{promptId}: Stores prompts created by teachers, nested under their user ID.
+ *
+ * Key Security Decisions:
+ * - User profiles can only be created by the user themselves upon sign-up.
+ * - User profiles can only be read and modified by the user themselves.
+ * - Teachers can only create, read, update, and delete prompts they own.
+ * - Teacher settings are secured to only be accessed by the respective teacher.
+ * - Listing all users is disallowed for privacy reasons.
+ *
+ * Denormalization for Authorization:
+ * - The 'Prompt' entity includes a 'userId' field, which is a denormalized copy of the teacher's UID.
+ *   This enables direct ownership checks within the security rules without additional reads.
+ *
+ * Structural Segregation:
+ * - Prompts are stored as subcollections under the user's document to maintain a clear ownership
+ *   structure and ensure that list operations are secure.
+ *
+ * @version 1.0
+ * @copyright 2024 Solomon Abraham
+ */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions
+    /**
+     * @description Enforces access control for user profiles, allowing only the owner to read and write their own profile.
+     * @path /users/{userId}
+     * @allow (create) User with UID 'user123' creates their profile with matching 'uid' field.
+     * @allow (get, update, delete) User with UID 'user123' reads/updates/deletes their own profile.
+     * @deny (create) User with UID 'user123' attempts to create a profile with a mismatched 'uid' field.
+     * @deny (get, update, delete) User with UID 'user456' attempts to read/update/delete the profile of 'user123'.
+     * @principle Enforces document ownership for all operations.
+     */
+    match /users/{userId} {
+      // Allow a user to create their own profile if the UID matches
+      allow create: if isSignedIn() && isNewOwner(userId);
+      // Allow reading, updating, and deleting only if the user is the owner
+      allow get, update, delete: if isSignedIn() && isExistingOwner(userId);
+      // No listing of all users
+      allow list: if false;
+
+      /**
+       * @description Enforces access control for prompts created by teachers, stored under their user ID.
+       * @path /users/{userId}/prompts/{promptId}
+       * @allow (create) Teacher with UID 'teacher123' creates a new prompt under their ID.
+       * @allow (get, update, delete) Teacher with UID 'teacher123' reads/updates/deletes their own prompt.
+       * @deny (create) Teacher with UID 'teacher123' attempts to create a prompt under another user's ID.
+       * @deny (get, update, delete) Teacher with UID 'teacher456' attempts to read/update/delete a prompt owned by 'teacher123'.
+       * @principle Enforces document ownership for writes; allows owner to list their own documents.
+       */
+      match /prompts/{promptId} {
+          allow create: if isSignedIn() && request.auth.uid == userId;
+          allow get, update, delete: if isSignedIn() && request.auth.uid == userId;
+          allow list: if isSignedIn() && request.auth.uid == userId;
+      }
+    }
+
+
+    /**
+     * @description Enforces access control for teacher settings, allowing only the teacher to read and write their own settings.
+     * @path /teacherSettings/{settingsId}
+     * @allow (create) Teacher with UID 'teacher123' creates their settings.
+     * @allow (get, update, delete) Teacher with UID 'teacher123' reads/updates/deletes their own settings.
+     * @deny (create) Teacher with UID 'teacher123' attempts to create settings with a mismatched 'teacherId' field.
+     * @deny (get, update, delete) Teacher with UID 'teacher456' attempts to read/update/delete the settings of 'teacher123'.
+     * @principle Enforces document ownership for writes.
+     */
+    match /teacherSettings/{settingsId} {
+      // Allow a teacher to create their own settings if the teacherId matches
+      allow create: if isSignedIn() && isNewTeacherSettingsOwner();
+      // Allow reading, updating, and deleting only if the teacher is the owner
+      allow get, update, delete: if isSignedIn() && isExistingTeacherSettingsOwner();
+      // No listing of all teacher settings
+      allow list: if false;
+    }
+
+    // --- Helper Functions ---
+
+    /**
+     * @function isSignedIn
+     * @description Checks if the user is signed in.
+     * @returns {boolean} True if the user is signed in, false otherwise.
+     */
     function isSignedIn() {
       return request.auth != null;
     }
 
-    function isUser(userId) {
-      return isSignedIn() && request.auth.uid == userId;
+    /**
+     * @function isOwner
+     * @description Checks if the user is the owner of the document.
+     * @param {string} userId - The user ID to check against.
+     * @returns {boolean} True if the user is the owner, false otherwise.
+     */
+    function isOwner(userId) {
+      return request.auth.uid == userId;
     }
 
-    // User profiles
-    match /users/{userId} {
-      allow get: if isUser(userId);
-      allow list: if false;
-      allow create: if isUser(userId) && request.resource.data.uid == userId;
-      allow update: if isUser(userId) && resource.data.uid == userId;
-      allow delete: if isUser(userId);
+    /**
+     * @function isNewOwner
+     * @description Checks if the user is creating their own profile and that the UID in the document matches the authenticated user's UID.
+     * @param {string} userId - The user ID from the path.
+     * @returns {boolean} True if the user is creating their own profile, false otherwise.
+     */
+    function isNewOwner(userId) {
+      return request.auth.uid == userId && request.resource.data.uid == request.auth.uid;
+    }
 
-      // Chat sessions - LIBERAL ACCESS
-      match /chatSessions/{sessionId} {
-        allow read, write: if isUser(userId);
+    /**
+     * @function isExistingOwner
+     * @description Checks if the user is the owner of an existing document.
+     * @param {string} userId - The user ID from the path.
+     * @returns {boolean} True if the user is the owner of the existing document, false otherwise.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource.data.uid == request.auth.uid;
+    }
 
-        // Messages in chat sessions - LIBERAL ACCESS
-        match /messages/{messageId} {
-          allow read, write: if isUser(userId);
-        }
+    /**
+     * @function isNewPromptOwner
+     * @description Checks if the user is creating a prompt under their own user ID, and that the userId in the document matches the path.
+     * @param {string} userId - The user ID from the path.
+     * @returns {boolean} True if the user is creating a prompt under their own user ID, false otherwise.
+     */
+    function isNewPromptOwner(userId) {
+      return request.auth.uid == userId && request.resource.data.userId == userId;
+    }
+
+    /**
+     * @function isExistingPromptOwner
+     * @description Checks if the user is the owner of an existing prompt.
+     * @param {string} userId - The user ID from the path.
+     * @returns {boolean} True if the user is the owner of the existing prompt, false otherwise.
+     */
+    function isExistingPromptOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+      /**
+       * @function isNewTeacherSettingsOwner
+       * @description Checks if the user is creating their own teacher settings and that the teacherId in the document matches the authenticated user's UID.
+       * @returns {boolean} True if the user is creating their own teacher settings, false otherwise.
+       */
+    function isNewTeacherSettingsOwner() {
+        return request.resource.data.teacherId == request.auth.uid;
       }
 
-      // Teacher prompts
-      match /prompts/{promptId} {
-        allow get: if isUser(userId);
-        allow list: if isUser(userId);
-        allow create: if isUser(userId) && request.resource.data.userId == userId;
-        allow update: if isUser(userId) && resource.data.userId == userId;
-        allow delete: if isUser(userId);
+      /**
+       * @function isExistingTeacherSettingsOwner
+       * @description Checks if the user is the owner of existing teacher settings.
+       * @returns {boolean} True if the user is the owner of the existing teacher settings, false otherwise.
+       */
+    function isExistingTeacherSettingsOwner() {
+        return resource.data.teacherId == request.auth.uid && resource != null;
       }
-    }
-
-    // Teacher settings - PUBLIC READ, OWNER WRITE
-    match /teacherSettings/{settingsId} {
-      allow get, list: if true;
-      allow create: if isSignedIn() && request.resource.data.teacherId == request.auth.uid;
-      allow update: if isSignedIn() && resource.data.teacherId == request.auth.uid;
-      allow delete: if isSignedIn() && resource.data.teacherId == request.auth.uid;
-    }
   }
 }
