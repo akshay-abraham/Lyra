@@ -14,12 +14,12 @@
  *
  * The primary exported function is `implementEthicalAIGuardrails`.
  */
-'use server'
+'use server';
 
 // Import necessary libraries.
 // C-like analogy: #include <genkit_lib.h> and #include <zod_struct_lib.h>
-import { ai } from '@/ai/genkit'
-import { z } from 'genkit'
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
 
 /**
  * C-like Analogy: Input Struct Definition
@@ -36,11 +36,11 @@ const ImplementEthicalAIGuardrailsInputSchema = z.object({
     .describe(
       "The system prompt defining the AI tutor's behavior and ethical guidelines.",
     ),
-})
+});
 // Create a TypeScript "type" from the schema.
 export type ImplementEthicalAIGuardrailsInput = z.infer<
   typeof ImplementEthicalAIGuardrailsInputSchema
->
+>;
 
 /**
  * C-like Analogy: Output Struct Definition
@@ -53,11 +53,11 @@ const ImplementEthicalAIGuardrailsOutputSchema = z.object({
   aiResponse: z
     .string()
     .describe("The AI tutor's response, adhering to ethical guidelines."),
-})
+});
 // Create a TypeScript "type" from the schema.
 export type ImplementEthicalAIGuardrailsOutput = z.infer<
   typeof ImplementEthicalAIGuardrailsOutputSchema
->
+>;
 
 /**
  * C-like Analogy: `ImplementEthicalAIGuardrailsOutput* implementEthicalAIGuardrails(ImplementEthicalAIGuardrailsInput* input)`
@@ -67,7 +67,7 @@ export type ImplementEthicalAIGuardrailsOutput = z.infer<
 export async function implementEthicalAIGuardrails(
   input: ImplementEthicalAIGuardrailsInput,
 ): Promise<ImplementEthicalAIGuardrailsOutput> {
-  return implementEthicalAIGuardrailsFlow(input)
+  return implementEthicalAIGuardrailsFlow(input);
 }
 
 /**
@@ -84,7 +84,7 @@ const ethicalAIGuardrailsPrompt = ai.definePrompt({
   input: { schema: ImplementEthicalAIGuardrailsInputSchema },
   output: { schema: ImplementEthicalAIGuardrailsOutputSchema },
   prompt: `{{systemPrompt}}\n\nUser Input: {{{userInput}}}`,
-})
+});
 
 /**
  * C-like Analogy: The Core Logic Function
@@ -103,10 +103,10 @@ const implementEthicalAIGuardrailsFlow = ai.defineFlow(
     // 1. Call the AI with our prompt, providing the rules and the user's input.
     //    `result = ai_call(ethicalAIGuardrailsPrompt, input);`
     //    We `await` its completion.
-    const { output } = await ethicalAIGuardrailsPrompt(input)
+    const { output } = await ethicalAIGuardrailsPrompt(input);
 
     // 2. Return the AI's response, which should now conform to the ethical guardrails.
     //    The `!` tells TypeScript we are sure the output is not null.
-    return output!
+    return output!;
   },
-)
+);

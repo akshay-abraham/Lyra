@@ -11,12 +11,12 @@
  *
  * The primary exported function is `generateChatTitle`.
  */
-'use server'
+'use server';
 
 // Import necessary libraries.
 // C-like analogy: #include <genkit_lib.h> and #include <zod_struct_lib.h>
-import { ai } from '@/ai/genkit'
-import { z } from 'genkit'
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
 
 /**
  * C-like Analogy: Input Struct Definition
@@ -29,11 +29,11 @@ const GenerateChatTitleInputSchema = z.object({
   firstMessage: z
     .string()
     .describe('The first message from the user in a chat session.'),
-})
+});
 // Create a TypeScript "type" from the schema.
 export type GenerateChatTitleInput = z.infer<
   typeof GenerateChatTitleInputSchema
->
+>;
 
 /**
  * C-like Analogy: Output Struct Definition
@@ -46,11 +46,11 @@ const GenerateChatTitleOutputSchema = z.object({
   title: z
     .string()
     .describe('A short, descriptive title for the chat session (5 words max).'),
-})
+});
 // Create a TypeScript "type" from the schema.
 export type GenerateChatTitleOutput = z.infer<
   typeof GenerateChatTitleOutputSchema
->
+>;
 
 /**
  * C-like Analogy: `GenerateChatTitleOutput* generateChatTitle(GenerateChatTitleInput* input)`
@@ -62,7 +62,7 @@ export async function generateChatTitle(
   input: GenerateChatTitleInput,
 ): Promise<GenerateChatTitleOutput> {
   // It's a simple wrapper that calls the internal Genkit flow.
-  return generateChatTitleFlow(input)
+  return generateChatTitleFlow(input);
 }
 
 /**
@@ -82,7 +82,7 @@ const prompt = ai.definePrompt({
 User Message: {{{firstMessage}}}
 
 Title:`,
-})
+});
 
 /**
  * C-like Analogy: The Core Logic Function
@@ -101,10 +101,10 @@ const generateChatTitleFlow = ai.defineFlow(
     // 1. Call the AI with our prompt, filling in the `input` data.
     //    `result = ai_call(prompt, input);`
     //    This is an asynchronous call, so we `await` its completion.
-    const { output } = await prompt(input)
+    const { output } = await prompt(input);
 
     // 2. The `result.output` is guaranteed by Genkit to match our `GenerateChatTitleOutputSchema`.
     //    We can simply return it. The `!` tells TypeScript we are sure it's not null.
-    return output!
+    return output!;
   },
-)
+);

@@ -24,45 +24,45 @@
  * we can provide a highly detailed error message that is extremely useful for debugging
  * those security rules.
  */
-'use client'
-import { getAuth, type User } from 'firebase/auth'
+'use client';
+import { getAuth, type User } from 'firebase/auth';
 
 // C-like Analogy: `typedef struct { ... } SecurityRuleContext;`
 // This struct holds the basic information about the failed Firestore operation.
 type SecurityRuleContext = {
-  path: string // The database path (e.g., "users/user123/chats").
-  operation: 'get' | 'list' | 'create' | 'update' | 'delete' | 'write'
-  requestResourceData?: any // The data being sent with the request (for writes).
-}
+  path: string; // The database path (e.g., "users/user123/chats").
+  operation: 'get' | 'list' | 'create' | 'update' | 'delete' | 'write';
+  requestResourceData?: any; // The data being sent with the request (for writes).
+};
 
 // C-like Analogy: These are nested structs defining the shape of the `request.auth` object.
 interface FirebaseAuthToken {
-  name: string | null
-  email: string | null
-  email_verified: boolean
-  phone_number: string | null
-  sub: string // The user's unique ID (UID).
+  name: string | null;
+  email: string | null;
+  email_verified: boolean;
+  phone_number: string | null;
+  sub: string; // The user's unique ID (UID).
   firebase: {
-    identities: Record<string, string[]>
-    sign_in_provider: string
-    tenant: string | null
-  }
+    identities: Record<string, string[]>;
+    sign_in_provider: string;
+    tenant: string | null;
+  };
 }
 
 interface FirebaseAuthObject {
-  uid: string
-  token: FirebaseAuthToken
+  uid: string;
+  token: FirebaseAuthToken;
 }
 
 // C-like Analogy: The main struct for the simulated request.
 interface SecurityRuleRequest {
-  auth: FirebaseAuthObject | null // Info about the authenticated user.
-  method: string // The operation being performed.
-  path: string // The full path to the document/collection.
+  auth: FirebaseAuthObject | null; // Info about the authenticated user.
+  method: string; // The operation being performed.
+  path: string; // The full path to the document/collection.
   resource?: {
     // The data included with the request.
-    data: any
-  }
+    data: any;
+  };
 }
 
 /**
@@ -78,7 +78,7 @@ interface SecurityRuleRequest {
  */
 function buildAuthObject(currentUser: User | null): FirebaseAuthObject | null {
   if (!currentUser) {
-    return null
+    return null;
   }
 
   // Manually construct the token object piece by piece from the user object.
@@ -92,21 +92,21 @@ function buildAuthObject(currentUser: User | null): FirebaseAuthObject | null {
       identities: currentUser.providerData.reduce(
         (acc, p) => {
           if (p.providerId) {
-            acc[p.providerId] = [p.uid]
+            acc[p.providerId] = [p.uid];
           }
-          return acc
+          return acc;
         },
         {} as Record<string, string[]>,
       ),
       sign_in_provider: currentUser.providerData[0]?.providerId || 'custom',
       tenant: currentUser.tenantId,
     },
-  }
+  };
 
   return {
     uid: currentUser.uid,
     token: token,
-  }
+  };
 }
 
 /**
@@ -120,13 +120,13 @@ function buildAuthObject(currentUser: User | null): FirebaseAuthObject | null {
  * @returns A structured request object for debugging.
  */
 function buildRequestObject(context: SecurityRuleContext): SecurityRuleRequest {
-  let authObject: FirebaseAuthObject | null = null
+  let authObject: FirebaseAuthObject | null = null;
   try {
     // Safely attempt to get the current user.
-    const firebaseAuth = getAuth()
-    const currentUser = firebaseAuth.currentUser
+    const firebaseAuth = getAuth();
+    const currentUser = firebaseAuth.currentUser;
     if (currentUser) {
-      authObject = buildAuthObject(currentUser)
+      authObject = buildAuthObject(currentUser);
     }
   } catch {
     // This will catch errors if the Firebase app is not yet initialized.
@@ -140,7 +140,7 @@ function buildRequestObject(context: SecurityRuleContext): SecurityRuleRequest {
     resource: context.requestResourceData
       ? { data: context.requestResourceData }
       : undefined,
-  }
+  };
 }
 
 /**
@@ -153,7 +153,7 @@ function buildRequestObject(context: SecurityRuleContext): SecurityRuleRequest {
  * @returns A string containing the full error message for display.
  */
 function buildErrorMessage(requestObject: SecurityRuleRequest): string {
-  return `Missing or insufficient permissions: The following request was denied by Firestore Security Rules:\n${JSON.stringify(requestObject, null, 2)}`
+  return `Missing or insufficient permissions: The following request was denied by Firestore Security Rules:\n${JSON.stringify(requestObject, null, 2)}`;
 }
 
 /**
@@ -164,19 +164,19 @@ function buildErrorMessage(requestObject: SecurityRuleRequest): string {
  */
 export class FirestorePermissionError extends Error {
   // `public readonly request` is like a public member variable of a struct.
-  public readonly request: SecurityRuleRequest
+  public readonly request: SecurityRuleRequest;
 
   // The constructor, like `new_firestore_permission_error(context)`.
   constructor(context: SecurityRuleContext) {
     // 1. Build the detailed request object from the context.
-    const requestObject = buildRequestObject(context)
+    const requestObject = buildRequestObject(context);
     // 2. Build the formatted error message string.
-    const errorMessage = buildErrorMessage(requestObject)
+    const errorMessage = buildErrorMessage(requestObject);
     // 3. Call the parent `Error` class's constructor with the message. `super()` is like `Error.new(errorMessage)`.
-    super(errorMessage)
+    super(errorMessage);
     // 4. Set the name of the error for identification.
-    this.name = 'FirebaseError'
+    this.name = 'FirebaseError';
     // 5. Store the structured request object as a public property of this error instance.
-    this.request = requestObject
+    this.request = requestObject;
   }
 }

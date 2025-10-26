@@ -19,14 +19,14 @@
  * Like the account page, this is a "Client Component" (`'use client'`) because it
  * needs to check the user's role, which is stored in the browser's `sessionStorage`.
  */
-'use client'
+'use client';
 
 // Import necessary components and hooks.
-import { TeacherDashboard } from '@/components/teacher/teacher-dashboard'
-import { useUser } from '@/firebase' // Hook to get user authentication status.
-import { useRouter } from 'next/navigation' // Hook for redirects.
-import { useEffect, useState } from 'react' // React's core hooks.
-import { SidebarLayout } from '@/components/layout/sidebar-layout'
+import { TeacherDashboard } from '@/components/teacher/teacher-dashboard';
+import { useUser } from '@/firebase'; // Hook to get user authentication status.
+import { useRouter } from 'next/navigation'; // Hook for redirects.
+import { useEffect, useState } from 'react'; // React's core hooks.
+import { SidebarLayout } from '@/components/layout/sidebar-layout';
 
 /**
  * C-like Explanation: `function TeacherPage() -> returns JSX_Element`
@@ -42,11 +42,11 @@ import { SidebarLayout } from '@/components/layout/sidebar-layout'
  */
 export default function TeacherPage() {
   // Get user authentication status.
-  const { user, isUserLoading } = useUser()
-  const router = useRouter()
+  const { user, isUserLoading } = useUser();
+  const router = useRouter();
   // State to hold the user's profile info (especially the role).
   // `useState` initializes it to `null`.
-  const [userInfo, setUserInfo] = useState<{ role?: string } | null>(null)
+  const [userInfo, setUserInfo] = useState<{ role?: string } | null>(null);
 
   // This `useEffect` hook handles both authentication and authorization.
   // It runs after the component renders and when `user` or `isUserLoading` changes.
@@ -73,16 +73,16 @@ export default function TeacherPage() {
     //   }
     // }
     if (!isUserLoading && !user) {
-      router.push('/login')
+      router.push('/login');
     }
     if (user) {
       // Fetch the user's role from session storage for a quick authorization check.
-      const storedInfo = sessionStorage.getItem('lyra-user-info')
+      const storedInfo = sessionStorage.getItem('lyra-user-info');
       if (storedInfo) {
-        setUserInfo(JSON.parse(storedInfo))
+        setUserInfo(JSON.parse(storedInfo));
       }
     }
-  }, [isUserLoading, user, router]) // Dependency array.
+  }, [isUserLoading, user, router]); // Dependency array.
 
   // This is the combined loading and authorization check.
   // Render a "Loading..." or "Access Denied" message if:
@@ -95,7 +95,7 @@ export default function TeacherPage() {
       <div className='flex items-center justify-center h-screen'>
         <p>Loading or unauthorized...</p>
       </div>
-    )
+    );
   }
 
   // If all checks pass, render the teacher dashboard.
@@ -110,5 +110,5 @@ export default function TeacherPage() {
         <TeacherDashboard />
       </div>
     </SidebarLayout>
-  )
+  );
 }

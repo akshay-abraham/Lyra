@@ -30,7 +30,7 @@
  * This ensures that even though we're not waiting for the result, we still have a
  * robust way to handle failures when they occur.
  */
-'use client'
+'use client';
 
 import {
   setDoc,
@@ -40,9 +40,9 @@ import {
   CollectionReference,
   DocumentReference,
   SetOptions,
-} from 'firebase/firestore'
-import { errorEmitter } from '@/firebase/error-emitter'
-import { FirestorePermissionError } from '@/firebase/errors'
+} from 'firebase/firestore';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 /**
  * C-like Explanation: `void setDocumentNonBlocking(DocRef* docRef, void* data, SetOptions options)`
@@ -64,10 +64,10 @@ export function setDocumentNonBlocking(
       path: docRef.path,
       operation: 'write', // 'set' can be a create or update.
       requestResourceData: data,
-    })
+    });
     // And emit it globally.
-    errorEmitter.emit('permission-error', permissionError)
-  })
+    errorEmitter.emit('permission-error', permissionError);
+  });
   // Execution continues immediately after the setDoc call is initiated.
 }
 
@@ -89,11 +89,11 @@ export function addDocumentNonBlocking(colRef: CollectionReference, data: any) {
         operation: 'create',
         requestResourceData: data,
       }),
-    )
-  })
+    );
+  });
   // Return the promise. The caller could optionally wait for it, but the typical
   // use case in this app is "fire-and-forget".
-  return promise
+  return promise;
 }
 
 /**
@@ -114,8 +114,8 @@ export function updateDocumentNonBlocking(
         operation: 'update',
         requestResourceData: data,
       }),
-    )
-  })
+    );
+  });
 }
 
 /**
@@ -132,6 +132,6 @@ export function deleteDocumentNonBlocking(docRef: DocumentReference) {
         path: docRef.path,
         operation: 'delete',
       }),
-    )
-  })
+    );
+  });
 }

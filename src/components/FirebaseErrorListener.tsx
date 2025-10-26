@@ -23,11 +23,11 @@
  * failed, non-blocking Firestore operation (which happens quietly in the background)
  * and a visible, actionable error message for the developer.
  */
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { errorEmitter } from '@/firebase/error-emitter'
-import { FirestorePermissionError } from '@/firebase/errors'
+import { useState, useEffect } from 'react';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 /**
  * An invisible component that listens for globally emitted 'permission-error' events.
@@ -48,7 +48,7 @@ import { FirestorePermissionError } from '@/firebase/errors'
  */
 export function FirebaseErrorListener() {
   // `useState` creates a state variable. `error` holds the value, `setError` is the function to change it.
-  const [error, setError] = useState<FirestorePermissionError | null>(null)
+  const [error, setError] = useState<FirestorePermissionError | null>(null);
 
   // `useEffect` runs side effects. Subscribing to an event is a side effect.
   useEffect(() => {
@@ -74,26 +74,26 @@ export function FirebaseErrorListener() {
 
     const handleError = (error: FirestorePermissionError) => {
       // Set error in state to trigger a re-render.
-      setError(error)
-    }
+      setError(error);
+    };
 
     // Subscribe to the 'permission-error' event.
-    errorEmitter.on('permission-error', handleError)
+    errorEmitter.on('permission-error', handleError);
 
     // Unsubscribe on unmount to prevent memory leaks.
     return () => {
-      errorEmitter.off('permission-error', handleError)
-    }
-  }, []) // The empty `[]` means this effect runs only once, like `onComponentMount`.
+      errorEmitter.off('permission-error', handleError);
+    };
+  }, []); // The empty `[]` means this effect runs only once, like `onComponentMount`.
 
   // This is the second part of the logic. After `setError` is called, the component
   // re-renders. On this new render, the `error` variable is no longer null.
   if (error) {
     // If an error exists in our state, we throw it.
     // This triggers the Next.js error boundary.
-    throw error
+    throw error;
   }
 
   // This component renders nothing to the screen. It's invisible.
-  return null
+  return null;
 }

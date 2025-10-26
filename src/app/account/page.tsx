@@ -20,14 +20,14 @@
  * shows a "Loading..." message while the page is waiting for necessary data
  * (like the user's authentication status) to be ready.
  */
-'use client'
+'use client';
 
 // Like `#include` in C, these lines import necessary code from other files.
-import { SidebarLayout } from '@/components/layout/sidebar-layout'
-import { AccountManagement } from '@/components/account/account-management'
-import { useUser } from '@/firebase' // A "hook" to get the current logged-in user.
-import { useRouter } from 'next/navigation' // A "hook" for programmatic navigation (redirects).
-import { useEffect, Suspense } from 'react' // React's core hooks.
+import { SidebarLayout } from '@/components/layout/sidebar-layout';
+import { AccountManagement } from '@/components/account/account-management';
+import { useUser } from '@/firebase'; // A "hook" to get the current logged-in user.
+import { useRouter } from 'next/navigation'; // A "hook" for programmatic navigation (redirects).
+import { useEffect, Suspense } from 'react'; // React's core hooks.
 
 /**
  * C-like Explanation: `function AccountPageContent() -> returns JSX_Element or string`
@@ -47,8 +47,8 @@ import { useEffect, Suspense } from 'react' // React's core hooks.
 function AccountPageContent() {
   // Get the user's status from our custom `useUser` hook.
   // It's like calling a function: `User* user = getUser(); bool isLoading = isUserStillLoading();`
-  const { user, isUserLoading } = useUser()
-  const router = useRouter() // Get the router object for redirects.
+  const { user, isUserLoading } = useUser();
+  const router = useRouter(); // Get the router object for redirects.
 
   // `useEffect` is a special React function that runs code *after* the component
   // has rendered. It's perfect for actions that interact with the outside world,
@@ -67,9 +67,9 @@ function AccountPageContent() {
     //   }
     // }
     if (!isUserLoading && !user) {
-      router.push('/login')
+      router.push('/login');
     }
-  }, [isUserLoading, user, router]) // The "dependency array": this effect re-runs ONLY when these values change.
+  }, [isUserLoading, user, router]); // The "dependency array": this effect re-runs ONLY when these values change.
 
   // While we're checking the user's login status, or if we've determined
   // they are not logged in (and are about to be redirected), show a loading message.
@@ -78,7 +78,7 @@ function AccountPageContent() {
       <div className='flex items-center justify-center h-screen'>
         <p>Loading...</p>
       </div>
-    )
+    );
   }
 
   // If the user is successfully loaded and authenticated, render the main page content.
@@ -93,7 +93,7 @@ function AccountPageContent() {
         <AccountManagement />
       </div>
     </SidebarLayout>
-  )
+  );
 }
 
 /**
@@ -121,5 +121,5 @@ export default function AccountPage() {
     >
       <AccountPageContent />
     </Suspense>
-  )
+  );
 }

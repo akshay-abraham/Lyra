@@ -17,11 +17,11 @@
  * and data handling, much like using a library for handling user input in a C GUI application.
  */
 
-'use client'
-import React, { useState, useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
+'use client';
+import React, { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import {
   Form,
   FormControl,
@@ -29,23 +29,23 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Button } from '@/components/ui/button'
+} from '@/components/ui/form';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Input } from '../ui/input'
-import { useToast } from '@/hooks/use-toast'
-import { ArrowRight, Loader2 } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useFirebase } from '@/firebase'
-import { signInWithEmailAndPassword, AuthError } from 'firebase/auth'
-import { doc, getDoc } from 'firebase/firestore'
+} from '@/components/ui/card';
+import { Input } from '../ui/input';
+import { useToast } from '@/hooks/use-toast';
+import { ArrowRight, Loader2 } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useFirebase } from '@/firebase';
+import { signInWithEmailAndPassword, AuthError } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
 // Zod schema defines the structure and validation rules for the form data.
 // It's like a C `struct` with attached validation logic.
@@ -53,10 +53,10 @@ import { doc, getDoc } from 'firebase/firestore'
 const formSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
   password: z.string().min(1, 'Password is required'), // Just checks that it's not empty.
-})
+});
 
 // A TypeScript type generated from the Zod schema.
-type FormData = z.infer<typeof formSchema>
+type FormData = z.infer<typeof formSchema>;
 
 // An array of strings for the cycling description text.
 const cyclingDescriptions = [
@@ -64,7 +64,7 @@ const cyclingDescriptions = [
   'The future of AI in education starts here.',
   'Customizable, ethical AI for your classroom.',
   'Empowering students, supporting teachers.',
-]
+];
 
 /**
  * C-like Explanation: `function LoginForm() -> returns JSX_Element`
@@ -84,13 +84,13 @@ const cyclingDescriptions = [
  */
 export function LoginForm() {
   // `useState` hook to manage simple state variables.
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [descriptionIndex, setDescriptionIndex] = useState(0)
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [descriptionIndex, setDescriptionIndex] = useState(0);
 
   // Get necessary services and utilities from hooks.
-  const { auth, firestore } = useFirebase()
-  const router = useRouter()
-  const { toast } = useToast()
+  const { auth, firestore } = useFirebase();
+  const router = useRouter();
+  const { toast } = useToast();
 
   // Initialize the form management with `react-hook-form`.
   const form = useForm<FormData>({
@@ -100,7 +100,7 @@ export function LoginForm() {
       email: '',
       password: '',
     },
-  })
+  });
 
   // This `useEffect` hook sets up an interval timer.
   useEffect(() => {
@@ -123,12 +123,12 @@ export function LoginForm() {
     const interval = setInterval(() => {
       setDescriptionIndex(
         (prevIndex) => (prevIndex + 1) % cyclingDescriptions.length,
-      )
-    }, 3000) // 3 seconds
+      );
+    }, 3000); // 3 seconds
 
     // Cleanup function to clear the interval when the component unmounts.
-    return () => clearInterval(interval)
-  }, []) // The empty `[]` means this effect runs only once.
+    return () => clearInterval(interval);
+  }, []); // The empty `[]` means this effect runs only once.
 
   /**
    * C-like Explanation: `async function handleLoginSubmit(data)`
@@ -136,7 +136,7 @@ export function LoginForm() {
    * `data` is a struct (`FormData`) containing the user's email and password.
    */
   const handleLoginSubmit = async (data: FormData) => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     try {
       // Call the Firebase SDK function to sign in. This is an asynchronous network call.
@@ -145,17 +145,17 @@ export function LoginForm() {
         auth,
         data.email,
         data.password,
-      )
-      const user = userCredential.user
+      );
+      const user = userCredential.user;
 
       if (user) {
         // --- Login Successful ---
         // Fetch the user's profile from our Firestore 'users' collection to get their role.
-        const userDocRef = doc(firestore, 'users', user.uid)
-        const userDoc = await getDoc(userDocRef)
+        const userDocRef = doc(firestore, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
 
         if (userDoc.exists()) {
-          const userData = userDoc.data()
+          const userData = userDoc.data();
           // Store user's name and role in the browser's session storage for quick access.
           sessionStorage.setItem(
             'lyra-user-info',
@@ -164,28 +164,28 @@ export function LoginForm() {
               role: userData.role,
               grade: userData.grade,
             }),
-          )
+          );
 
           toast({
             title: 'Login Successful',
             description: `Welcome back, ${userData.name}!`,
-          })
+          });
 
           // Redirect the user based on their role.
           if (userData.role === 'teacher') {
-            router.push('/teacher') // Redirect to teacher dashboard.
+            router.push('/teacher'); // Redirect to teacher dashboard.
           } else {
-            router.push('/') // Redirect to student chat page.
+            router.push('/'); // Redirect to student chat page.
           }
         } else {
           // This case happens if a user exists in Firebase Auth but not in our Firestore db.
-          throw new Error('User profile not found.')
+          throw new Error('User profile not found.');
         }
       }
     } catch (error) {
       // --- Login Failed ---
-      console.error('Firebase sign-in failed:', error)
-      let description = 'An unexpected error occurred. Please try again.'
+      console.error('Firebase sign-in failed:', error);
+      let description = 'An unexpected error occurred. Please try again.';
 
       const authError = error as AuthError;
       // Provide a more user-friendly error message for common authentication errors.
@@ -194,18 +194,18 @@ export function LoginForm() {
         authError.code === 'auth/wrong-password' ||
         authError.code === 'auth/invalid-credential'
       ) {
-        description = 'Invalid email or password. Please try again.'
+        description = 'Invalid email or password. Please try again.';
       }
       toast({
         variant: 'destructive',
         title: 'Login Failed',
         description: description,
-      })
+      });
     } finally {
       // This block runs whether the `try` or `catch` block was executed.
-      setIsSubmitting(false) // Stop the loading spinner.
+      setIsSubmitting(false); // Stop the loading spinner.
     }
-  }
+  };
 
   // ========================== RETURN JSX (The View) ==========================
   // The rest of this file is JSX, which describes the component's visual structure.
@@ -306,5 +306,5 @@ export function LoginForm() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

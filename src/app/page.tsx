@@ -18,14 +18,14 @@
  * This is a "Client Component" (`'use client'`) because it uses React Hooks like
  * `useEffect`, `useRouter`, and `useSearchParams` that must run in the browser.
  */
-'use client'
+'use client';
 
 // Import necessary components and hooks.
-import { SidebarLayout } from '@/components/layout/sidebar-layout'
-import { ChatInterface } from '@/components/student/chat-interface'
-import { useUser } from '@/firebase' // Hook to get the current user.
-import { useRouter, useSearchParams } from 'next/navigation' // Hooks for navigation and URL parameters.
-import { Suspense, useEffect } from 'react' // React's core hooks.
+import { SidebarLayout } from '@/components/layout/sidebar-layout';
+import { ChatInterface } from '@/components/student/chat-interface';
+import { useUser } from '@/firebase'; // Hook to get the current user.
+import { useRouter, useSearchParams } from 'next/navigation'; // Hooks for navigation and URL parameters.
+import { Suspense, useEffect } from 'react'; // React's core hooks.
 
 /**
  * C-like Explanation: `function ChatPageContent() -> returns JSX_Element or NULL`
@@ -42,12 +42,12 @@ import { Suspense, useEffect } from 'react' // React's core hooks.
  */
 function ChatPageContent() {
   // Get the user's authentication status.
-  const { user, isUserLoading } = useUser()
-  const router = useRouter() // Get the router for redirects.
+  const { user, isUserLoading } = useUser();
+  const router = useRouter(); // Get the router for redirects.
   // Get the URL search parameters. `useSearchParams` is a React Hook for this.
-  const searchParams = useSearchParams()
+  const searchParams = useSearchParams();
   // Read the 'chatId' parameter from the URL.
-  const chatId = searchParams.get('chatId')
+  const chatId = searchParams.get('chatId');
 
   // This `useEffect` hook acts as a gatekeeper. It runs after the component renders
   // and whenever its dependencies (`isUserLoading`, `user`) change.
@@ -61,14 +61,14 @@ function ChatPageContent() {
     //   }
     // }
     if (!isUserLoading && !user) {
-      router.push('/login')
+      router.push('/login');
     }
-  }, [isUserLoading, user, router]) // Dependency array.
+  }, [isUserLoading, user, router]); // Dependency array.
 
   // While checking for the user or if the user is not logged in (and about to be redirected),
   // we render nothing (`null`). The parent component's `<Suspense>` fallback will be shown.
   if (isUserLoading || !user) {
-    return null
+    return null;
   }
 
   // If the user is authenticated, render the main chat layout.
@@ -86,7 +86,7 @@ function ChatPageContent() {
       */}
       <ChatInterface key={chatId} chatId={chatId} />
     </SidebarLayout>
-  )
+  );
 }
 
 /**
@@ -103,5 +103,5 @@ export default function StudentPage() {
     <Suspense fallback={<div>Loading...</div>}>
       <ChatPageContent />
     </Suspense>
-  )
+  );
 }

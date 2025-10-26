@@ -76,5 +76,5 @@ export function Logo() {
         strokeLinejoin='round'
       />
     </svg>
-  )
+  );
 }

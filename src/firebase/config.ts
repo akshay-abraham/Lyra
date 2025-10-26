@@ -36,4 +36,4 @@ export const firebaseConfig = {
   authDomain: 'studio-1148187791-ff9d6.firebaseapp.com',
   measurementId: '',
   messagingSenderId: '702313910835',
-}
+};

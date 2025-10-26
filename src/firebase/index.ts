@@ -14,12 +14,12 @@
  * This acts as a "public interface" for the Firebase module, hiding the internal
  * file structure from the rest of the application.
  */
-'use client'
+'use client';
 
-import { firebaseConfig } from '@/firebase/config'
-import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app'
-import { getAuth } from 'firebase/auth'
-import { getFirestore } from 'firebase/firestore'
+import { firebaseConfig } from '@/firebase/config';
+import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 /**
  * C-like Explanation: `FirebaseServices* initializeFirebase()`
@@ -51,10 +51,10 @@ export function initializeFirebase() {
     // integrates with the initializeApp() function to provide the environment variables needed to
     // populate the FirebaseOptions in production. It is critical that we attempt to call initializeApp()
     // without arguments.
-    let firebaseApp
+    let firebaseApp;
     try {
       // Attempt to initialize via Firebase App Hosting environment variables. This is for production.
-      firebaseApp = initializeApp()
+      firebaseApp = initializeApp();
     } catch (e) {
       // This `catch` block will typically run during local development.
       // Only warn in production because it's normal to use the firebaseConfig to initialize
@@ -63,18 +63,18 @@ export function initializeFirebase() {
         console.warn(
           'Automatic initialization failed. Falling back to firebase config object.',
           e,
-        )
+        );
       }
       // Initialize using the hard-coded config from `config.ts`.
-      firebaseApp = initializeApp(firebaseConfig)
+      firebaseApp = initializeApp(firebaseConfig);
     }
 
     // Once the app is initialized, get the handles to the other services (Auth, Firestore).
-    return getSdks(firebaseApp)
+    return getSdks(firebaseApp);
   }
 
   // If already initialized, just get the existing app instance and return the service handles.
-  return getSdks(getApp())
+  return getSdks(getApp());
 }
 
 /**
@@ -91,7 +91,7 @@ export function getSdks(firebaseApp: FirebaseApp) {
     firebaseApp,
     auth: getAuth(firebaseApp),
     firestore: getFirestore(firebaseApp),
-  }
+  };
 }
 
 // This section uses `export * from ...` to re-export everything from the other
@@ -99,11 +99,11 @@ export function getSdks(firebaseApp: FirebaseApp) {
 // through a single import path, e.g., `import { useUser } from '@/firebase';`.
 // It's like having a master `include "firebase.h"` that itself includes
 // `auth.h`, `firestore.h`, `errors.h`, etc.
-export * from './provider'
-export * from './client-provider'
-export * from './firestore/use-collection'
-export * from './firestore/use-doc'
-export * from './non-blocking-updates'
-export * from './non-blocking-login'
-export * from './errors'
-export * from './error-emitter'
+export * from './provider';
+export * from './client-provider';
+export * from './firestore/use-collection';
+export * from './firestore/use-doc';
+export * from './non-blocking-updates';
+export * from './non-blocking-login';
+export * from './errors';
+export * from './error-emitter';

@@ -14,8 +14,8 @@
  *     pages that might have complex components.
  */
 
-import { RegisterForm } from '@/components/auth/register-form'
-import { Suspense } from 'react'
+import { RegisterForm } from '@/components/auth/register-form';
+import { Suspense } from 'react';
 
 /**
  * C-like Explanation: `function RegisterPage() -> returns JSX_Element`
@@ -47,5 +47,5 @@ export default function RegisterPage() {
         <RegisterForm />
       </Suspense>
     </div>
-  )
+  );
 }

@@ -25,14 +25,14 @@
  * It uses `react-hook-form` to manage the form state, validation, and saving, and it
  * interacts with Firestore to load and save these settings for each teacher and subject.
  */
-'use client'
+'use client';
 
 // Like `#include` in C, these lines import necessary code from other files.
-import { useState, useEffect, useCallback } from 'react'
-import { useForm, useFieldArray } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { Button } from '@/components/ui/button'
+import { useState, useEffect, useCallback } from 'react';
+import { useForm, useFieldArray } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -41,19 +41,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Textarea } from '@/components/ui/textarea'
-import { Input } from '@/components/ui/input'
+} from '@/components/ui/form';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
-import { useToast } from '@/hooks/use-toast'
-import { generateGuidedResponse } from '@/ai/flows/guide-ai-response-generation'
+} from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/hooks/use-toast';
+import { generateGuidedResponse } from '@/ai/flows/guide-ai-response-generation';
 import {
   Bot,
   Loader2,
@@ -62,13 +62,13 @@ import {
   X,
   BrainCircuit,
   BookCopy,
-} from 'lucide-react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { RagManagement } from './rag-management'
-import { useFirebase, useUser } from '@/firebase'
+} from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { RagManagement } from './rag-management';
+import { useFirebase, useUser } from '@/firebase';
 import {
   collection,
   query,
@@ -77,14 +77,14 @@ import {
   setDoc,
   doc,
   getDoc,
-} from 'firebase/firestore'
+} from 'firebase/firestore';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../ui/select'
+} from '../ui/select';
 
 // `zod` is a library for data validation. This defines the "shape" of our settings form.
 // It's like defining a `struct` in C and then writing a function to check if
@@ -99,18 +99,18 @@ const settingsSchema = z.object({
       value: z.string().min(1, { message: 'Example cannot be empty.' }),
     }),
   ),
-})
+});
 
 // A simpler schema just for the "Test AI" form.
 const testSchema = z.object({
   studentQuestion: z.string().min(5, {
     message: 'Test question must be at least 5 characters.',
   }),
-})
+});
 
 // A default system prompt to use for new settings.
 const defaultSystemPrompt =
-  'You are Lyra, an AI tutor. Your goal is to help the student verbalize their problem and guide them towards the solution by providing hints, analogies, and questions instead of direct answers. You should never give the direct answer. Emulate the Socratic method. Be patient and encouraging. You can use Markdown for formatting.'
+  'You are Lyra, an AI tutor. Your goal is to help the student verbalize their problem and guide them towards the solution by providing hints, analogies, and questions instead of direct answers. You should never give the direct answer. Emulate the Socratic method. Be patient and encouraging. You can use Markdown for formatting.';
 
 /**
  * =================================================================================
@@ -137,16 +137,16 @@ const defaultSystemPrompt =
  * =================================================================================
  */
 export function TeacherDashboard() {
-  const [isSaving, setIsSaving] = useState(false)
-  const [isTesting, setIsTesting] = useState(false)
-  const [testResult, setTestResult] = useState('')
-  const [teacherData, setTeacherData] = useState<any>(null)
-  const [selectedSubject, setSelectedSubject] = useState<string>('')
-  const [isLoadingSettings, setIsLoadingSettings] = useState(true)
+  const [isSaving, setIsSaving] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
+  const [testResult, setTestResult] = useState('');
+  const [teacherData, setTeacherData] = useState<any>(null);
+  const [selectedSubject, setSelectedSubject] = useState<string>('');
+  const [isLoadingSettings, setIsLoadingSettings] = useState(true);
 
-  const { toast } = useToast()
-  const { firestore } = useFirebase()
-  const { user } = useUser()
+  const { toast } = useToast();
+  const { firestore } = useFirebase();
+  const { user } = useUser();
 
   const form = useForm<z.infer<typeof settingsSchema>>({
     resolver: zodResolver(settingsSchema),
@@ -159,17 +159,17 @@ export function TeacherDashboard() {
         },
       ],
     },
-  })
+  });
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: 'exampleAnswers',
-  })
+  });
 
   const testForm = useForm<z.infer<typeof testSchema>>({
     resolver: zodResolver(testSchema),
     defaultValues: { studentQuestion: '' },
-  })
+  });
 
   /**
    * C-like Explanation: `useCallback(async function loadTeacherData() ...)`
@@ -179,28 +179,28 @@ export function TeacherDashboard() {
    */
   const loadTeacherData = useCallback(async () => {
     if (user && firestore) {
-      setIsLoadingSettings(true)
-      const userDocRef = doc(firestore, 'users', user.uid)
-      const docSnap = await getDoc(userDocRef)
+      setIsLoadingSettings(true);
+      const userDocRef = doc(firestore, 'users', user.uid);
+      const docSnap = await getDoc(userDocRef);
       if (docSnap.exists()) {
-        const data = docSnap.data()
-        setTeacherData(data)
+        const data = docSnap.data();
+        setTeacherData(data);
         // If the teacher teaches at least one subject, select the first one by default.
         if (data.subjectsTaught && data.subjectsTaught.length > 0) {
-          setSelectedSubject(data.subjectsTaught[0])
+          setSelectedSubject(data.subjectsTaught[0]);
         } else {
-          setIsLoadingSettings(false)
+          setIsLoadingSettings(false);
         }
       } else {
-        setIsLoadingSettings(false)
+        setIsLoadingSettings(false);
       }
     }
-  }, [user, firestore])
+  }, [user, firestore]);
 
   // This `useEffect` calls `loadTeacherData` once when the component first mounts.
   useEffect(() => {
-    loadTeacherData()
-  }, [loadTeacherData])
+    loadTeacherData();
+  }, [loadTeacherData]);
 
   /**
    * C-like Explanation: `useEffect` for loading settings.
@@ -211,21 +211,21 @@ export function TeacherDashboard() {
   useEffect(() => {
     async function loadSettings() {
       if (selectedSubject && user && firestore) {
-        setIsLoadingSettings(true)
+        setIsLoadingSettings(true);
         // Construct a unique ID for the settings document (e.g., "teacher123_Maths").
-        const settingsId = `${user.uid}_${selectedSubject.replace(/\s+/g, '-')}`
-        const settingsDocRef = doc(firestore, 'teacherSettings', settingsId)
-        const docSnap = await getDoc(settingsDocRef)
+        const settingsId = `${user.uid}_${selectedSubject.replace(/\s+/g, '-')}`;
+        const settingsDocRef = doc(firestore, 'teacherSettings', settingsId);
+        const docSnap = await getDoc(settingsDocRef);
 
         if (docSnap.exists()) {
           // If settings exist, load them into the form.
-          const settings = docSnap.data()
+          const settings = docSnap.data();
           form.reset({
             systemPrompt: settings.systemPrompt,
             exampleAnswers: settings.exampleAnswers.map((e: string) => ({
               value: e,
             })),
-          })
+          });
         } else {
           // Otherwise, reset the form to the default prompt and examples.
           form.reset({
@@ -236,15 +236,15 @@ export function TeacherDashboard() {
                   "Instead of solving it for you, can you tell me what you've tried so far?",
               },
             ],
-          })
+          });
         }
-        setIsLoadingSettings(false)
+        setIsLoadingSettings(false);
       }
     }
     if (selectedSubject) {
-      loadSettings()
+      loadSettings();
     }
-  }, [selectedSubject, user, firestore, form])
+  }, [selectedSubject, user, firestore, form]);
 
   /**
    * C-like Explanation: `async function onSubmit(values)`
@@ -252,31 +252,31 @@ export function TeacherDashboard() {
    * `values` is a struct containing the data from the form fields.
    */
   async function onSubmit(values: z.infer<typeof settingsSchema>) {
-    if (!selectedSubject || !user || !firestore) return
-    setIsSaving(true)
+    if (!selectedSubject || !user || !firestore) return;
+    setIsSaving(true);
     try {
-      const settingsId = `${user.uid}_${selectedSubject.replace(/\s+/g, '-')}`
+      const settingsId = `${user.uid}_${selectedSubject.replace(/\s+/g, '-')}`;
       // `setDoc` will create the document if it doesn't exist, or overwrite it if it does.
       await setDoc(doc(firestore, 'teacherSettings', settingsId), {
         teacherId: user.uid,
         subject: selectedSubject,
         systemPrompt: values.systemPrompt,
         exampleAnswers: values.exampleAnswers.map((e) => e.value),
-      })
+      });
 
       toast({
         title: 'Settings Saved',
         description: `Your customizations for ${selectedSubject} have been successfully saved.`,
-      })
+      });
     } catch (error) {
-      console.error(error)
+      console.error(error);
       toast({
         variant: 'destructive',
         title: 'Save Failed',
         description: 'Could not save your customizations. Please try again.',
-      })
+      });
     } finally {
-      setIsSaving(false) // Set loading to false whether it succeeded or failed.
+      setIsSaving(false); // Set loading to false whether it succeeded or failed.
     }
   }
 
@@ -286,13 +286,13 @@ export function TeacherDashboard() {
    * `values` is a struct containing the student's test question.
    */
   async function onTest(values: z.infer<typeof testSchema>) {
-    setIsTesting(true)
-    setTestResult('')
-    const currentSettings = form.getValues() // Get the latest settings from the main form.
+    setIsTesting(true);
+    setTestResult('');
+    const currentSettings = form.getValues(); // Get the latest settings from the main form.
     const teacherExamples =
       currentSettings.exampleAnswers
         ?.map((e) => e.value)
-        .filter((e) => e.trim() !== '') || []
+        .filter((e) => e.trim() !== '') || [];
 
     try {
       // Call the AI flow (like a remote function call) with the test data.
@@ -300,20 +300,20 @@ export function TeacherDashboard() {
         studentQuestion: values.studentQuestion,
         teacherExamples: teacherExamples,
         systemPrompt: currentSettings.systemPrompt,
-      })
-      setTestResult(result.aiResponse) // Update state to display the AI's response.
+      });
+      setTestResult(result.aiResponse); // Update state to display the AI's response.
     } catch (error) {
-      console.error(error)
+      console.error(error);
       setTestResult(
         'An error occurred while testing. Please check the console.',
-      )
+      );
       toast({
         variant: 'destructive',
         title: 'Test Failed',
         description: 'Could not get a response from the AI. Please try again.',
-      })
+      });
     } finally {
-      setIsTesting(false)
+      setIsTesting(false);
     }
   }
 
@@ -589,5 +589,5 @@ export function TeacherDashboard() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

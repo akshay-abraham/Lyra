@@ -17,21 +17,21 @@
  * The `import` statements are the modern equivalent of `#include` in C. They tell the
  * program to load the code from another file.
  */
-'use server'
-import { config } from 'dotenv'
-config()
+'use server';
+import { config } from 'dotenv';
+config();
 
 // #include "src/ai/flows/guide-ai-response-generation.ts"
-import '@/ai/flows/guide-ai-response-generation.ts'
+import '@/ai/flows/guide-ai-response-generation.ts';
 
 // #include "src/ai/flows/customize-ai-teaching-style.ts"
-import '@/ai/flows/customize-ai-teaching-style.ts'
+import '@/ai/flows/customize-ai-teaching-style.ts';
 
 // #include "src/ai/flows/generate-ai-tutor-response.ts"
-import '@/ai/flows/generate-ai-tutor-response.ts'
+import '@/ai/flows/generate-ai-tutor-response.ts';
 
 // #include "src/ai/flows/implement-ethical-ai-guardrails.ts"
-import '@/ai/flows/implement-ethical-ai-guardrails.ts'
+import '@/ai/flows/implement-ethical-ai-guardrails.ts';
 
 // #include "src/ai/flows/generate-chat-title.ts"
-import '@/ai/flows/generate-chat-title.ts'
+import '@/ai/flows/generate-chat-title.ts';

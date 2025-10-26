@@ -28,8 +28,8 @@
  *     the rest of the program can use via an `extern` declaration.
  */
 
-import { genkit } from 'genkit'
-import { googleAI } from '@genkit-ai/google-genai'
+import { genkit } from 'genkit';
+import { googleAI } from '@genkit-ai/google-genai';
 
 // `export const ai = ...` is how you create a global, read-only variable
 // that can be used by other files in the project.
@@ -38,4 +38,4 @@ export const ai = genkit({
   plugins: [googleAI()],
   // Set the default model for all AI generation calls.
   model: 'googleai/gemini-2.5-flash',
-})
+});

@@ -15,7 +15,7 @@
 
 // Like `#include` in C, these lines import necessary "libraries" or components.
 // We are importing UI components (like Card, Button) and icons.
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   BrainCircuit,
   Database,
@@ -23,10 +23,10 @@ import {
   ArrowRight,
   Shield,
   Scale,
-} from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { SidebarLayout } from '@/components/layout/sidebar-layout' // The main layout with the navigation sidebar.
-import Image from 'next/image' // Next.js's optimized image component.
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { SidebarLayout } from '@/components/layout/sidebar-layout'; // The main layout with the navigation sidebar.
+import Image from 'next/image'; // Next.js's optimized image component.
 
 /**
  * C-like Explanation: `function AboutPage() -> returns JSX_Element`
@@ -228,5 +228,5 @@ export default function AboutPage() {
         </Card>
       </div>
     </SidebarLayout>
-  )
+  );
 }

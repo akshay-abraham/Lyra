@@ -19,11 +19,11 @@
  * the form's complexity.
  */
 
-'use client'
-import React, { useState, useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
+'use client';
+import React, { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import {
   Form,
   FormControl,
@@ -32,7 +32,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
+} from '@/components/ui/form';
 import {
   Select,
   SelectContent,
@@ -40,32 +40,32 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Input } from '../ui/input'
-import { useToast } from '@/hooks/use-toast'
-import { ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useFirebase } from '@/firebase'
-import { createUserWithEmailAndPassword } from 'firebase/auth'
-import { setDoc, doc, serverTimestamp } from 'firebase/firestore'
-import { MultiSelect, type GroupedOption } from '@/components/ui/multi-select'
+} from '@/components/ui/card';
+import { Input } from '../ui/input';
+import { useToast } from '@/hooks/use-toast';
+import { ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useFirebase } from '@/firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { MultiSelect, type GroupedOption } from '@/components/ui/multi-select';
 import {
   allClasses,
   getSubjectsForClasses,
   type ClassData,
-} from '@/lib/subjects-data'
-import { Progress } from '../ui/progress'
-import { cn } from '@/lib/utils'
-import { calculatePasswordStrength } from '@/lib/utils'
+} from '@/lib/subjects-data';
+import { Progress } from '../ui/progress';
+import { cn } from '@/lib/utils';
+import { calculatePasswordStrength } from '@/lib/utils';
 
 // This Zod schema is more complex. It defines validation rules for all possible fields.
 // It also uses `.refine()` for custom validation logic that depends on multiple fields.
@@ -98,9 +98,9 @@ const formSchema = z
   .refine(
     (data) => {
       if (data.role === 'student') {
-        return !!data.class
+        return !!data.class;
       }
-      return true
+      return true;
     },
     { message: 'Please select a class', path: ['class'] },
   )
@@ -108,9 +108,9 @@ const formSchema = z
   .refine(
     (data) => {
       if (data.role === 'teacher') {
-        return data.classesTaught && data.classesTaught.length > 0
+        return data.classesTaught && data.classesTaught.length > 0;
       }
-      return true
+      return true;
     },
     { message: 'Please select at least one class', path: ['classesTaught'] },
   )
@@ -118,12 +118,12 @@ const formSchema = z
   .refine(
     (data) => {
       if (data.role === 'teacher') {
-        return data.subjectsTaught && data.subjectsTaught.length > 0
+        return data.subjectsTaught && data.subjectsTaught.length > 0;
       }
-      return true
+      return true;
     },
     { message: 'Please select at least one subject', path: ['subjectsTaught'] },
-  )
+  );
 
 /**
  * C-like Explanation: `function RegisterForm() -> returns JSX_Element`
@@ -144,16 +144,16 @@ const formSchema = z
  *     2.  To update the list of `availableSubjects` whenever the teacher changes their selected `classesTaught`.
  */
 export function RegisterForm() {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [availableSubjects, setAvailableSubjects] = useState<string[]>([])
-  const [passwordStrength, setPasswordStrength] = useState(0)
-  const [strengthColor, setStrengthColor] = useState('bg-destructive')
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [availableSubjects, setAvailableSubjects] = useState<string[]>([]);
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [strengthColor, setStrengthColor] = useState('bg-destructive');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const { auth, firestore } = useFirebase()
-  const router = useRouter()
-  const { toast } = useToast()
+  const { auth, firestore } = useFirebase();
+  const router = useRouter();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -169,27 +169,27 @@ export function RegisterForm() {
       subjectsTaught: [],
     },
     mode: 'onChange', // Re-validate the form on every change for real-time feedback.
-  })
+  });
 
   // `form.watch` lets us subscribe to changes in specific form fields.
-  const selectedRole = form.watch('role')
-  const selectedClasses = form.watch('classesTaught')
-  const password = form.watch('password')
+  const selectedRole = form.watch('role');
+  const selectedClasses = form.watch('classesTaught');
+  const password = form.watch('password');
 
   // This `useEffect` hook runs whenever the `password` value changes.
   useEffect(() => {
     // It calculates the strength and updates the state for the progress bar.
-    const strength = calculatePasswordStrength(password)
-    setPasswordStrength(strength)
+    const strength = calculatePasswordStrength(password);
+    setPasswordStrength(strength);
 
     if (strength < 40) {
-      setStrengthColor('bg-red-500')
+      setStrengthColor('bg-red-500');
     } else if (strength < 80) {
-      setStrengthColor('bg-orange-500')
+      setStrengthColor('bg-orange-500');
     } else {
-      setStrengthColor('bg-green-500')
+      setStrengthColor('bg-green-500');
     }
-  }, [password]) // Dependency array: only re-run when `password` changes.
+  }, [password]); // Dependency array: only re-run when `password` changes.
 
   // This `useEffect` hook runs when `selectedClasses` or `selectedRole` changes.
   useEffect(() => {
@@ -200,14 +200,14 @@ export function RegisterForm() {
       selectedClasses.length > 0
     ) {
       // ...get the corresponding subjects and update the `availableSubjects` state.
-      const subjects = getSubjectsForClasses(selectedClasses)
-      setAvailableSubjects(subjects.map((s) => s.name))
+      const subjects = getSubjectsForClasses(selectedClasses);
+      setAvailableSubjects(subjects.map((s) => s.name));
     } else {
-      setAvailableSubjects([])
+      setAvailableSubjects([]);
     }
     // Also, reset the `subjectsTaught` field since the available options have changed.
-    form.setValue('subjectsTaught', [])
-  }, [selectedClasses, selectedRole, form])
+    form.setValue('subjectsTaught', []);
+  }, [selectedClasses, selectedRole, form]);
 
   /**
    * C-like Explanation: `async function handleRegisterSubmit(data)`
@@ -215,15 +215,15 @@ export function RegisterForm() {
    * `data` is a struct (`z.infer<typeof formSchema>`) containing the validated form data.
    */
   const handleRegisterSubmit = async (data: z.infer<typeof formSchema>) => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
       // 1. Create the user in Firebase Authentication.
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         data.email,
         data.password,
-      )
-      const user = userCredential.user
+      );
+      const user = userCredential.user;
 
       if (user) {
         // 2. Prepare the user profile data for Firestore.
@@ -234,75 +234,76 @@ export function RegisterForm() {
           role: data.role,
           school: data.school,
           createdAt: serverTimestamp(), // Use the database's timestamp.
-        }
+        };
 
         // Add role-specific fields.
         if (data.role === 'student') {
-          userProfileData.class = data.class
+          userProfileData.class = data.class;
         } else {
-          userProfileData.classesTaught = data.classesTaught
-          userProfileData.subjectsTaught = data.subjectsTaught
+          userProfileData.classesTaught = data.classesTaught;
+          userProfileData.subjectsTaught = data.subjectsTaught;
         }
 
         // 3. Create the user profile document in the 'users' collection.
-        const userDocRef = doc(firestore, 'users', user.uid)
+        const userDocRef = doc(firestore, 'users', user.uid);
         // `setDoc` creates or overwrites a document with the given data.
-        await setDoc(userDocRef, userProfileData)
+        await setDoc(userDocRef, userProfileData);
 
         // 4. Store user info in session storage for quick access.
         sessionStorage.setItem(
           'lyra-user-info',
           JSON.stringify(userProfileData),
-        )
+        );
 
         toast({
           title: 'Registration Successful',
           description: `Welcome to Lyra, ${data.name}!`,
-        })
+        });
 
         // 5. Redirect based on role.
         if (data.role === 'teacher') {
-          router.push('/teacher')
+          router.push('/teacher');
         } else {
-          router.push('/')
+          router.push('/');
         }
       }
     } catch (error: any) {
       // Handle errors, e.g., if the email is already in use.
-      console.error('Registration failed:', error)
-      let description = 'An unexpected error occurred. Please try again.'
+      console.error('Registration failed:', error);
+      let description = 'An unexpected error occurred. Please try again.';
       if (error.code === 'auth/email-already-in-use') {
-        description = 'This email is already registered. Please try logging in.'
+        description =
+          'This email is already registered. Please try logging in.';
       }
       toast({
         variant: 'destructive',
         title: 'Registration Failed',
         description: description,
-      })
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   // Prepare options for the various dropdowns in the form.
-  const schoolOptions = ['Girideepam Bethany Central School']
+  const schoolOptions = ['Girideepam Bethany Central School'];
   const groupedClasses = allClasses.reduce(
     (acc, currentClass) => {
-      const grade = `Grade ${currentClass.grade}`
+      const grade = `Grade ${currentClass.grade}`;
       if (!acc[grade]) {
-        acc[grade] = []
+        acc[grade] = [];
       }
-      acc[grade].push(currentClass)
-      return acc
+      acc[grade].push(currentClass);
+      return acc;
     },
     {} as Record<string, ClassData[]>,
-  )
+  );
   const teacherClassOptions: GroupedOption[] = Object.entries(
     groupedClasses,
   ).map(([grade, classes]) => ({
     label: grade,
     options: classes.map((c) => ({ label: c.name, value: c.name })),
-  }))
+  }));
 
   // ========================== RETURN JSX (The View) ==========================
   return (
@@ -600,5 +601,5 @@ export function RegisterForm() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

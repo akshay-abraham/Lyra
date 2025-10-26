@@ -13,12 +13,12 @@
  *
  * The primary exported function is `generateGuidedResponse`.
  */
-'use server'
+'use server';
 
 // Import necessary libraries.
 // C-like analogy: #include <genkit_lib.h> and #include <zod_struct_lib.h>
-import { ai } from '@/ai/genkit'
-import { z } from 'genkit'
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
 
 /**
  * C-like Analogy: Input Struct Definition
@@ -37,9 +37,9 @@ const GuidedResponseInputSchema = z.object({
   systemPrompt: z
     .string()
     .describe('The overall system prompt for the AI tutor.'),
-})
+});
 // Create a TypeScript "type" from the schema.
-export type GuidedResponseInput = z.infer<typeof GuidedResponseInputSchema>
+export type GuidedResponseInput = z.infer<typeof GuidedResponseInputSchema>;
 
 /**
  * C-like Analogy: Output Struct Definition
@@ -54,9 +54,9 @@ const GuidedResponseOutputSchema = z.object({
     .describe(
       'The AI-generated response to the student question, guided by the teacher examples.',
     ),
-})
+});
 // Create a TypeScript "type" from the schema.
-export type GuidedResponseOutput = z.infer<typeof GuidedResponseOutputSchema>
+export type GuidedResponseOutput = z.infer<typeof GuidedResponseOutputSchema>;
 
 /**
  * C-like Analogy: `GuidedResponseOutput* generateGuidedResponse(GuidedResponseInput* input)`
@@ -68,7 +68,7 @@ export async function generateGuidedResponse(
   input: GuidedResponseInput,
 ): Promise<GuidedResponseOutput> {
   // It's a simple wrapper that calls the internal Genkit flow.
-  return generateGuidedResponseFlow(input)
+  return generateGuidedResponseFlow(input);
 }
 
 /**
@@ -87,7 +87,7 @@ const prompt = ai.definePrompt({
   input: { schema: GuidedResponseInputSchema }, // Input data format.
   output: { schema: GuidedResponseOutputSchema }, // Expected output format.
   prompt: `{{systemPrompt}}\n\nHere are some examples of good answers to guide your response:\n{{#each teacherExamples}}\n- {{{this}}}\n{{/each}}\n\nStudent Question: {{{studentQuestion}}}\n\nAI Response: `,
-})
+});
 
 /**
  * C-like Analogy: The Core Logic Function
@@ -106,10 +106,10 @@ const generateGuidedResponseFlow = ai.defineFlow(
     // 1. Call the AI with our prompt, filling it in with the `input` data (system prompt, examples, and question).
     //    `result = ai_call(prompt, input);`
     //    We `await` its completion.
-    const { output } = await prompt(input)
+    const { output } = await prompt(input);
 
     // 2. The `result.output` is guaranteed by Genkit to match our `GuidedResponseOutputSchema`.
     //    We can simply return it. The `!` tells TypeScript we are sure it's not null.
-    return output!
+    return output!;
   },
-)
+);

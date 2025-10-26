@@ -15,8 +15,8 @@
  *     needs to load any data asynchronously (though in this case, it's very fast).
  */
 
-import { LoginForm } from '@/components/auth/login-form'
-import { Suspense } from 'react'
+import { LoginForm } from '@/components/auth/login-form';
+import { Suspense } from 'react';
 
 /**
  * C-like Explanation: `function LoginPage() -> returns JSX_Element`
@@ -51,5 +51,5 @@ export default function LoginPage() {
         <LoginForm />
       </Suspense>
     </div>
-  )
+  );
 }

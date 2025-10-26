@@ -1,5 +1,5 @@
 // Copyright (C) 2025 Akshay K Rooben abraham
-import { allSubjects, type SubjectName } from './subjects-data'
+import { allSubjects, type SubjectName } from './subjects-data';
 
 const loadingTexts: Record<SubjectName, string[]> = {
   // Grade 1-5
@@ -153,14 +153,14 @@ const loadingTexts: Record<SubjectName, string[]> = {
     'Untangling a knot of knowledge...',
     'Shuffling the library cards...',
   ],
-}
+};
 
 // Function to get a random loading text for a given subject
 export function getLoadingText(subject: string | null): string {
   const validSubject =
     subject && allSubjects.find((s) => s.name === subject)
       ? (subject as SubjectName)
-      : 'Other'
-  const texts = loadingTexts[validSubject]
-  return texts[Math.floor(Math.random() * texts.length)]
+      : 'Other';
+  const texts = loadingTexts[validSubject];
+  return texts[Math.floor(Math.random() * texts.length)];
 }

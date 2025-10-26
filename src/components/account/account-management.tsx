@@ -15,12 +15,12 @@
  * validation, and submission. This is like using a pre-built GUI library in C to
  * handle all the complexities of form management instead of writing it all from scratch.
  */
-'use client'
+'use client';
 
-import { useState, useEffect, useCallback } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
+import { useState, useEffect, useCallback } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import {
   Form,
   FormControl,
@@ -29,30 +29,24 @@ import {
   FormLabel,
   FormMessage,
   FormDescription,
-} from '@/components/ui/form'
-import { Button } from '@/components/ui/button'
+} from '@/components/ui/form';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { useToast } from '@/hooks/use-toast'
-import {
-  Loader2,
-  Trash2,
-  User,
-  KeyRound,
-  ShieldAlert,
-} from 'lucide-react'
-import { useFirebase, useUser } from '@/firebase'
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
+import { Loader2, Trash2, User, KeyRound, ShieldAlert } from 'lucide-react';
+import { useFirebase, useUser } from '@/firebase';
 import {
   updateProfile,
   sendPasswordResetEmail,
   updateEmail,
-} from 'firebase/auth'
+} from 'firebase/auth';
 import {
   doc,
   updateDoc,
@@ -60,7 +54,7 @@ import {
   collection,
   getDocs,
   getDoc,
-} from 'firebase/firestore'
+} from 'firebase/firestore';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -71,7 +65,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
+} from '@/components/ui/alert-dialog';
 import {
   Select,
   SelectContent,
@@ -79,13 +73,13 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../ui/select'
-import { MultiSelect, type GroupedOption } from '../ui/multi-select'
+} from '../ui/select';
+import { MultiSelect, type GroupedOption } from '../ui/multi-select';
 import {
   allClasses,
   getSubjectsForClasses,
   type ClassData,
-} from '@/lib/subjects-data'
+} from '@/lib/subjects-data';
 
 // `zod` is used to define the "schema" or structure of our form data.
 // It's like defining a `struct` in C and also providing validation rules for each member.
@@ -98,10 +92,10 @@ const profileSchema = z.object({
   // Teacher-specific fields
   classesTaught: z.array(z.string()).optional(),
   subjectsTaught: z.array(z.string()).optional(),
-})
+});
 
 // A type definition derived from the schema, like `typedef struct ProfileFormDataType {...}`
-type ProfileFormData = z.infer<typeof profileSchema>
+type ProfileFormData = z.infer<typeof profileSchema>;
 
 // A type for the user's profile data stored in Firestore.
 interface UserInfo {
@@ -132,16 +126,16 @@ interface UserInfo {
  *     and to react to changes (like when a teacher changes the classes they teach).
  */
 export function AccountManagement() {
-  const { user } = useUser()
-  const { auth, firestore } = useFirebase()
-  const { toast } = useToast()
+  const { user } = useUser();
+  const { auth, firestore } = useFirebase();
+  const { toast } = useToast();
 
   // State variables for loading indicators.
-  const [isSaving, setIsSaving] = useState(false)
-  const [isDeletingChat, setIsDeletingChat] = useState(false)
-  const [isResetting, setIsResetting] = useState(false)
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
-  const [availableSubjects, setAvailableSubjects] = useState<string[]>([])
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeletingChat, setIsDeletingChat] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [availableSubjects, setAvailableSubjects] = useState<string[]>([]);
 
   // Initialize the form using the `useForm` hook.
   const form = useForm<ProfileFormData>({
@@ -155,9 +149,9 @@ export function AccountManagement() {
       classesTaught: [],
       subjectsTaught: [],
     },
-  })
+  });
 
-  const selectedClasses = form.watch('classesTaught') // Watch for changes to this specific field.
+  const selectedClasses = form.watch('classesTaught'); // Watch for changes to this specific field.
 
   // This `useEffect` hook runs when `selectedClasses` changes.
   // Its job is to update the list of available subjects for a teacher.
@@ -167,25 +161,25 @@ export function AccountManagement() {
       selectedClasses &&
       selectedClasses.length > 0
     ) {
-      const subjects = getSubjectsForClasses(selectedClasses)
-      setAvailableSubjects(subjects.map((s) => s.name))
+      const subjects = getSubjectsForClasses(selectedClasses);
+      setAvailableSubjects(subjects.map((s) => s.name));
       // Reset the selected subjects if the classes they are based on have changed.
-      form.setValue('subjectsTaught', [])
+      form.setValue('subjectsTaught', []);
     } else {
-      setAvailableSubjects([])
+      setAvailableSubjects([]);
     }
-  }, [selectedClasses, userInfo?.role, form])
+  }, [selectedClasses, userInfo?.role, form]);
 
   // `useCallback` is an optimization. It "memoizes" the function, meaning it won't
   // be recreated on every render unless its dependencies change.
   // This function fetches the complete user profile from Firestore.
   const fetchUserInfo = useCallback(async () => {
     if (user && firestore) {
-      const userDocRef = doc(firestore, 'users', user.uid)
-      const userDoc = await getDoc(userDocRef)
+      const userDocRef = doc(firestore, 'users', user.uid);
+      const userDoc = await getDoc(userDocRef);
       if (userDoc.exists()) {
-        const data = userDoc.data() as UserInfo
-        setUserInfo(data)
+        const data = userDoc.data() as UserInfo;
+        setUserInfo(data);
         // Once data is fetched, reset the form with these new default values.
         form.reset({
           name: data.name || user.displayName || '',
@@ -194,19 +188,19 @@ export function AccountManagement() {
           class: data.class || '',
           classesTaught: data.classesTaught || [],
           subjectsTaught: data.subjectsTaught || [],
-        })
+        });
         if (data.role === 'teacher' && data.classesTaught) {
-          const subjects = getSubjectsForClasses(data.classesTaught)
-          setAvailableSubjects(subjects.map((s) => s.name))
+          const subjects = getSubjectsForClasses(data.classesTaught);
+          setAvailableSubjects(subjects.map((s) => s.name));
         }
       }
     }
-  }, [user, firestore, form])
+  }, [user, firestore, form]);
 
   // This `useEffect` calls `fetchUserInfo` once when the component is first mounted.
   useEffect(() => {
-    fetchUserInfo()
-  }, [fetchUserInfo])
+    fetchUserInfo();
+  }, [fetchUserInfo]);
 
   /**
    * C-like Explanation: `async function onProfileSubmit(values)`
@@ -214,58 +208,59 @@ export function AccountManagement() {
    * `react-hook-form` automatically handles collecting the data into the `values` struct.
    */
   async function onProfileSubmit(values: ProfileFormData) {
-    if (!user || !userInfo) return
-    setIsSaving(true)
+    if (!user || !userInfo) return;
+    setIsSaving(true);
     try {
       // --- Update Firebase Authentication Profile ---
       // These are built-in Firebase functions to update the core auth user record.
       if (values.name !== user.displayName) {
-        await updateProfile(user, { displayName: values.name })
+        await updateProfile(user, { displayName: values.name });
       }
       if (values.email !== user.email) {
-        await updateEmail(user, values.email) // Note: This might require re-authentication.
+        await updateEmail(user, values.email); // Note: This might require re-authentication.
       }
 
       // --- Update Firestore Document Profile ---
       // This updates our custom user profile document in the database.
-      const userDocRef = doc(firestore, 'users', user.uid)
+      const userDocRef = doc(firestore, 'users', user.uid);
       const updateData: Partial<UserInfo> = {
         name: values.name,
         email: values.email,
         school: values.school,
-      }
+      };
       if (userInfo.role === 'student') {
-        updateData.class = values.class
+        updateData.class = values.class;
       } else if (userInfo.role === 'teacher') {
-        updateData.classesTaught = values.classesTaught
-        updateData.subjectsTaught = values.subjectsTaught
+        updateData.classesTaught = values.classesTaught;
+        updateData.subjectsTaught = values.subjectsTaught;
       }
-      await updateDoc(userDocRef, updateData)
+      await updateDoc(userDocRef, updateData);
 
       // --- Update Local Session Storage ---
       // This keeps the locally cached user info in sync.
-      const storedInfo = sessionStorage.getItem('lyra-user-info')
+      const storedInfo = sessionStorage.getItem('lyra-user-info');
       if (storedInfo) {
-        const currentInfo = JSON.parse(storedInfo)
-        const newInfo = { ...currentInfo, ...updateData }
-        sessionStorage.setItem('lyra-user-info', JSON.stringify(newInfo))
-        setUserInfo(newInfo) // Update local component state as well.
+        const currentInfo = JSON.parse(storedInfo);
+        const newInfo = { ...currentInfo, ...updateData };
+        sessionStorage.setItem('lyra-user-info', JSON.stringify(newInfo));
+        setUserInfo(newInfo); // Update local component state as well.
       }
 
       toast({
         title: 'Profile Updated',
         description: 'Your account information has been successfully updated.',
-      })
+      });
     } catch (error) {
-      console.error('Profile update failed:', error)
-      const message = error instanceof Error ? error.message : 'An unknown error occurred.'
+      console.error('Profile update failed:', error);
+      const message =
+        error instanceof Error ? error.message : 'An unknown error occurred.';
       toast({
         variant: 'destructive',
         title: 'Update Failed',
         description: message,
-      })
+      });
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
   }
 
@@ -274,24 +269,25 @@ export function AccountManagement() {
    * This function sends a password reset email using Firebase's built-in functionality.
    */
   async function handlePasswordReset() {
-    if (!user?.email) return
-    setIsResetting(true)
+    if (!user?.email) return;
+    setIsResetting(true);
     try {
-      await sendPasswordResetEmail(auth, user.email)
+      await sendPasswordResetEmail(auth, user.email);
       toast({
         title: 'Password Reset Email Sent',
         description: `A reset link has been sent to ${user.email}. Please check your inbox.`,
-      })
+      });
     } catch (error) {
-      console.error('Password reset failed:', error)
-      const message = error instanceof Error ? error.message : 'An unknown error occurred.'
+      console.error('Password reset failed:', error);
+      const message =
+        error instanceof Error ? error.message : 'An unknown error occurred.';
       toast({
         variant: 'destructive',
         title: 'Password Reset Failed',
         description: message,
-      })
+      });
     } finally {
-      setIsResetting(false)
+      setIsResetting(false);
     }
   }
 
@@ -302,60 +298,60 @@ export function AccountManagement() {
    * into a single request to the server.
    */
   async function handleDeleteChatHistory() {
-    if (!user) return
-    setIsDeletingChat(true)
+    if (!user) return;
+    setIsDeletingChat(true);
 
     const chatSessionsRef = collection(
       firestore,
       'users',
       user.uid,
       'chatSessions',
-    )
-    const snapshot = await getDocs(chatSessionsRef)
+    );
+    const snapshot = await getDocs(chatSessionsRef);
 
     if (snapshot.empty) {
-      toast({ title: 'No chats to delete.' })
-      setIsDeletingChat(false)
-      return
+      toast({ title: 'No chats to delete.' });
+      setIsDeletingChat(false);
+      return;
     }
 
     // Create a new batch operation.
-    const batch = writeBatch(firestore)
+    const batch = writeBatch(firestore);
     // For each document found, add a `delete` operation to the batch.
     snapshot.forEach((doc) => {
-      batch.delete(doc.ref)
-    })
+      batch.delete(doc.ref);
+    });
 
     // Commit the batch - this sends all the delete operations to the server at once.
-    await batch.commit()
+    await batch.commit();
 
     toast({
       title: 'Chat History Deleted',
       description: 'Your chat sessions have been cleared.',
-    })
+    });
 
-    setIsDeletingChat(false)
+    setIsDeletingChat(false);
   }
 
   // Options for the UI dropdowns.
-  const schoolOptions = ['Girideepam Bethany Central School']
+  const schoolOptions = ['Girideepam Bethany Central School'];
   const groupedClasses = allClasses.reduce(
     (acc, currentClass) => {
-      const grade = `Grade ${currentClass.grade}`
+      const grade = `Grade ${currentClass.grade}`;
       if (!acc[grade]) {
-        acc[grade] = []
+        acc[grade] = [];
       }
-      acc[grade].push(currentClass)
-      return acc
+      acc[grade].push(currentClass);
+      return acc;
     },
     {} as Record<string, ClassData[]>,
-  )
+  );
   const teacherClassOptions: GroupedOption[] = Object.entries(
     groupedClasses,
   ).map(([grade, classes]) => ({
     label: grade,
     options: classes.map((c) => ({ label: c.name, value: c.name })),
-  }))
+  }));
 
   // ========================== RETURN JSX (The View) ==========================
   // The rest of this file is the JSX code that describes what the component looks like.
@@ -652,5 +648,5 @@ export function AccountManagement() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

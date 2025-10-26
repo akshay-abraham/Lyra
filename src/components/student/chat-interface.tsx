@@ -16,7 +16,7 @@
  * receiving responses. This component focuses only on the "View" part of the app,
  * following a Model-View-Controller like pattern where `useChat` is the Controller.
  */
-'use client'
+'use client';
 
 // Like `#include` in C, these lines import necessary code from other files.
 import React, {
@@ -25,32 +25,32 @@ import React, {
   useEffect,
   type FormEvent,
   type KeyboardEvent,
-} from 'react'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent } from '@/components/ui/card'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Bot, User, CornerDownLeft, BookCheck } from 'lucide-react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-import mermaid from 'mermaid'
-import { cn } from '@/lib/utils'
+} from 'react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Bot, User, CornerDownLeft, BookCheck } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import mermaid from 'mermaid';
+import { cn } from '@/lib/utils';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../ui/select'
-import { useChat } from '@/hooks/use-chat'
-import { useToast } from '@/hooks/use-toast'
-import { getLoadingText } from '@/lib/loading-texts'
+} from '../ui/select';
+import { useChat } from '@/hooks/use-chat';
+import { useToast } from '@/hooks/use-toast';
+import { getLoadingText } from '@/lib/loading-texts';
 import {
   getSubjectsForUser,
   type SubjectData,
   allSubjects,
-} from '@/lib/subjects-data'
+} from '@/lib/subjects-data';
 
 /**
  * C-like Explanation: Mermaid Component
@@ -72,22 +72,22 @@ import {
  */
 const Mermaid = React.memo(({ chart }: { chart: string }) => {
   // `useRef` is like creating a pointer to an element on the screen.
-  const chartRef = useRef<HTMLDivElement>(null)
+  const chartRef = useRef<HTMLDivElement>(null);
 
   // `useEffect` is a special React function that runs code *after* the component
   // has been rendered to the screen. It's useful for interacting with browser APIs.
   // Think of it as a function that gets called automatically at a specific time.
   useEffect(() => {
     // Initialize the mermaid library.
-    mermaid.initialize({ startOnLoad: false, theme: 'neutral' })
+    mermaid.initialize({ startOnLoad: false, theme: 'neutral' });
     // If the pointer to our screen element is valid and we have a chart string...
     if (chartRef.current && chart) {
       // ...tell mermaid to find that element and render the diagram inside it.
       mermaid.run({
         nodes: [chartRef.current],
-      })
+      });
     }
-  }, [chart]) // This function re-runs only if the `chart` string changes.
+  }, [chart]); // This function re-runs only if the `chart` string changes.
 
   // This is JSX, which looks like HTML. It returns the visual element.
   // The `ref={chartRef}` part is how we connect our `pointer` to this specific `div`.
@@ -95,9 +95,9 @@ const Mermaid = React.memo(({ chart }: { chart: string }) => {
     <div ref={chartRef} className='mermaid'>
       {chart}
     </div>
-  )
-})
-Mermaid.displayName = 'Mermaid'
+  );
+});
+Mermaid.displayName = 'Mermaid';
 
 /**
  * C-like Explanation: CodeBlock Component
@@ -121,13 +121,13 @@ const CodeBlock: React.FC<any> = ({
   ...props
 }) => {
   // This uses regular expressions (regex) to find the language name, e.g., "language-javascript".
-  const match = /language-(\w+)/.exec(className || '')
-  const lang = match && match[1]
+  const match = /language-(\w+)/.exec(className || '');
+  const lang = match && match[1];
 
   // If the language is 'mermaid', render the special Mermaid component.
   if (lang === 'mermaid') {
     // The `children` prop contains the actual code string.
-    return <Mermaid chart={String(children).replace(/\n$/, '')} />
+    return <Mermaid chart={String(children).replace(/\n$/, '')} />;
   }
 
   // For any other language, render it inside a standard HTML `<code>` tag for styling.
@@ -139,9 +139,9 @@ const CodeBlock: React.FC<any> = ({
     <code className={className} {...props}>
       {children}
     </code>
-  )
-}
-CodeBlock.displayName = 'CodeBlock'
+  );
+};
+CodeBlock.displayName = 'CodeBlock';
 
 /**
  * C-like Explanation: NewChatView Component
@@ -163,9 +163,9 @@ const NewChatView = React.memo(
     subject,
     availableSubjects,
   }: {
-    onSubjectSelect: (subject: string) => void
-    subject: string | null
-    availableSubjects: SubjectData[]
+    onSubjectSelect: (subject: string) => void;
+    subject: string | null;
+    availableSubjects: SubjectData[];
   }) => (
     <div className='flex flex-col items-center justify-center h-full text-center text-muted-foreground p-4 animate-fade-in-up'>
       <div className='p-3 rounded-full border-2 border-primary/20 bg-primary/10 mb-4 animate-scale-in'>
@@ -202,15 +202,15 @@ const NewChatView = React.memo(
       </Select>
     </div>
   ),
-)
-NewChatView.displayName = 'NewChatView'
+);
+NewChatView.displayName = 'NewChatView';
 
 // This is like a constant key-value map or a hash table.
 // It maps a subject's name (string) to its color (string).
 // Used to style the chat bubbles based on the subject.
 const subjectColorMap = new Map<string, string>(
   allSubjects.map((s) => [s.name, s.color]),
-)
+);
 
 /**
  * =================================================================================
@@ -239,39 +239,41 @@ const subjectColorMap = new Map<string, string>(
 export function ChatInterface({
   chatId: currentChatId,
 }: {
-  chatId: string | null
+  chatId: string | null;
 }) {
   // `useState` is a React Hook. It's how you declare a variable whose changes
   // will cause the UI to re-render.
   // C-like analogy: `char* input = ""; void setInput(char* newValue) { ... }`
   // `input` is the variable, `setInput` is the function to change it.
-  const [input, setInput] = useState('')
-  const [subject, setSubject] = useState<string | null>(null)
-  const [localLoadingText, setLocalLoadingText] = useState(getLoadingText(null))
-  const [availableSubjects, setAvailableSubjects] = useState<SubjectData[]>([])
+  const [input, setInput] = useState('');
+  const [subject, setSubject] = useState<string | null>(null);
+  const [localLoadingText, setLocalLoadingText] = useState(
+    getLoadingText(null),
+  );
+  const [availableSubjects, setAvailableSubjects] = useState<SubjectData[]>([]);
 
   // These are calls to other hooks to get access to common utilities.
-  const { toast } = useToast() // For showing pop-up notifications.
-  const scrollAreaRef = useRef<HTMLDivElement>(null) // Pointer to the scrollable message area.
-  const inputRef = useRef<HTMLTextAreaElement>(null) // Pointer to the text input box.
+  const { toast } = useToast(); // For showing pop-up notifications.
+  const scrollAreaRef = useRef<HTMLDivElement>(null); // Pointer to the scrollable message area.
+  const inputRef = useRef<HTMLTextAreaElement>(null); // Pointer to the text input box.
 
   // This is the most important hook call. It connects this UI component to the chat logic.
   // It gives us back a struct of data and functions: `{ messages, sendMessage, isLoading, chatSubject }`
   const { messages, sendMessage, isLoading, chatSubject } =
-    useChat(currentChatId)
+    useChat(currentChatId);
 
   // If `messages` is null (which can happen initially), we use an empty array
   // to avoid errors. This is a safety check.
   // `const safeMessages = (messages != NULL) ? messages : create_empty_array();`
-  const safeMessages = messages || []
+  const safeMessages = messages || [];
 
   // Determine the current subject. If a subject is selected for a new chat, use that.
   // Otherwise, use the subject from the existing chat session.
-  const currentSubject = subject || chatSubject
+  const currentSubject = subject || chatSubject;
   // Get the accent color for the current subject from our map. Default to primary color if not found.
   const chatAccentColor = currentSubject
     ? subjectColorMap.get(currentSubject) || 'hsl(var(--primary))'
-    : 'hsl(var(--primary))'
+    : 'hsl(var(--primary))';
 
   // `useEffect` runs code after rendering. This one runs only once when the component is first created.
   // Its job is to figure out which subjects the current student should see.
@@ -294,33 +296,33 @@ export function ChatInterface({
     //   }
     // }
     try {
-      const userInfoStr = sessionStorage.getItem('lyra-user-info')
+      const userInfoStr = sessionStorage.getItem('lyra-user-info');
       if (userInfoStr) {
-        const userInfo = JSON.parse(userInfoStr)
-        setAvailableSubjects(getSubjectsForUser(userInfo.role, userInfo.class))
+        const userInfo = JSON.parse(userInfoStr);
+        setAvailableSubjects(getSubjectsForUser(userInfo.role, userInfo.class));
       } else {
-        setAvailableSubjects(getSubjectsForUser(null, null))
+        setAvailableSubjects(getSubjectsForUser(null, null));
       }
     } catch (e) {
-      setAvailableSubjects(getSubjectsForUser(null, null))
+      setAvailableSubjects(getSubjectsForUser(null, null));
     }
-  }, []) // The empty `[]` means this runs only once.
+  }, []); // The empty `[]` means this runs only once.
 
   // This `useEffect` hook's job is to automatically scroll the chat window
   // to the bottom whenever a new message is added or when the AI starts typing.
   useEffect(() => {
-    const scrollArea = scrollAreaRef.current // Get the element from our pointer.
+    const scrollArea = scrollAreaRef.current; // Get the element from our pointer.
     if (scrollArea) {
       scrollArea.scrollTo({
         top: scrollArea.scrollHeight, // Scroll to the very bottom.
         behavior: 'smooth', // Make it a smooth animation.
-      })
+      });
     }
-  }, [safeMessages, isLoading]) // It re-runs whenever `safeMessages` or `isLoading` changes.
+  }, [safeMessages, isLoading]); // It re-runs whenever `safeMessages` or `isLoading` changes.
 
   // This `useEffect` runs only once. It focuses the text input box and initializes the Mermaid library.
   useEffect(() => {
-    inputRef.current?.focus() // Puts the cursor in the textbox.
+    inputRef.current?.focus(); // Puts the cursor in the textbox.
     mermaid.initialize({
       startOnLoad: true,
       theme: 'neutral',
@@ -333,8 +335,8 @@ export function ChatInterface({
         secondaryColor: '#020817',
         tertiaryColor: '#1e293b',
       },
-    })
-  }, [])
+    });
+  }, []);
 
   // This `useEffect` hook manages the "AI is thinking..." text.
   // It starts a timer to cycle through different fun loading messages.
@@ -342,17 +344,17 @@ export function ChatInterface({
     // If the AI is currently loading a response...
     if (isLoading) {
       // Set an initial loading text.
-      setLocalLoadingText(getLoadingText(currentSubject))
+      setLocalLoadingText(getLoadingText(currentSubject));
       // ...then start a timer (interval) that changes the text every 2.5 seconds.
       const interval = setInterval(() => {
-        setLocalLoadingText(getLoadingText(currentSubject))
-      }, 2500)
+        setLocalLoadingText(getLoadingText(currentSubject));
+      }, 2500);
       // This `return` is a cleanup function. It's like `free()` in C.
       // It runs when the component is removed or when `isLoading` becomes false.
       // It stops the timer to prevent memory leaks.
-      return () => clearInterval(interval)
+      return () => clearInterval(interval);
     }
-  }, [isLoading, currentSubject]) // It re-runs whenever `isLoading` or `currentSubject` changes.
+  }, [isLoading, currentSubject]); // It re-runs whenever `isLoading` or `currentSubject` changes.
 
   /**
    * C-like Explanation: `async function handleSendMessage()`
@@ -370,37 +372,37 @@ export function ChatInterface({
    *     it runs in the background. We `await` it to wait for it to finish.
    */
   const handleSendMessage = async () => {
-    if (!input.trim()) return
+    if (!input.trim()) return;
 
     if (!currentChatId && !subject) {
       toast({
         variant: 'destructive',
         title: 'Please select a subject',
         description: 'You need to choose a subject before starting a new chat.',
-      })
-      return
+      });
+      return;
     }
 
-    const currentInput = input
-    setInput('')
+    const currentInput = input;
+    setInput('');
 
-    await sendMessage(currentInput, subject)
-  }
+    await sendMessage(currentInput, subject);
+  };
 
   // This function is a simple wrapper to call `handleSendMessage` when the form is submitted.
   const handleSubmit = (e: FormEvent) => {
-    e.preventDefault() // Prevents the webpage from reloading, which is the default form behavior.
-    handleSendMessage()
-  }
+    e.preventDefault(); // Prevents the webpage from reloading, which is the default form behavior.
+    handleSendMessage();
+  };
 
   // This function handles keyboard input in the text area.
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     // If the user presses "Enter" but NOT "Shift+Enter"...
     if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault() // ...prevent a new line from being added...
-      handleSendMessage() // ...and send the message instead.
+      e.preventDefault(); // ...prevent a new line from being added...
+      handleSendMessage(); // ...and send the message instead.
     }
-  }
+  };
 
   // ========================== RETURN JSX (The View) ==========================
   // The rest of this file is the JSX code that describes what the component looks like.
@@ -553,5 +555,5 @@ export function ChatInterface({
         </p>
       </div>
     </div>
-  )
+  );
 }

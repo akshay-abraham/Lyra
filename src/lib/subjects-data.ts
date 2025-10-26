@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Akshay K Rooben abraham
+// Copyright (C) 2025 Akshay K Rooben Abraham
 
 import {
   BookOpen,
@@ -21,64 +21,64 @@ import {
   BookCopy,
   PenTool,
   type LucideIcon,
-} from 'lucide-react'
+} from 'lucide-react';
 
 export type SubjectData = {
-  name: string
-  icon: LucideIcon
-  color: string
-}
+  name: string;
+  icon: LucideIcon;
+  color: string;
+};
 
 export type Stream =
   | 'Bio-Maths'
   | 'CS'
   | 'Bio-CS/Bio-IP'
   | 'Commerce'
-  | 'Humanities'
+  | 'Humanities';
 
 export type ClassData = {
-  name: string
-  grade: number
-  stream?: Stream
-}
+  name: string;
+  grade: number;
+  stream?: Stream;
+};
 
 // Function to convert number to Roman numeral for grades 1-12
 const toRoman = (num: number): string => {
-  const roman: { [key: string]: number } = { X: 10, IX: 9, V: 5, IV: 4, I: 1 }
-  let result = ''
+  const roman: { [key: string]: number } = { X: 10, IX: 9, V: 5, IV: 4, I: 1 };
+  let result = '';
   if (num > 10) {
-    result += 'X' + toRoman(num - 10)
+    result += 'X' + toRoman(num - 10);
   } else {
     for (const key in roman) {
       while (num >= roman[key]) {
-        result += key
-        num -= roman[key]
+        result += key;
+        num -= roman[key];
       }
     }
   }
-  return result
-}
+  return result;
+};
 
 const createClass = (
   grade: number,
   division: string,
   stream?: Stream,
 ): ClassData => {
-  const romanGrade = toRoman(grade)
-  const streamName = stream ? ` (${stream})` : ''
+  const romanGrade = toRoman(grade);
+  const streamName = stream ? ` (${stream})` : '';
   return {
     name: `${romanGrade}-${division.toUpperCase()}${streamName}`,
     grade,
     stream,
-  }
-}
+  };
+};
 
 const createClassesForGrade = (
   grade: number,
   divisions: string[],
 ): ClassData[] => {
-  return divisions.map((div) => createClass(grade, div))
-}
+  return divisions.map((div) => createClass(grade, div));
+};
 
 export const allSubjects: SubjectData[] = [
   { name: 'English', icon: BookOpen, color: '#4A90E2' },
@@ -107,7 +107,7 @@ export const allSubjects: SubjectData[] = [
   { name: 'Business Studies', icon: Briefcase, color: '#FF9800' },
   { name: 'Accountancy', icon: BookCopy, color: '#CDDC39' },
   { name: 'Other', icon: PenTool, color: '#9E9E9E' },
-]
+];
 
 export const allClasses: ClassData[] = [
   ...createClassesForGrade(1, ['a', 'b']),
@@ -130,7 +130,7 @@ export const allClasses: ClassData[] = [
   createClass(12, 'c', 'Bio-CS/Bio-IP'),
   createClass(12, 'd', 'Commerce'),
   createClass(12, 'e', 'Humanities'),
-]
+];
 
 export const streamSubjects: Record<Stream, string[]> = {
   'Bio-Maths': ['Physics', 'Chemistry', 'Biology', 'Maths Core', 'English'],
@@ -159,7 +159,7 @@ export const streamSubjects: Record<Stream, string[]> = {
     'Law Studies',
     'English',
   ],
-}
+};
 
 export const gradeSubjects: Record<number, string[]> = {
   1: ['English', 'Malayalam', 'Hindi', 'EVS', 'Maths', 'GK'],
@@ -226,61 +226,61 @@ export const gradeSubjects: Record<number, string[]> = {
     'Geography',
     'Economics',
   ],
-}
+};
 
-export type SubjectName = (typeof allSubjects)[number]['name']
+export type SubjectName = (typeof allSubjects)[number]['name'];
 
 export function getSubjectsForUser(
   role: string | null,
   className: string | null,
 ): SubjectData[] {
   if (role === 'teacher') {
-    return allSubjects.filter((s) => s.name !== 'Other')
+    return allSubjects.filter((s) => s.name !== 'Other');
   }
 
   if (!className) {
-    return allSubjects
+    return allSubjects;
   }
 
-  const selectedClass = allClasses.find((c) => c.name === className)
+  const selectedClass = allClasses.find((c) => c.name === className);
   if (!selectedClass) {
-    return allSubjects
+    return allSubjects;
   }
 
-  let subjectNames: string[] = []
+  let subjectNames: string[] = [];
   if (selectedClass.grade >= 11 && selectedClass.stream) {
-    subjectNames = streamSubjects[selectedClass.stream]
+    subjectNames = streamSubjects[selectedClass.stream];
   } else if (gradeSubjects[selectedClass.grade]) {
-    subjectNames = gradeSubjects[selectedClass.grade]
+    subjectNames = gradeSubjects[selectedClass.grade];
   } else {
-    return allSubjects
+    return allSubjects;
   }
 
-  return allSubjects.filter((subject) => subjectNames.includes(subject.name))
+  return allSubjects.filter((subject) => subjectNames.includes(subject.name));
 }
 
 export function getSubjectsForClasses(classNames: string[]): SubjectData[] {
   if (!classNames || classNames.length === 0) {
-    return []
+    return [];
   }
 
-  const subjectNameSet = new Set<string>()
+  const subjectNameSet = new Set<string>();
 
   classNames.forEach((className) => {
-    const selectedClass = allClasses.find((c) => c.name === className)
+    const selectedClass = allClasses.find((c) => c.name === className);
     if (selectedClass) {
-      let subjects: string[] = []
+      let subjects: string[] = [];
       if (selectedClass.grade >= 11 && selectedClass.stream) {
-        subjects = streamSubjects[selectedClass.stream]
+        subjects = streamSubjects[selectedClass.stream];
       } else if (gradeSubjects[selectedClass.grade]) {
-        subjects = gradeSubjects[selectedClass.grade]
+        subjects = gradeSubjects[selectedClass.grade];
       }
-      subjects.forEach((sub) => subjectNameSet.add(sub))
+      subjects.forEach((sub) => subjectNameSet.add(sub));
     }
-  })
+  });
 
-  return allSubjects.filter((subject) => subjectNameSet.has(subject.name))
+  return allSubjects.filter((subject) => subjectNameSet.has(subject.name));
 }
 export function getSubjectsByStream(stream: Stream): string[] {
-  return streamSubjects[stream] || []
+  return streamSubjects[stream] || [];
 }

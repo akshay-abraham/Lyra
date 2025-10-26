@@ -34,13 +34,13 @@
  * these functions if you want this non-blocking behavior. `await` would turn them
  * back into blocking functions.
  */
-'use client'
+'use client';
 import {
   Auth, // Import Auth type for type hinting.
   signInAnonymously,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-} from 'firebase/auth'
+} from 'firebase/auth';
 
 /**
  * C-like Explanation: `void initiateAnonymousSignIn(Auth* authInstance)`
@@ -51,7 +51,7 @@ import {
  */
 export function initiateAnonymousSignIn(authInstance: Auth): void {
   // CRITICAL: Call signInAnonymously directly. Do NOT use `await`.
-  signInAnonymously(authInstance)
+  signInAnonymously(authInstance);
   // Code execution continues immediately.
 }
 
@@ -66,7 +66,7 @@ export function initiateEmailSignUp(
   password: string,
 ): void {
   // CRITICAL: Call createUserWithEmailAndPassword directly. Do NOT use `await`.
-  createUserWithEmailAndPassword(authInstance, email, password)
+  createUserWithEmailAndPassword(authInstance, email, password);
   // Code execution continues immediately.
 }
 
@@ -81,6 +81,6 @@ export function initiateEmailSignIn(
   password: string,
 ): void {
   // CRITICAL: Call signInWithEmailAndPassword directly. Do NOT use `await`.
-  signInWithEmailAndPassword(authInstance, email, password)
+  signInWithEmailAndPassword(authInstance, email, password);
   // Code execution continues immediately.
 }

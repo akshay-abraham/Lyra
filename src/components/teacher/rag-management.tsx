@@ -17,7 +17,7 @@
  * 2.  Show a list of example course material files.
  * 3.  Provide a (currently non-functional) button to "upload" new files.
  */
-'use client'
+'use client';
 
 import {
   Card,
@@ -25,8 +25,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import {
   UploadCloud,
   FileText,
@@ -34,10 +34,10 @@ import {
   BrainCircuit,
   FileUp,
   Trash2,
-} from 'lucide-react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
-import React from 'react'
+} from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import React from 'react';
 
 // This is a static array of C-like structs, used to simulate a list of files.
 const exampleFiles = [
@@ -60,7 +60,7 @@ const exampleFiles = [
     size: '120 KB',
   },
   { name: 'homework-1.docx', type: 'Homework', icon: FileText, size: '45 KB' },
-]
+];
 
 /**
  * C-like Explanation: `function RagManagement() -> returns JSX_Element`
@@ -158,5 +158,5 @@ export function RagManagement() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

@@ -20,7 +20,7 @@
  * collapsible state of the sidebar, the logout functionality, and the
  * navigation links.
  */
-'use client'
+'use client';
 
 // Import all the necessary building blocks for the sidebar from our UI library.
 import {
@@ -36,15 +36,21 @@ import {
   SidebarFooter,
   useSidebar, // A hook to get the sidebar's state (e.g., is it open/closed).
   SidebarSeparator,
-} from '@/components/ui/sidebar'
-import { Logo } from '@/components/layout/logo'
-import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import { BookOpen, GraduationCap, LogOut, PlusCircle, User } from 'lucide-react'
-import React from 'react'
-import { useFirebase } from '@/firebase'
-import { Button } from '../ui/button'
-import { ChatHistory } from '../student/chat-history' // Component that shows the list of past chats.
+} from '@/components/ui/sidebar';
+import { Logo } from '@/components/layout/logo';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import {
+  BookOpen,
+  GraduationCap,
+  LogOut,
+  PlusCircle,
+  User,
+} from 'lucide-react';
+import React from 'react';
+import { useFirebase } from '@/firebase';
+import { Button } from '../ui/button';
+import { ChatHistory } from '../student/chat-history'; // Component that shows the list of past chats.
 
 /**
  * C-like Explanation: `function SidebarMenuItems() -> returns JSX_Element`
@@ -58,25 +64,27 @@ import { ChatHistory } from '../student/chat-history' // Component that shows th
  * close the mobile menu after a link is clicked.
  */
 function SidebarMenuItems() {
-  const pathname = usePathname() // Hook to get the current URL path.
-  const { setOpenMobile, isMobile } = useSidebar() // Hook to control the mobile sidebar.
-  const [userInfo, setUserInfo] = React.useState<{ role?: string } | null>(null)
+  const pathname = usePathname(); // Hook to get the current URL path.
+  const { setOpenMobile, isMobile } = useSidebar(); // Hook to control the mobile sidebar.
+  const [userInfo, setUserInfo] = React.useState<{ role?: string } | null>(
+    null,
+  );
 
   // This `useEffect` hook runs whenever the page URL changes.
   // It reads the user's role from session storage to decide whether to show the "Teacher" link.
   React.useEffect(() => {
-    const storedInfo = sessionStorage.getItem('lyra-user-info')
+    const storedInfo = sessionStorage.getItem('lyra-user-info');
     if (storedInfo) {
-      setUserInfo(JSON.parse(storedInfo))
+      setUserInfo(JSON.parse(storedInfo));
     }
-  }, [pathname]) // Dependency: re-run if the path changes.
+  }, [pathname]); // Dependency: re-run if the path changes.
 
   // This function is called when a user clicks a link in the mobile menu.
   const handleLinkClick = () => {
     if (isMobile) {
-      setOpenMobile(false) // Close the mobile sidebar.
+      setOpenMobile(false); // Close the mobile sidebar.
     }
-  }
+  };
 
   return (
     <SidebarMenu className='p-0'>
@@ -140,7 +148,7 @@ function SidebarMenuItems() {
         </SidebarMenuItem>
       </div>
     </SidebarMenu>
-  )
+  );
 }
 
 /**
@@ -155,8 +163,8 @@ function SidebarMenuItems() {
  *     of our C analogy.
  */
 export function SidebarLayout({ children }: { children: React.ReactNode }) {
-  const { auth } = useFirebase()
-  const router = useRouter()
+  const { auth } = useFirebase();
+  const router = useRouter();
 
   /**
    * C-like Explanation: `async function handleLogout()`
@@ -164,10 +172,10 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
    * local session, and redirects them to the login page.
    */
   const handleLogout = async () => {
-    await auth.signOut() // Call Firebase SDK to sign out.
-    sessionStorage.removeItem('lyra-user-info') // Clean up local session data.
-    router.push('/login') // Redirect.
-  }
+    await auth.signOut(); // Call Firebase SDK to sign out.
+    sessionStorage.removeItem('lyra-user-info'); // Clean up local session data.
+    router.push('/login'); // Redirect.
+  };
 
   return (
     // `<SidebarProvider>` is a Context Provider. It makes the sidebar's state
@@ -225,5 +233,5 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
         {children}
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

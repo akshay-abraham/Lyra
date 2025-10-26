@@ -21,18 +21,18 @@
  * the auth service, etc.) and passes them into the `<FirebaseProvider>`, which makes
  * them available to the rest of the application.
  */
-'use client'
+'use client';
 
 // Import necessary components from React and other Firebase files.
-import React, { useMemo, type ReactNode } from 'react'
-import { FirebaseProvider } from '@/firebase/provider'
-import { initializeFirebase } from '@/firebase'
+import React, { useMemo, type ReactNode } from 'react';
+import { FirebaseProvider } from '@/firebase/provider';
+import { initializeFirebase } from '@/firebase';
 
 // This defines the "props" (properties/arguments) for our component.
 // It's like the function signature in C: `FirebaseClientProvider(props)`.
 // Here, `props` is a struct with one member: `children`.
 interface FirebaseClientProviderProps {
-  children: ReactNode // `ReactNode` is a generic type for any renderable element.
+  children: ReactNode; // `ReactNode` is a generic type for any renderable element.
 }
 
 /**
@@ -73,8 +73,8 @@ export function FirebaseClientProvider({
   // just keep the first result forever".
   const firebaseServices = useMemo(() => {
     // This function will only be executed on the client-side when the app first loads.
-    return initializeFirebase()
-  }, []) // Empty dependency array ensures this runs only once on mount.
+    return initializeFirebase();
+  }, []); // Empty dependency array ensures this runs only once on mount.
 
   // Render the main FirebaseProvider, passing the now-initialized services to it.
   return (
@@ -86,5 +86,5 @@ export function FirebaseClientProvider({
       {/* All other components in the app will be rendered here, as `children`. */}
       {children}
     </FirebaseProvider>
-  )
+  );
 }

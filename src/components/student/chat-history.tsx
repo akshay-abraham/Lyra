@@ -20,33 +20,33 @@
  * It uses our custom `useCollection` hook to handle all the complexities of
  * real-time data fetching from Firestore.
  */
-'use client'
+'use client';
 
-import React from 'react'
-import { useCollection } from '@/firebase/firestore/use-collection'
-import { useFirebase, useUser, useMemoFirebase } from '@/firebase'
-import { collection, query, orderBy } from 'firebase/firestore'
+import React from 'react';
+import { useCollection } from '@/firebase/firestore/use-collection';
+import { useFirebase, useUser, useMemoFirebase } from '@/firebase';
+import { collection, query, orderBy } from 'firebase/firestore';
 import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarMenuSkeleton,
-} from '../ui/sidebar'
-import Link from 'next/link'
-import { MessageSquareText } from 'lucide-react'
-import { usePathname } from 'next/navigation'
+} from '../ui/sidebar';
+import Link from 'next/link';
+import { MessageSquareText } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion'
-import { allSubjects, type SubjectData } from '@/lib/subjects-data'
+} from '@/components/ui/accordion';
+import { allSubjects, type SubjectData } from '@/lib/subjects-data';
 
 // This defines the structure of a chat session document, like a `typedef struct` in C.
 interface ChatSession {
-  id: string
-  title: string
-  subject: string
+  id: string;
+  title: string;
+  subject: string;
 }
 
 // Create a lookup map for subject data (like an icon and color).
@@ -54,7 +54,7 @@ interface ChatSession {
 // It's like a hash map or `std::map` in C++.
 const subjectDataMap = new Map<string, SubjectData>(
   allSubjects.map((s) => [s.name, s]),
-)
+);
 
 /**
  * C-like Explanation: `function ChatHistory(props) -> returns JSX_Element`
@@ -78,30 +78,30 @@ const subjectDataMap = new Map<string, SubjectData>(
  *     `groupedSessions` only when the `chatSessions` data actually changes.
  */
 export function ChatHistory({ onLinkClick }: { onLinkClick: () => void }) {
-  const { firestore } = useFirebase()
-  const { user } = useUser()
-  const pathname = usePathname()
+  const { firestore } = useFirebase();
+  const { user } = useUser();
+  const pathname = usePathname();
 
   // 1. Construct the Firestore query.
   // `useMemoFirebase` ensures this query object is stable across re-renders.
   const chatSessionsQuery = useMemoFirebase(() => {
     // If we don't have a user or database connection yet, return null.
-    if (!user || !firestore) return null
+    if (!user || !firestore) return null;
     // This is the query definition:
     // "Get documents from the `chatSessions` collection for the current user,
     // ordered by `startTime` in descending order."
     return query(
       collection(firestore, 'users', user.uid, 'chatSessions'),
       orderBy('startTime', 'desc'),
-    )
-  }, [user, firestore]) // Dependencies: only re-create the query if `user` or `firestore` changes.
+    );
+  }, [user, firestore]); // Dependencies: only re-create the query if `user` or `firestore` changes.
 
   // 2. Subscribe to the query using our custom hook.
   // This hook handles all the real-time subscription logic.
   // `chatSessions` will be an array of `ChatSession` structs (or null).
   // `isLoading` will be `true` during the initial fetch.
   const { data: chatSessions, isLoading } =
-    useCollection<ChatSession>(chatSessionsQuery)
+    useCollection<ChatSession>(chatSessionsQuery);
 
   // 3. Group the fetched sessions by subject.
   // `React.useMemo` ensures this grouping logic only runs when `chatSessions` data changes.
@@ -116,19 +116,19 @@ export function ChatHistory({ onLinkClick }: { onLinkClick: () => void }) {
     //       create an empty array at `grouped_map[subject]`;
     //     push session into `grouped_map[subject]`;
     //   return grouped_map;
-    if (!chatSessions) return {}
+    if (!chatSessions) return {};
     return chatSessions.reduce(
       (acc, session) => {
-        const subject = session.subject || 'Other'
+        const subject = session.subject || 'Other';
         if (!acc[subject]) {
-          acc[subject] = []
+          acc[subject] = [];
         }
-        acc[subject].push(session)
-        return acc
+        acc[subject].push(session);
+        return acc;
       },
       {} as Record<string, ChatSession[]>,
-    )
-  }, [chatSessions]) // Dependency: only re-run when `chatSessions` changes.
+    );
+  }, [chatSessions]); // Dependency: only re-run when `chatSessions` changes.
 
   // 4. Render the UI based on the state.
 
@@ -140,7 +140,7 @@ export function ChatHistory({ onLinkClick }: { onLinkClick: () => void }) {
         <SidebarMenuSkeleton showIcon />
         <SidebarMenuSkeleton showIcon />
       </div>
-    )
+    );
   }
 
   // If loading is finished and there are no chats, show a helpful message.
@@ -149,7 +149,7 @@ export function ChatHistory({ onLinkClick }: { onLinkClick: () => void }) {
       <div className='px-4 py-2 text-xs text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden'>
         Your chat history will appear here.
       </div>
-    )
+    );
   }
 
   // If we have data, render the list of accordions.
@@ -165,8 +165,8 @@ export function ChatHistory({ onLinkClick }: { onLinkClick: () => void }) {
                   // render an AccordionItem for this subject...
             */}
       {Object.entries(groupedSessions).map(([subject, sessions]) => {
-        const subjectInfo = subjectDataMap.get(subject)
-        const Icon = subjectInfo?.icon || MessageSquareText
+        const subjectInfo = subjectDataMap.get(subject);
+        const Icon = subjectInfo?.icon || MessageSquareText;
 
         return (
           <AccordionItem value={subject} key={subject} className='border-b-0'>
@@ -201,8 +201,8 @@ export function ChatHistory({ onLinkClick }: { onLinkClick: () => void }) {
               </div>
             </AccordionContent>
           </AccordionItem>
-        )
+        );
       })}
     </Accordion>
-  )
+  );
 }

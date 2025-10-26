@@ -1,32 +1,32 @@
-'use client'
-import React, { useState, useRef, useEffect } from 'react'
-import { X } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { Badge } from './badge'
-import { Command, CommandGroup, CommandItem, CommandList } from './command'
-import { Command as CommandPrimitive } from 'cmdk'
-import { FormLabel } from './form'
+'use client';
+import React, { useState, useRef, useEffect } from 'react';
+import { X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Badge } from './badge';
+import { Command, CommandGroup, CommandItem, CommandList } from './command';
+import { Command as CommandPrimitive } from 'cmdk';
+import { FormLabel } from './form';
 
 export type Option = {
-  value: string
-  label: string
-  disable?: boolean
+  value: string;
+  label: string;
+  disable?: boolean;
   /** Fixed options are not removable. */
-  fixed?: boolean
-}
+  fixed?: boolean;
+};
 
 export type GroupedOption = {
-  label: string
-  options: Option[]
-}
+  label: string;
+  options: Option[];
+};
 
 type MultiSelectProps = {
-  options: Option[] | GroupedOption[]
-  defaultValue?: string[]
-  placeholder?: string
-  onValueChange: (value: string[]) => void
-  isGrouped?: boolean
-}
+  options: Option[] | GroupedOption[];
+  defaultValue?: string[];
+  placeholder?: string;
+  onValueChange: (value: string[]) => void;
+  isGrouped?: boolean;
+};
 
 export function MultiSelect({
   options,
@@ -35,67 +35,67 @@ export function MultiSelect({
   onValueChange,
   isGrouped = false,
 }: MultiSelectProps) {
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [open, setOpen] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [open, setOpen] = useState(false);
 
   const getOptionsFromValue = (
     value: string[],
     opts: Option[] | GroupedOption[],
   ) => {
-    let flatOptions: Option[] = []
+    let flatOptions: Option[] = [];
     if (isGrouped) {
-      flatOptions = (opts as GroupedOption[]).flatMap((group) => group.options)
+      flatOptions = (opts as GroupedOption[]).flatMap((group) => group.options);
     } else {
-      flatOptions = opts as Option[]
+      flatOptions = opts as Option[];
     }
     return value
       .map((v) => flatOptions.find((option) => option.value === v))
-      .filter(Boolean) as Option[]
-  }
+      .filter(Boolean) as Option[];
+  };
 
   const [selected, setSelected] = useState<Option[]>(
     getOptionsFromValue(defaultValue, options),
-  )
+  );
 
-  const [inputValue, setInputValue] = useState('')
+  const [inputValue, setInputValue] = useState('');
 
   const handleUnselect = (option: Option) => {
-    const newSelected = selected.filter((s) => s.value !== option.value)
-    setSelected(newSelected)
-    onValueChange(newSelected.map((s) => s.value))
-  }
+    const newSelected = selected.filter((s) => s.value !== option.value);
+    setSelected(newSelected);
+    onValueChange(newSelected.map((s) => s.value));
+  };
 
   useEffect(() => {
-    setSelected(getOptionsFromValue(defaultValue, options))
-  }, [defaultValue, options, isGrouped])
+    setSelected(getOptionsFromValue(defaultValue, options));
+  }, [defaultValue, options, isGrouped]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    const input = inputRef.current
+    const input = inputRef.current;
     if (input) {
       if (e.key === 'Delete' || e.key === 'Backspace') {
         if (input.value === '' && selected.length > 0) {
-          const lastSelected = selected[selected.length - 1]
+          const lastSelected = selected[selected.length - 1];
           if (!lastSelected.fixed) {
-            handleUnselect(lastSelected)
+            handleUnselect(lastSelected);
           }
         }
       }
       if (e.key === 'Escape') {
-        input.blur()
+        input.blur();
       }
     }
-  }
+  };
 
   const getSelectables = () => {
     const flatOptions = isGrouped
       ? (options as GroupedOption[]).flatMap((g) => g.options)
-      : (options as Option[])
+      : (options as Option[]);
     return flatOptions.filter(
       (option) => !selected.some((s) => s.value === option.value),
-    )
-  }
+    );
+  };
 
-  const selectables = getSelectables()
+  const selectables = getSelectables();
 
   return (
     <Command
@@ -114,12 +114,12 @@ export function MultiSelect({
                 )}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
-                    handleUnselect(option)
+                    handleUnselect(option);
                   }
                 }}
                 onMouseDown={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
+                  e.preventDefault();
+                  e.stopPropagation();
                 }}
                 onClick={() => handleUnselect(option)}
               >
@@ -146,8 +146,8 @@ export function MultiSelect({
                 (options as GroupedOption[]).map((group) => {
                   const filteredOptions = group.options.filter(
                     (option) => !selected.some((s) => s.value === option.value),
-                  )
-                  if (filteredOptions.length === 0) return null
+                  );
+                  if (filteredOptions.length === 0) return null;
                   return (
                     <CommandGroup
                       key={group.label}
@@ -161,14 +161,14 @@ export function MultiSelect({
                         <CommandItem
                           key={option.value}
                           onMouseDown={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
+                            e.preventDefault();
+                            e.stopPropagation();
                           }}
                           onSelect={() => {
-                            setInputValue('')
-                            const newSelected = [...selected, option]
-                            setSelected(newSelected)
-                            onValueChange(newSelected.map((s) => s.value))
+                            setInputValue('');
+                            const newSelected = [...selected, option];
+                            setSelected(newSelected);
+                            onValueChange(newSelected.map((s) => s.value));
                           }}
                           className={'cursor-pointer'}
                         >
@@ -176,7 +176,7 @@ export function MultiSelect({
                         </CommandItem>
                       ))}
                     </CommandGroup>
-                  )
+                  );
                 })
               ) : (
                 <CommandGroup className='h-full overflow-auto'>
@@ -189,14 +189,14 @@ export function MultiSelect({
                       <CommandItem
                         key={option.value}
                         onMouseDown={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
+                          e.preventDefault();
+                          e.stopPropagation();
                         }}
                         onSelect={() => {
-                          setInputValue('')
-                          const newSelected = [...selected, option]
-                          setSelected(newSelected)
-                          onValueChange(newSelected.map((s) => s.value))
+                          setInputValue('');
+                          const newSelected = [...selected, option];
+                          setSelected(newSelected);
+                          onValueChange(newSelected.map((s) => s.value));
                         }}
                         className={'cursor-pointer'}
                       >
@@ -210,5 +210,5 @@ export function MultiSelect({
         </CommandList>
       </div>
     </Command>
-  )
+  );
 }
