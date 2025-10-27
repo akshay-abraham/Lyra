@@ -48,10 +48,15 @@ import { ArrowRight, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useFirebase } from '@/firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import {
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { COLLECTIONS } from '@/lib/constants';
 import type { UserProfile } from '@/types';
+import { Separator } from '../ui/separator';
 
 /**
  * @typedef {z.infer<typeof formSchema>} FormData
@@ -174,7 +179,6 @@ export function LoginForm() {
     } catch (error: any) {
       console.error('Firebase sign-in failed:', error);
       let description = 'An unexpected error occurred. Please try again.';
-
       if (error && typeof error === 'object' && 'code' in error) {
         const errorCode = (error as { code: string }).code;
         if (
@@ -185,11 +189,67 @@ export function LoginForm() {
           description = 'Invalid email or password. Please try again.';
         }
       }
-
       toast({
         variant: 'destructive',
         title: 'Login Failed',
         description: description,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setIsSubmitting(true);
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      const userDocRef = doc(firestore, COLLECTIONS.USERS, user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists()) {
+        // Existing user, log them in
+        const userData = userDoc.data() as UserProfile;
+        sessionStorage.setItem(
+          'lyra-user-info',
+          JSON.stringify({
+            name: userData.name,
+            role: userData.role,
+            class: userData.class,
+          }),
+        );
+        toast({
+          title: 'Login Successful',
+          description: `Welcome back, ${userData.name}!`,
+        });
+        if (userData.role === 'teacher') {
+          router.push('/teacher');
+        } else {
+          router.push('/');
+        }
+      } else {
+        // New user, redirect to registration to complete profile
+        sessionStorage.setItem(
+          'lyra-google-pending-registration',
+          JSON.stringify({
+            uid: user.uid,
+            email: user.email,
+            name: user.displayName,
+          }),
+        );
+        router.push('/register');
+      }
+    } catch (error: any) {
+      console.error('Google sign-in failed:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Google Sign-In Failed',
+        description:
+          error.code === 'auth/popup-closed-by-user'
+            ? 'The sign-in window was closed.'
+            : 'Could not sign in with Google. Please try again.',
       });
     } finally {
       setIsSubmitting(false);
@@ -261,6 +321,39 @@ export function LoginForm() {
             </Button>
           </form>
         </Form>
+        <div className='relative my-6'>
+          <div className='absolute inset-0 flex items-center'>
+            <span className='w-full border-t' />
+          </div>
+          <div className='relative flex justify-center text-xs uppercase'>
+            <span className='bg-background px-2 text-muted-foreground'>
+              Or continue with
+            </span>
+          </div>
+        </div>
+        <Button
+          variant='outline'
+          className='w-full'
+          onClick={handleGoogleSignIn}
+          disabled={isSubmitting}
+        >
+          <svg
+            className='mr-2 h-4 w-4'
+            aria-hidden='true'
+            focusable='false'
+            data-prefix='fab'
+            data-icon='google'
+            role='img'
+            xmlns='http://www.w3.org/2000/svg'
+            viewBox='0 0 488 512'
+          >
+            <path
+              fill='currentColor'
+              d='M488 261.8C488 403.3 381.5 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 126 21.5 174.4 57.9l-67.4 64.4C324.7 97.4 289.3 80 248 80c-81.9 0-148.6 66.7-148.6 148.6s66.7 148.6 148.6 148.6c95.6 0 131.3-64.4 135.2-97.4H248v-68.9h239.5c1.6 8.9 2.5 18.2 2.5 27.8z'
+            ></path>
+          </svg>
+          Google
+        </Button>
         <div className='mt-6 text-center text-sm'>
           <p className='text-muted-foreground'>Don't have an account?</p>
           <Link href='/register'>

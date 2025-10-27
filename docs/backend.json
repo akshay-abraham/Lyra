@@ -22,7 +22,10 @@
         "role": {
           "type": "string",
           "description": "The user's role in the application.",
-          "enum": ["student", "teacher"]
+          "enum": [
+            "student",
+            "teacher"
+          ]
         },
         "school": {
           "type": "string",
@@ -35,15 +38,25 @@
         "classesTaught": {
           "type": "array",
           "description": "The classes taught by the teacher.",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "subjectsTaught": {
           "type": "array",
           "description": "The subjects taught by the teacher.",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         }
       },
-      "required": ["uid", "name", "email", "role", "school"]
+      "required": [
+        "uid",
+        "name",
+        "email",
+        "role",
+        "school"
+      ]
     },
     "Prompt": {
       "$schema": "http://json-schema.org/draft-07/schema#",
@@ -118,11 +131,18 @@
           }
         }
       },
-      "required": ["teacherId", "subject", "systemPrompt"]
+      "required": [
+        "teacherId",
+        "subject",
+        "systemPrompt"
+      ]
     }
   },
   "auth": {
-    "providers": ["password"]
+    "providers": [
+      "password",
+      "google.com"
+    ]
   },
   "firestore": {
     "structure": [
@@ -146,7 +166,9 @@
         "path": "/teacherSettings/{settingsId}",
         "definition": {
           "entityName": "TeacherSettings",
-          "schema": { "$ref": "#/backend/entities/TeacherSettings" },
+          "schema": {
+            "$ref": "#/backend/entities/TeacherSettings"
+          },
           "description": "Stores customized AI settings for each subject, managed by teachers. The document ID can be a composite key like {teacherId}_{subject} for easy lookup."
         }
       },
