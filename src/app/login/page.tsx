@@ -13,6 +13,7 @@
  * - A clean header with the application logo and name.
  * - A central "hero" section with a bold headline and a descriptive paragraph.
  * - The login form component is the primary call-to-action, placed centrally.
+ * - A "Powered by" section showcasing the core technologies.
  *
  * C-like Analogy:
  * Think of this as the main function for a graphical application's startup screen.
@@ -31,6 +32,14 @@ import { Logo } from '@/components/layout/logo';
  * @returns {JSX.Element} The JSX that describes the structure of the login page.
  */
 export default function LoginPage() {
+  const technologies = [
+    'Next.js',
+    'Firebase',
+    'Genkit',
+    'React',
+    'Tailwind CSS',
+  ];
+
   return (
     <div className='relative min-h-screen w-full overflow-hidden bg-background'>
       {/* The animated background is a separate div placed behind everything else. */}
@@ -73,6 +82,26 @@ export default function LoginPage() {
             <LoginForm />
           </Suspense>
         </main>
+
+        <footer
+          className='absolute bottom-0 w-full p-6 text-center animate-fade-in-up'
+          style={{ animationDelay: '0.6s' }}
+        >
+          <p className='text-sm font-medium text-muted-foreground mb-3'>
+            Powered by
+          </p>
+          <div className='flex justify-center items-center gap-x-4 gap-y-2 flex-wrap'>
+            {technologies.map((tech, index) => (
+              <div
+                key={tech}
+                className='text-sm text-muted-foreground font-semibold animate-fade-in-up'
+                style={{ animationDelay: `${0.7 + index * 0.1}s` }}
+              >
+                {tech}
+              </div>
+            ))}
+          </div>
+        </footer>
       </div>
     </div>
   );
