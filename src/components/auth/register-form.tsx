@@ -57,8 +57,13 @@ import { useToast } from '@/hooks/use-toast';
 import { ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useFirebase } from '@/firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { useFirebase, useUser } from '@/firebase';
+import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from 'firebase/auth';
 import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { MultiSelect, type GroupedOption } from '@/components/ui/multi-select';
 import {
@@ -130,6 +135,12 @@ const formSchema = z
     { message: 'Please select at least one subject', path: ['subjectsTaught'] },
   );
 
+// A modified schema for Google Sign-up, where passwords are not needed.
+const googleFormSchema = formSchema.omit({
+  password: true,
+  confirmPassword: true,
+});
+
 /**
  * The main component function for the registration form.
  *
@@ -151,13 +162,22 @@ export function RegisterForm() {
   const [strengthColor, setStrengthColor] = useState('bg-destructive');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isGoogleSignUp, setIsGoogleSignUp] = useState(false);
+  const [googleSignUpData, setGoogleSignUpData] = useState<{
+    uid: string;
+    email: string;
+    name: string;
+  } | null>(null);
 
   const { auth, firestore } = useFirebase();
+  const { user } = useUser();
   const router = useRouter();
   const { toast } = useToast();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const currentSchema = isGoogleSignUp ? googleFormSchema : formSchema;
+
+  const form = useForm<z.infer<typeof currentSchema>>({
+    resolver: zodResolver(currentSchema),
     defaultValues: {
       name: '',
       email: '',
@@ -172,6 +192,21 @@ export function RegisterForm() {
     mode: 'onChange', // Re-validate the form on every change for real-time feedback.
   });
 
+  useEffect(() => {
+    const pendingReg = sessionStorage.getItem('lyra-google-pending-registration');
+    if (pendingReg) {
+      const data = JSON.parse(pendingReg);
+      setIsGoogleSignUp(true);
+      setGoogleSignUpData(data);
+      form.reset({
+        email: data.email,
+        name: data.name || '',
+        role: 'student',
+        school: 'Girideepam Bethany Central School',
+      });
+    }
+  }, [form]);
+
   // `form.watch` lets us subscribe to changes in specific form fields.
   const selectedRole = form.watch('role');
   const selectedClasses = form.watch('classesTaught');
@@ -180,7 +215,7 @@ export function RegisterForm() {
   // This `useEffect` hook runs whenever the `password` value changes.
   // It calculates the strength and updates the state for the progress bar.
   useEffect(() => {
-    const strength = calculatePasswordStrength(password);
+    const strength = calculatePasswordStrength(password || '');
     setPasswordStrength(strength);
 
     if (strength < 40) {
@@ -215,58 +250,80 @@ export function RegisterForm() {
    *
    * @param {z.infer<typeof formSchema>} data - The validated form data.
    */
-  const handleRegisterSubmit = async (data: z.infer<typeof formSchema>) => {
+  const handleRegisterSubmit = async (
+    data: z.infer<typeof currentSchema>,
+  ) => {
     setIsSubmitting(true);
     try {
-      // 1. Create the user in Firebase Authentication with email and password.
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        data.email,
-        data.password,
-      );
-      const user = userCredential.user;
+      let userId: string;
+      let userEmail: string | null;
 
-      if (user) {
-        // 2. Prepare the user profile data for Firestore.
-        const userProfileData: Partial<UserProfile> = {
-          uid: user.uid,
-          name: data.name,
-          email: data.email,
-          role: data.role as UserRole,
-          school: data.school as School,
-          createdAt: serverTimestamp(), // Use the database's timestamp for consistency.
-        };
-
-        // Add role-specific fields to the profile data object.
-        if (data.role === 'student') {
-          userProfileData.class = data.class;
-        } else {
-          userProfileData.classesTaught = data.classesTaught;
-          userProfileData.subjectsTaught = data.subjectsTaught;
+      if (isGoogleSignUp && googleSignUpData) {
+        // This is a Google sign-up completion
+        userId = googleSignUpData.uid;
+        userEmail = googleSignUpData.email;
+        if (auth.currentUser && auth.currentUser.uid !== userId) {
+          throw new Error(
+            'Session mismatch. Please try signing in with Google again.',
+          );
         }
-
-        // 3. Create the user profile document in the 'users' collection in Firestore.
-        const userDocRef = doc(firestore, COLLECTIONS.USERS, user.uid);
-        // `setDoc` creates or overwrites a document with the given data.
-        await setDoc(userDocRef, userProfileData);
-
-        // 4. Store user info in session storage for quick access in the current session.
-        sessionStorage.setItem(
-          'lyra-user-info',
-          JSON.stringify(userProfileData),
+      } else {
+        // This is a standard email/password sign-up
+        if (!('password' in data)) {
+          throw new Error('Password is required for standard registration.');
+        }
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          data.email,
+          data.password,
         );
+        userId = userCredential.user.uid;
+        userEmail = userCredential.user.email;
+      }
 
-        toast({
-          title: 'Registration Successful',
-          description: `Welcome to Lyra, ${data.name}!`,
-        });
+      // 2. Prepare the user profile data for Firestore.
+      const userProfileData: Partial<UserProfile> = {
+        uid: userId,
+        name: data.name,
+        email: data.email,
+        role: data.role as UserRole,
+        school: data.school as School,
+        createdAt: serverTimestamp(), // Use the database's timestamp for consistency.
+      };
 
-        // 5. Redirect based on role.
-        if (data.role === 'teacher') {
-          router.push('/teacher');
-        } else {
-          router.push('/');
-        }
+      // Add role-specific fields to the profile data object.
+      if (data.role === 'student') {
+        userProfileData.class = data.class;
+      } else {
+        userProfileData.classesTaught = data.classesTaught;
+        userProfileData.subjectsTaught = data.subjectsTaught;
+      }
+
+      // 3. Create the user profile document in the 'users' collection in Firestore.
+      const userDocRef = doc(firestore, COLLECTIONS.USERS, userId);
+      // `setDoc` creates or overwrites a document with the given data.
+      await setDoc(userDocRef, userProfileData);
+
+      // 4. Store user info in session storage for quick access in the current session.
+      sessionStorage.setItem(
+        'lyra-user-info',
+        JSON.stringify(userProfileData),
+      );
+      // Clean up pending registration data
+      if (isGoogleSignUp) {
+        sessionStorage.removeItem('lyra-google-pending-registration');
+      }
+
+      toast({
+        title: 'Registration Successful',
+        description: `Welcome to Lyra, ${data.name}!`,
+      });
+
+      // 5. Redirect based on role.
+      if (data.role === 'teacher') {
+        router.push('/teacher');
+      } else {
+        router.push('/');
       }
     } catch (error: any) {
       // Handle errors, e.g., if the email is already in use.
@@ -314,13 +371,17 @@ export function RegisterForm() {
           className='font-headline text-3xl animate-fade-in-down gradient-text'
           style={{ animationDelay: '0.2s' }}
         >
-          Create Your Lyra Account
+          {isGoogleSignUp
+            ? 'Complete Your Profile'
+            : 'Create Your Lyra Account'}
         </CardTitle>
         <CardDescription
           className='animate-fade-in-down'
           style={{ animationDelay: '0.3s' }}
         >
-          Join the future of AI-powered education.
+          {isGoogleSignUp
+            ? "You're almost there! Just a few more details."
+            : 'Join the future of AI-powered education.'}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -353,6 +414,7 @@ export function RegisterForm() {
                       type='email'
                       placeholder='e.g., jane.doe@school.edu'
                       {...field}
+                      disabled={isGoogleSignUp}
                     />
                   </FormControl>
                   <FormMessage />
@@ -360,87 +422,91 @@ export function RegisterForm() {
               )}
             />
 
-            {/* Password Field with visibility toggle and strength meter */}
-            <FormField
-              name='password'
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <div className='relative'>
-                    <FormControl>
-                      <Input
-                        type={showPassword ? 'text' : 'password'}
-                        placeholder='••••••••'
-                        {...field}
-                      />
-                    </FormControl>
-                    <button
-                      type='button'
-                      onClick={() => setShowPassword(!showPassword)}
-                      className='absolute inset-y-0 right-0 flex items-center pr-3'
-                      aria-label='Toggle password visibility'
-                    >
-                      {showPassword ? (
-                        <EyeOff className='h-4 w-4 text-muted-foreground' />
-                      ) : (
-                        <Eye className='h-4 w-4 text-muted-foreground' />
+            {!isGoogleSignUp && (
+              <>
+                {/* Password Field with visibility toggle and strength meter */}
+                <FormField
+                  name='password'
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <div className='relative'>
+                        <FormControl>
+                          <Input
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder='••••••••'
+                            {...field}
+                          />
+                        </FormControl>
+                        <button
+                          type='button'
+                          onClick={() => setShowPassword(!showPassword)}
+                          className='absolute inset-y-0 right-0 flex items-center pr-3'
+                          aria-label='Toggle password visibility'
+                        >
+                          {showPassword ? (
+                            <EyeOff className='h-4 w-4 text-muted-foreground' />
+                          ) : (
+                            <Eye className='h-4 w-4 text-muted-foreground' />
+                          )}
+                        </button>
+                      </div>
+                      {/* Only show the strength meter if the user has started typing. */}
+                      {password && (
+                        <div className='space-y-2 pt-1'>
+                          <Progress
+                            value={passwordStrength}
+                            className='h-2'
+                            indicatorClassName={cn(strengthColor)}
+                          />
+                          <FormDescription>
+                            Password must be at least 8 characters and include
+                            an uppercase letter, a lowercase letter, a number,
+                            and a special character.
+                          </FormDescription>
+                        </div>
                       )}
-                    </button>
-                  </div>
-                  {/* Only show the strength meter if the user has started typing. */}
-                  {password && (
-                    <div className='space-y-2 pt-1'>
-                      <Progress
-                        value={passwordStrength}
-                        className='h-2'
-                        indicatorClassName={cn(strengthColor)}
-                      />
-                      <FormDescription>
-                        Password must be at least 8 characters and include an
-                        uppercase letter, a lowercase letter, a number, and a
-                        special character.
-                      </FormDescription>
-                    </div>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                />
 
-            <FormField
-              name='confirmPassword'
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
-                  <div className='relative'>
-                    <FormControl>
-                      <Input
-                        type={showConfirmPassword ? 'text' : 'password'}
-                        placeholder='••••••••'
-                        {...field}
-                      />
-                    </FormControl>
-                    <button
-                      type='button'
-                      onClick={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
-                      className='absolute inset-y-0 right-0 flex items-center pr-3'
-                      aria-label='Toggle confirm password visibility'
-                    >
-                      {showConfirmPassword ? (
-                        <EyeOff className='h-4 w-4 text-muted-foreground' />
-                      ) : (
-                        <Eye className='h-4 w-4 text-muted-foreground' />
-                      )}
-                    </button>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                <FormField
+                  name='confirmPassword'
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Confirm Password</FormLabel>
+                      <div className='relative'>
+                        <FormControl>
+                          <Input
+                            type={showConfirmPassword ? 'text' : 'password'}
+                            placeholder='••••••••'
+                            {...field}
+                          />
+                        </FormControl>
+                        <button
+                          type='button'
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                          className='absolute inset-y-0 right-0 flex items-center pr-3'
+                          aria-label='Toggle confirm password visibility'
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff className='h-4 w-4 text-muted-foreground' />
+                          ) : (
+                            <Eye className='h-4 w-4 text-muted-foreground' />
+                          )}
+                        </button>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
 
             <FormField
               name='school'
@@ -589,17 +655,25 @@ export function RegisterForm() {
             </Button>
           </form>
         </Form>
-        <div className='mt-6 text-center text-sm'>
-          <p className='text-muted-foreground'>Already have an account?</p>
-          <Link href='/login'>
-            <Button variant='link' className='text-primary'>
-              Log in here
-            </Button>
-          </Link>
-        </div>
-        <div className='mt-4 text-center text-xs text-muted-foreground'>
-          <p>By creating an account, you agree to our Terms and Conditions.</p>
-        </div>
+        {!isGoogleSignUp && (
+          <>
+            <div className='mt-6 text-center text-sm'>
+              <p className='text-muted-foreground'>
+                Already have an account?
+              </p>
+              <Link href='/login'>
+                <Button variant='link' className='text-primary'>
+                  Log in here
+                </Button>
+              </Link>
+            </div>
+            <div className='mt-4 text-center text-xs text-muted-foreground'>
+              <p>
+                By creating an account, you agree to our Terms and Conditions.
+              </p>
+            </div>
+          </>
+        )}
       </CardContent>
     </Card>
   );
