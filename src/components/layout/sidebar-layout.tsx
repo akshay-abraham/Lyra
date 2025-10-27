@@ -72,7 +72,6 @@ import type { UserProfile } from '@/types';
  * @description
  * This component renders the navigation links in the sidebar. It uses hooks like
  * `usePathname` to determine which link is currently active and `useSidebar` to
-ator
  * handle mobile-specific behavior, such as closing the menu after a link is clicked.
  *
  * C-like Explanation: `function SidebarMenuItems() -> returns JSX_Element`
@@ -203,7 +202,7 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
       {/* `<Sidebar>` is the main container for the sidebar itself. */}
       <Sidebar side='left' collapsible='icon'>
         <SidebarHeader>
-          <div className='flex items-center gap-2 p-2'>
+          <div className='flex items-center gap-3 p-2'>
             <Logo />
             {/*
               This `<span>` is conditionally hidden with CSS when the sidebar is collapsed

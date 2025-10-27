@@ -23,13 +23,6 @@
 'use client';
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -136,31 +129,28 @@ export function LoginForm() {
   };
 
   return (
-    <Card
-      className='w-full max-w-sm border bg-card/80 backdrop-blur-sm animate-fade-in-up'
+    <div
+      className='w-full max-w-sm animate-fade-in-up'
       style={{ animationDelay: '0.4s' }}
     >
-      <CardHeader className='text-center'>
-        <CardTitle className='font-headline text-2xl'>Get Started</CardTitle>
-        <CardDescription>
-          Sign in with your Google account to begin your learning journey.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+      <div className='flex flex-col items-center space-y-4'>
+        <h2 className='text-2xl font-headline font-semibold text-foreground'>
+          Get Started
+        </h2>
         <Button
           variant='outline'
-          className='w-full h-12 text-base bg-white/90 text-black hover:bg-white transition-all duration-300 transform hover:scale-105'
+          className='w-full h-14 text-lg bg-white/95 text-black hover:bg-white transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-primary/20'
           onClick={handleGoogleSignIn}
           disabled={isSubmitting}
         >
           {isSubmitting ? (
             <Loader2 className='mr-2 h-6 w-6 animate-spin' />
           ) : (
-            <GoogleLogo className='mr-3 h-6 w-6' />
+            <GoogleLogo className='mr-3 h-7 w-7' />
           )}
           Sign in with Google
         </Button>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
