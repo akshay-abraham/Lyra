@@ -21,7 +21,7 @@
  * call auth service, fetch user data, and redirect.
  */
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -41,17 +41,6 @@ import type { UserProfile } from '@/types';
 import { GoogleLogo } from './google-logo';
 
 /**
- * An array of strings for the cycling description text in the header.
- * @const {string[]}
- */
-const cyclingDescriptions = [
-  'Step into a world of guided learning. Your AI Tutor awaits!',
-  'The future of AI in education starts here.',
-  'Customizable, ethical AI for your classroom.',
-  'Empowering students, supporting teachers.',
-];
-
-/**
  * The main component function for the login form.
  *
  * @returns {JSX.Element} The JSX for the login form.
@@ -61,35 +50,12 @@ const cyclingDescriptions = [
  *
  * Internal State (Global Variables for this function):
  *   - `isSubmitting`: A boolean flag to show a loading spinner on the button.
- *   - `descriptionIndex`: An integer to track which description string is currently shown.
  */
 export function LoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [descriptionIndex, setDescriptionIndex] = useState(0);
-
   const { auth, firestore } = useFirebase();
   const router = useRouter();
   const { toast } = useToast();
-
-  /**
-   * This `useEffect` hook sets up an interval timer to cycle through the header descriptions.
-   *
-   * C-like Analogy:
-   * This is like using `setInterval` in a C environment (if one existed) or setting
-   * up a timer interrupt in an embedded system. It schedules a piece of code to run
-   * repeatedly at a fixed interval. It also includes a "cleanup" function, which is
-   * crucial for preventing memory leaks, similar to calling `free()` or `destroy_timer()`
-   * when the component is no longer needed.
-   */
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setDescriptionIndex(
-        (prevIndex) => (prevIndex + 1) % cyclingDescriptions.length,
-      );
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   /**
    * Handles the Google Sign-In process. It orchestrates the entire login/registration
@@ -154,40 +120,30 @@ export function LoginForm() {
   };
 
   return (
-    <Card className='w-full max-w-md shadow-2xl shadow-primary/10 bg-card/80 backdrop-blur-sm border-primary/20 animate-fade-in-up'>
+    <Card
+      className='w-full max-w-sm border-0 bg-white/10 text-white backdrop-blur-md animate-fade-in-up'
+      style={{ animationDelay: '0.4s' }}
+    >
       <CardHeader className='text-center'>
-        <CardTitle
-          className='font-headline text-3xl animate-fade-in-down gradient-text'
-          style={{ animationDelay: '0.2s' }}
-        >
-          Welcome to Lyra
-        </CardTitle>
-        <CardDescription
-          key={descriptionIndex}
-          className='animate-fade-in-down transition-all duration-500'
-          style={{ animationDelay: '0.3s' }}
-        >
-          {cyclingDescriptions[descriptionIndex]}
+        <CardTitle className='font-headline text-2xl'>Get Started</CardTitle>
+        <CardDescription className='text-gray-300'>
+          Sign in with your Google account to begin your learning journey.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Button
           variant='outline'
-          className='w-full h-12 text-base'
+          className='w-full h-12 text-base bg-white/90 text-black hover:bg-white transition-all duration-300 transform hover:scale-105'
           onClick={handleGoogleSignIn}
           disabled={isSubmitting}
         >
           {isSubmitting ? (
-            <Loader2 className='mr-2 h-5 w-5 animate-spin' />
+            <Loader2 className='mr-2 h-6 w-6 animate-spin' />
           ) : (
-            <GoogleLogo className='mr-2 h-5 w-5' />
+            <GoogleLogo className='mr-3 h-6 w-6' />
           )}
           Sign in with Google
         </Button>
-
-        <p className='mt-6 text-center text-xs text-muted-foreground px-4'>
-          By signing in, you agree to our Terms of Service and Privacy Policy.
-        </p>
       </CardContent>
     </Card>
   );
