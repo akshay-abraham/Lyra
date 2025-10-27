@@ -79,32 +79,31 @@ import type { UserProfile, UserRole, School } from '@/types';
 
 // This Zod schema is more complex. It defines validation rules for all possible fields
 // and uses `.refine()` for custom validation logic that depends on multiple fields.
-const formSchema = z
-  .object({
-    name: z.string().min(2, 'Name must be at least 2 characters'),
-    email: z.string().email('Please enter a valid email'),
-    password: z
-      .string()
-      .min(8, 'Password must be at least 8 characters long.')
-      .regex(/[A-Z]/, 'Must contain at least one uppercase letter.')
-      .regex(/[a-z]/, 'Must contain at least one lowercase letter.')
-      .regex(/[0-9]/, 'Must contain at least one number.')
-      .regex(/[^A-Za-z0-9]/, 'Must contain at least one special character.'),
-    confirmPassword: z.string(),
-    role: z.enum(['student', 'teacher']),
-    school: z.string().min(1, 'Please select a school'),
-    // Student fields
-    class: z.string().optional(),
-    // Teacher fields
-    classesTaught: z.array(z.string()).optional(),
-    subjectsTaught: z.array(z.string()).optional(),
-  })
-  // Custom validation rule 1: Check if passwords match.
+const baseFormSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Please enter a valid email'),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters long.')
+    .regex(/[A-Z]/, 'Must contain at least one uppercase letter.')
+    .regex(/[a-z]/, 'Must contain at least one lowercase letter.')
+    .regex(/[0-9]/, 'Must contain at least one number.')
+    .regex(/[^A-Za-z0-9]/, 'Must contain at least one special character.'),
+  confirmPassword: z.string(),
+  role: z.enum(['student', 'teacher']),
+  school: z.string().min(1, 'Please select a school'),
+  // Student fields
+  class: z.string().optional(),
+  // Teacher fields
+  classesTaught: z.array(z.string()).optional(),
+  subjectsTaught: z.array(z.string()).optional(),
+});
+
+const formSchema = baseFormSchema
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
-    path: ['confirmPassword'], // The field where the error message should appear.
+    path: ['confirmPassword'],
   })
-  // Custom validation rule 2: If role is 'student', the 'class' field is required.
   .refine(
     (data) => {
       if (data.role === 'student') {
@@ -114,7 +113,6 @@ const formSchema = z
     },
     { message: 'Please select a class', path: ['class'] },
   )
-  // Custom validation rule 3: If role is 'teacher', 'classesTaught' is required.
   .refine(
     (data) => {
       if (data.role === 'teacher') {
@@ -124,7 +122,6 @@ const formSchema = z
     },
     { message: 'Please select at least one class', path: ['classesTaught'] },
   )
-  // Custom validation rule 4: If role is 'teacher', 'subjectsTaught' is required.
   .refine(
     (data) => {
       if (data.role === 'teacher') {
@@ -136,7 +133,7 @@ const formSchema = z
   );
 
 // A modified schema for Google Sign-up, where passwords are not needed.
-const googleFormSchema = formSchema.omit({
+const googleFormSchema = baseFormSchema.omit({
   password: true,
   confirmPassword: true,
 });
