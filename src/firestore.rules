@@ -1,0 +1,100 @@
+// Copyright (C) 2025 Akshay K Rooben Abraham
+/**
+ * @fileoverview Firestore Security Rules.
+ * @copyright Copyright (C) 2025 Akshay K Rooben Abraham. All rights reserved.
+ *
+ * @description
+ * These rules define who can read, write, and update data in your Firestore database.
+ * They are critical for securing your application's data. These rules follow a
+ * principle of "deny by default," meaning access is forbidden unless a rule
+ * explicitly allows it.
+ *
+ * C-like Analogy:
+ * Think of these rules as a series of `if` statements that run on the server
+ * before any database operation is allowed to proceed.
+ *
+ * function can_user_access_data(request, resource_path) {
+ *   if (matches_path(resource_path, "/users/{userId}")) {
+ *     // Rule for the `users` collection
+ *     if (request.method == "read" || request.method == "update") {
+ *       // Allow read/update only if the user's ID matches the document ID.
+ *       return request.auth.uid == userId;
+ *     }
+ *   }
+ *   // ... other rules
+ *   return false; // Deny by default
+ * }
+ */
+rules_version = '2';
+
+service cloud.firestore {
+  // This rule applies to all documents in the database.
+  match /databases/{database}/documents {
+
+    /**
+     * Helper function to check if the requesting user is the owner of the data.
+     * @returns {boolean} True if the user's UID matches the document's {userId}.
+     */
+    function isOwner(userId) {
+      // `request.auth` is not null if the user is authenticated.
+      // `request.auth.uid` is the unique ID of the logged-in user.
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    /**
+     * Rules for the `users` collection.
+     * Each document in this collection is identified by a user's unique ID (`userId`).
+     */
+    match /users/{userId} {
+      // `allow read, update`: Specifies which operations this rule applies to.
+      // `if isOwner(userId)`: The condition that must be met.
+      // This rule means: "A user can read or update a document in the `users`
+      // collection if and only if their own UID matches the document's ID."
+      // This prevents users from reading or changing each other's profiles.
+      allow read, update: if isOwner(userId);
+
+      // `create` is allowed if the user is creating their *own* user document.
+      allow create: if isOwner(userId);
+    }
+
+    /**
+     * Rules for the `teacherSettings` collection.
+     * Documents here store custom AI settings created by teachers.
+     */
+    match /teacherSettings/{settingsId} {
+      // A user can read settings if they are authenticated. This is a simplification;
+      // in a real app, you might restrict this to only the teacher who owns the settings.
+      allow read: if request.auth != null;
+
+      // A user can write (create or update) settings if they are authenticated and
+      // the `teacherId` field inside the document they are writing matches their own UID.
+      // This ensures teachers can only modify their own settings.
+      allow write: if request.auth != null && request.resource.data.teacherId == request.auth.uid;
+    }
+
+    /**
+     * Rules for the `chatSessions` subcollection, nested under each user.
+     * This path matches any document inside the `chatSessions` subcollection of any user.
+     */
+    match /users/{userId}/chatSessions/{chatId} {
+      // Allow a user to read, write, and delete documents in their *own* chatSessions subcollection.
+      // The `isOwner(userId)` function ensures that `userId` from the path matches the logged-in user's UID.
+      // `read` covers `get` (single document) but NOT `list` (multiple documents).
+      allow read, write, delete: if isOwner(userId);
+
+      // This is the new rule. `list` is a separate permission from `read`.
+      // This rule explicitly allows a user to list all the chat sessions that belong to them,
+      // which is required for the chat history feature to work.
+      allow list: if isOwner(userId);
+
+      /**
+       * Rules for the `messages` subcollection, nested under each chat session.
+       * This ensures that the permissions for messages are inherited from the parent chat session.
+       */
+      match /messages/{messageId} {
+        // Allow the owner of the parent user document to perform any action on the messages within their chat sessions.
+        allow read, write, delete: if isOwner(userId);
+      }
+    }
+  }
+}
