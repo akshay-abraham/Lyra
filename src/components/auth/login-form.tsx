@@ -45,6 +45,11 @@ import { GoogleLogo } from './google-logo';
  *
  * @returns {JSX.Element} The JSX for the login form.
  *
+ * @description
+ * This component's main job is to display the Google Sign-In button and handle the
+ * authentication flow when the button is clicked. It uses `useState` to manage a
+ * loading state (`isSubmitting`) to provide visual feedback to the user.
+ *
  * C-like Analogy:
  * This is the main function for the login UI, managing its state and behavior.
  *
@@ -58,23 +63,30 @@ export function LoginForm() {
   const { toast } = useToast();
 
   /**
-   * Handles the Google Sign-In process. It orchestrates the entire login/registration
-   * sequence: authenticating with Firebase, checking for an existing profile, and
-   * redirecting the user appropriately.
+   * Handles the Google Sign-In process.
+   *
+   * @description
+   * This function orchestrates the entire login/registration sequence: authenticating
+   * with Firebase, checking for an existing profile, and redirecting the user appropriately.
+   * It's an `async` function, allowing it to use `await` to handle the asynchronous
+   * nature of network requests to Firebase.
    */
   const handleGoogleSignIn = async () => {
     setIsSubmitting(true);
     const provider = new GoogleAuthProvider();
     try {
+      // 1. `signInWithPopup` opens the Google login window. We `await` its result.
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
+      // 2. Look for an existing user profile document in Firestore using the user's unique ID.
       const userDocRef = doc(firestore, COLLECTIONS.USERS, user.uid);
       const userDoc = await getDoc(userDocRef);
 
       if (userDoc.exists()) {
-        // Existing user, log them in
+        // 3a. If the document exists, the user is returning.
         const userData = userDoc.data() as UserProfile;
+        // Store essential info in `sessionStorage` for quick access on other pages.
         sessionStorage.setItem(
           'lyra-user-info',
           JSON.stringify({
@@ -87,13 +99,15 @@ export function LoginForm() {
           title: 'Login Successful',
           description: `Welcome back, ${userData.name}!`,
         });
+        // Redirect to the correct dashboard based on their role.
         if (userData.role === 'teacher') {
           router.push('/teacher');
         } else {
           router.push('/');
         }
       } else {
-        // New user, redirect to registration to complete profile
+        // 3b. If no document exists, this is a new user.
+        // Store their Google account info in `sessionStorage` and redirect to the registration page.
         sessionStorage.setItem(
           'lyra-google-pending-registration',
           JSON.stringify({
@@ -105,6 +119,7 @@ export function LoginForm() {
         router.push('/register');
       }
     } catch (error: any) {
+      // 4. Handle any errors during the process.
       console.error('Google sign-in failed:', error);
       toast({
         variant: 'destructive',
@@ -115,18 +130,19 @@ export function LoginForm() {
             : 'Could not sign in with Google. Please try again.',
       });
     } finally {
+      // 5. Always stop the loading spinner, whether success or failure.
       setIsSubmitting(false);
     }
   };
 
   return (
     <Card
-      className='w-full max-w-sm border-0 bg-white/10 text-white backdrop-blur-md animate-fade-in-up'
+      className='w-full max-w-sm border bg-card/80 backdrop-blur-sm animate-fade-in-up'
       style={{ animationDelay: '0.4s' }}
     >
       <CardHeader className='text-center'>
         <CardTitle className='font-headline text-2xl'>Get Started</CardTitle>
-        <CardDescription className='text-gray-300'>
+        <CardDescription>
           Sign in with your Google account to begin your learning journey.
         </CardDescription>
       </CardHeader>
