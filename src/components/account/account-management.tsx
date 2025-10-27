@@ -10,7 +10,7 @@
  * 2.  Handling user input to change this information.
  * 3.  Validating the input to ensure it's correct (e.g., email has a valid format).
  * 4.  Submitting the updated data to Firebase Auth and Firestore.
- * 5.  Providing security actions like resetting a password or deleting chat history.
+ * 5.  Providing security actions like deleting chat history.
  *
  * C-like Analogy:
  * Think of this as a dedicated C module (`account_ui.c`) that handles a complex
@@ -33,7 +33,6 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import {
@@ -45,13 +44,9 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Trash2, User, KeyRound, ShieldAlert } from 'lucide-react';
+import { Loader2, Trash2, User, ShieldAlert } from 'lucide-react';
 import { useFirebase, useUser } from '@/firebase';
-import {
-  updateProfile,
-  sendPasswordResetEmail,
-  updateEmail,
-} from 'firebase/auth';
+import { updateProfile, updateEmail } from 'firebase/auth';
 import {
   doc,
   updateDoc,
@@ -112,7 +107,7 @@ type ProfileFormData = z.infer<typeof profileSchema>;
  * C-like Explanation: `function AccountManagement() -> returns JSX_Element`
  *
  * Internal State (Global Variables for this function):
- *   - `isSaving`, `isDeletingChat`, `isResetting`: Boolean flags to show loading spinners on buttons.
+ *   - `isSaving`, `isDeletingChat`: Boolean flags to show loading spinners on buttons.
  *   - `userInfo`: A struct-like object to hold the user's full profile from Firestore.
  *   - `availableSubjects`: An array of strings for the subjects a teacher can select, updated dynamically.
  *
@@ -132,7 +127,6 @@ export function AccountManagement() {
   // State variables for loading indicators.
   const [isSaving, setIsSaving] = useState(false);
   const [isDeletingChat, setIsDeletingChat] = useState(false);
-  const [isResetting, setIsResetting] = useState(false);
   const [userInfo, setUserInfo] = useState<UserProfile | null>(null);
   const [availableSubjects, setAvailableSubjects] = useState<string[]>([]);
 
@@ -273,32 +267,6 @@ export function AccountManagement() {
   }
 
   /**
-   * Sends a password reset email using Firebase's built-in functionality.
-   */
-  async function handlePasswordReset() {
-    if (!user?.email) return;
-    setIsResetting(true);
-    try {
-      await sendPasswordResetEmail(auth, user.email);
-      toast({
-        title: 'Password Reset Email Sent',
-        description: `A reset link has been sent to ${user.email}. Please check your inbox.`,
-      });
-    } catch (error) {
-      console.error('Password reset failed:', error);
-      const message =
-        error instanceof Error ? error.message : 'An unknown error occurred.';
-      toast({
-        variant: 'destructive',
-        title: 'Password Reset Failed',
-        description: message,
-      });
-    } finally {
-      setIsResetting(false);
-    }
-  }
-
-  /**
    * Deletes all documents in the user's `chatSessions` subcollection.
    * It uses a "batch write" for efficiency, which groups multiple delete operations
    * into a single request to the server, making it faster and more atomic.
@@ -420,9 +388,6 @@ export function AccountManagement() {
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription>
-                      Changing your email might require re-verification.
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -544,33 +509,6 @@ export function AccountManagement() {
           </Button>
         </form>
       </Form>
-
-      {/* Security Settings Card */}
-      <Card className='bg-card/80 backdrop-blur-sm'>
-        <CardHeader>
-          <CardTitle className='flex items-center gap-2 font-headline text-2xl'>
-            <KeyRound /> Password & Security
-          </CardTitle>
-          <CardDescription>Manage your security settings.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className='flex items-center justify-between'>
-            <p className='text-sm text-muted-foreground'>
-              Send a password reset link to your email.
-            </p>
-            <Button
-              variant='outline'
-              onClick={handlePasswordReset}
-              disabled={isResetting}
-            >
-              {isResetting ? (
-                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-              ) : null}
-              Reset Password
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Danger Zone Card for destructive actions */}
       <Card className='border-destructive bg-destructive/5'>
