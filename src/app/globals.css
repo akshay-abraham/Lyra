@@ -224,6 +224,18 @@
     animation: gradient-animation 4s ease infinite;
   }
 
+  .animated-gradient {
+    background: linear-gradient(
+      -45deg,
+      hsl(var(--primary) / 0.8),
+      hsl(var(--primary) / 0.6),
+      #23a6d5,
+      #23d5ab
+    );
+    background-size: 400% 400%;
+    animation: gradient-animation 15s ease infinite;
+  }
+
   /* The animation that makes the text gradient shift its position over time. */
   @keyframes gradient-animation {
     0% {
