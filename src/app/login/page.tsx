@@ -39,24 +39,28 @@ export default function LoginPage() {
       {/* Main container for the page content. */}
       <div className='relative z-10 flex min-h-screen flex-col items-center justify-center p-4 text-center'>
         <header className='absolute top-0 left-0 w-full p-4 sm:p-6'>
-          <div className='flex items-center gap-2'>
+          <div className='flex items-center gap-3'>
             <Logo />
-            <span className='font-headline text-xl font-bold'>Lyra</span>
+            <span className='font-headline text-2xl font-bold text-foreground'>
+              Lyra
+            </span>
           </div>
         </header>
 
-        <main className='flex w-full flex-col items-center'>
+        <main className='flex w-full flex-col items-center space-y-8'>
           <div
-            className='mb-8 max-w-2xl animate-fade-in-up'
+            className='max-w-3xl animate-fade-in-up'
             style={{ animationDelay: '0.2s' }}
           >
             <h1 className='text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl font-headline gradient-text'>
-              The Future of AI in Education Starts Here.
+              An Ethical AI Tutor,
+              <br />
+              Customizable by Teachers.
             </h1>
             <p className='mt-6 text-lg leading-8 text-muted-foreground'>
-              Lyra is an ethical AI tutor designed to guide students toward
-              solutions, not just give them away. Empower students and support
-              teachers with customizable, pedagogical guardrails.
+              Lyra is designed to guide students toward solutions, not just give
+              them away. Empower students and support teachers with
+              pedagogical guardrails you control.
             </p>
           </div>
 

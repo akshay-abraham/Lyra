@@ -109,41 +109,42 @@
     left: 0;
     z-index: -1;
     background: hsl(var(--background));
+    overflow: hidden;
   }
 
   .animated-background::before,
   .animated-background::after {
     content: '';
     position: absolute;
-    width: 400px;
-    height: 400px;
+    width: 600px;
+    height: 600px;
     border-radius: 50%;
-    opacity: 0.15;
-    filter: blur(120px);
+    opacity: 0.2;
+    filter: blur(150px);
   }
 
   .animated-background::before {
     background-color: hsl(var(--primary));
-    top: 10%;
-    left: 10%;
-    animation: pulse-glow 15s infinite alternate;
+    top: 5%;
+    left: 5%;
+    animation: pulse-glow 20s infinite alternate;
   }
 
   .animated-background::after {
     background-color: hsl(var(--accent));
-    bottom: 10%;
-    right: 10%;
-    animation: pulse-glow 20s infinite alternate-reverse;
+    bottom: 5%;
+    right: 5%;
+    animation: pulse-glow 25s infinite alternate-reverse;
   }
 
   @keyframes pulse-glow {
     from {
-      transform: scale(0.8) translate(0, 0);
-      opacity: 0.1;
+      transform: scale(0.9) translate(-50px, 50px);
+      opacity: 0.15;
     }
     to {
-      transform: scale(1.2) translate(20px, -20px);
-      opacity: 0.2;
+      transform: scale(1.3) translate(50px, -50px);
+      opacity: 0.25;
     }
   }
 
@@ -158,30 +159,6 @@
   }
   .animate-glow {
     animation: glow 3s ease-in-out infinite;
-  }
-
-  @keyframes colorful-border {
-    0% {
-      border-color: hsl(262, 83%, 58%);
-    }
-    25% {
-      border-color: hsl(310, 83%, 58%);
-    }
-    50% {
-      border-color: hsl(34, 91%, 58%);
-    }
-    75% {
-      border-color: hsl(180, 83%, 58%);
-    }
-    100% {
-      border-color: hsl(262, 83%, 58%);
-    }
-  }
-
-  .animate-colorful-border {
-    border-width: 1px;
-    border-style: solid;
-    animation: colorful-border 5s linear infinite;
   }
 
   .gradient-text {
