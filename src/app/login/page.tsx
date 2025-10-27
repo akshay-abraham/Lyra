@@ -5,61 +5,73 @@
  *
  * @description
  * This file serves as the entry point for the `/login` route of the application.
- * Its main responsibility is to display the login form to the user. It provides a
- * centered layout and renders the `LoginForm` component, which encapsulates all
- * the actual logic for handling user input, validation, and authentication.
+ * It has been redesigned into a sophisticated, two-column layout to provide a
+ * more engaging and informative welcome experience for users.
  *
- * C-like Analogy:
- * This file is like a very simple C function that sets up the screen environment
- * (e.g., clearing the screen, setting a background color) and then calls a single,
- * more complex function to handle the main task.
- *
- * ```c
- * void show_login_page() {
- *   // 1. Set up the container and center it.
- *   setup_centered_layout();
- *
- *   // 2. Render the actual login form UI and logic.
- *   render_login_form_component();
- * }
- * ```
+ * Left Column: A dynamic introduction to Lyra's pedagogical mission.
+ * Right Column: The focused login form.
  */
 
 import { LoginForm } from '@/components/auth/login-form';
 import { Suspense } from 'react';
 import { LoadingScreen } from '@/components/layout/loading-screen';
+import { Logo } from '@/components/layout/logo';
+import { CheckCircle } from 'lucide-react';
 
 /**
- * The main component for the login page.
- * Because it's named `page.tsx` and is inside the `/login` folder, Next.js
- * automatically maps this component to the `/login` URL.
+ * The main component for the redesigned login page.
  *
  * @returns {JSX.Element} The JSX that describes the structure of the login page.
  */
 export default function LoginPage() {
+  const features = [
+    'Ethical AI with Pedagogical Guardrails',
+    'Customizable by Teachers for Any Subject',
+    'Focus on Guidance, Not Just Answers',
+    'Encourages Critical Thinking',
+  ];
+
   return (
-    // This `div` acts as a container for the whole page.
-    // The `className` uses Tailwind CSS utility classes to style it:
-    // - `flex items-center justify-center`: This common combination centers a child element horizontally and vertically.
-    // - `min-h-screen`: Makes the container take up at least the full height of the browser screen.
-    // - `bg-background`: Sets the background color using the CSS variable defined in `globals.css`.
-    // - `p-4`: Applies padding around the content.
-    <div className='flex items-center justify-center min-h-screen bg-background p-4'>
-      {/*
-        The `<Suspense>` component is a React feature for handling loading states.
-        It tells React: "Try to render the component inside me (`LoginForm`). While it's
-        loading any required code or data, show the `fallback` UI instead." This is
-        useful for code splitting, where `LoginForm` might be loaded on demand.
-      */}
-      <Suspense fallback={<LoadingScreen />}>
+    <div className='w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen'>
+      <div className='hidden bg-background lg:block animated-gradient'>
+        <div className='flex flex-col justify-between h-full p-8 text-white'>
+          <div className='flex items-center gap-2 text-lg font-medium'>
+            <Logo />
+            <span className='font-headline text-2xl'>Lyra</span>
+          </div>
+          <div className='space-y-4'>
+            <h1 className='text-4xl font-bold font-headline shadow-lg'>
+              The Future of AI in Education Starts Here.
+            </h1>
+            <p className='text-lg text-gray-200/80 shadow-md'>
+              Lyra is an ethical AI tutor designed to guide students toward
+              solutions, not just give them away. Empower students, support
+              teachers.
+            </p>
+            <div className='space-y-2 pt-4'>
+              {features.map((feature, i) => (
+                <div key={i} className='flex items-center gap-2'>
+                  <CheckCircle className='h-5 w-5 text-green-400' />
+                  <span>{feature}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <footer className='text-sm text-gray-200/60'>
+            Copyright © 2025 Akshay K Rooben Abraham. All rights reserved.
+          </footer>
+        </div>
+      </div>
+      <div className='flex items-center justify-center py-12 min-h-screen'>
         {/*
-          This renders the actual login form component. All the logic for handling
-          user input, validation, and communicating with Firebase is contained within
-          `@/components/auth/login-form.tsx`. This separation keeps our page file clean
-          and simple, focusing only on layout. It's like calling a function: `renderLoginFormScreen();`
+          The `<Suspense>` component is a React feature for handling loading states.
+          It tells React: "Try to render the component inside me (`LoginForm`). While it's
+          loading any required code or data, show the `fallback` UI instead."
         */}
-        <LoginForm />
-      </Suspense>
+        <Suspense fallback={<LoadingScreen />}>
+          <LoginForm />
+        </Suspense>
+      </div>
     </div>
   );
 }
