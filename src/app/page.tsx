@@ -1,47 +1,52 @@
-// Copyright (C) 2025 Akshay K Rooben abraham
+// Copyright (C) 2025 Akshay K Rooben Abraham
 /**
- * @fileoverview Main Student Chat Page (`/`)
+ * @fileoverview Main Student Chat Page (`/`).
+ * @copyright Copyright (C) 2025 Akshay K Rooben Abraham. All rights reserved.
  *
- * C-like Analogy:
- * This file is the entry point for the application's root URL (`/`). This is
- * the main chat page for a student.
+ * @description
+ * This file serves as the entry point for the application's root URL (`/`). This is
+ * the primary chat page where a student interacts with the Lyra AI tutor.
  *
- * Its primary responsibilities are:
- * 1.  Act as a gatekeeper: It checks if a user is logged in. If not, it redirects
+ * Its main responsibilities are:
+ * 1.  **Authentication Guard:** It checks if a user is logged in. If not, it redirects
  *     them to the `/login` page.
- * 2.  Handle chat session routing: It reads the `chatId` from the URL's query
- *     parameters (e.g., `/?chatId=xyz123`). This ID is then passed to the
- *     `ChatInterface` component.
- * 3.  Render the main layout: It displays the `SidebarLayout` and the `ChatInterface`,
- *     which together form the complete chat screen.
+ * 2.  **Chat Session Routing:** It reads the `chatId` from the URL's query
+ *     parameters (e.g., `/?chatId=xyz123`). This ID is then passed down to the
+ *     `ChatInterface` component, telling it which conversation to load.
+ * 3.  **Layout Rendering:** It renders the main `SidebarLayout` and the `ChatInterface`,
+ *     which together form the complete, interactive chat screen.
  *
  * This is a "Client Component" (`'use client'`) because it uses React Hooks like
- * `useEffect`, `useRouter`, and `useSearchParams` that must run in the browser.
+ * `useEffect`, `useRouter`, and `useSearchParams` that must run in the browser
+ * to access client-side information like the URL and authentication status.
  */
 'use client';
 
 // Import necessary components and hooks.
 import { SidebarLayout } from '@/components/layout/sidebar-layout';
 import { ChatInterface } from '@/components/student/chat-interface';
-import { useUser } from '@/firebase'; // Hook to get the current user.
+import { useUser } from '@/firebase'; // Hook to get the current user's authentication state.
 import { useRouter, useSearchParams } from 'next/navigation'; // Hooks for navigation and URL parameters.
 import { Suspense, useEffect } from 'react'; // React's core hooks.
+import { LoadingScreen } from '@/components/layout/loading-screen';
 
 /**
- * C-like Explanation: `function ChatPageContent() -> returns JSX_Element or NULL`
- *
  * This component contains the core logic for the page. It's separated so that it
  * can be wrapped in `<Suspense>`, which gracefully handles the initial loading state.
+ *
+ * @returns {JSX.Element | null} The chat UI if the user is authenticated, or null while loading/redirecting.
+ *
+ * C-like Explanation: `function ChatPageContent() -> returns JSX_Element or NULL`
  *
  * Internal State (Global Variables for this function):
  *   - `user`: A struct-like object for the logged-in user (or NULL).
  *   - `isUserLoading`: A boolean flag, `true` while checking auth.
  *   - `router`: An object for programmatic navigation.
  *   - `searchParams`: An object to read URL query parameters.
- *   - `chatId`: The ID of the chat from the URL (or NULL).
+ *   - `chatId`: The ID of the chat from the URL (or NULL if it's a new chat).
  */
 function ChatPageContent() {
-  // Get the user's authentication status.
+  // Get the user's authentication status from the global Firebase context.
   const { user, isUserLoading } = useUser();
   const router = useRouter(); // Get the router for redirects.
   // Get the URL search parameters. `useSearchParams` is a React Hook for this.
@@ -68,7 +73,7 @@ function ChatPageContent() {
   // While checking for the user or if the user is not logged in (and about to be redirected),
   // we render nothing (`null`). The parent component's `<Suspense>` fallback will be shown.
   if (isUserLoading || !user) {
-    return null;
+    return null; // The Suspense fallback (LoadingScreen) will be shown instead.
   }
 
   // If the user is authenticated, render the main chat layout.
@@ -79,8 +84,9 @@ function ChatPageContent() {
         - `key={chatId}`: This is a crucial React optimization. When the `key` changes
           (i.e., when the user clicks a different chat in the sidebar, changing the URL
           and thus the `chatId`), React will completely destroy the old `ChatInterface`
-          instance and create a brand new one. This is the simplest way to ensure that
-          the chat component resets its state and fetches messages for the new chat session.
+          instance and create a brand new one. This is the simplest and most robust way
+          to ensure that the chat component completely resets its state and fetches
+          messages for the new chat session.
         - `chatId={chatId}`: We pass the chat ID down to the component so it knows which
           chat session to load. This is like passing an argument to a function.
       */}
@@ -90,17 +96,17 @@ function ChatPageContent() {
 }
 
 /**
- * C-like Explanation: `function StudentPage() -> returns JSX_Element`
- *
  * This is the main exported function for the root page (`/`).
- * Its only job is to wrap our main content (`ChatPageContent`) in `<Suspense>`,
+ * Its primary job is to wrap our main content (`ChatPageContent`) in `<Suspense>`,
  * ensuring a smooth loading experience for the user.
+ *
+ * @returns {JSX.Element} The Suspense boundary wrapping the page content.
  */
 export default function StudentPage() {
   return (
     // While `ChatPageContent` is checking for the user, the `fallback` UI is shown.
-    // This prevents a blank screen or layout shifts.
-    <Suspense fallback={<div>Loading...</div>}>
+    // This prevents a blank screen or jarring layout shifts.
+    <Suspense fallback={<LoadingScreen />}>
       <ChatPageContent />
     </Suspense>
   );

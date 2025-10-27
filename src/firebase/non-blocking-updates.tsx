@@ -1,34 +1,36 @@
-// Copyright (C) 2025 Akshay K Rooben abraham
+// Copyright (C) 2025 Akshay K Rooben Abraham
 /**
- * @fileoverview Non-Blocking Firestore Writes (`non-blocking-updates.tsx`)
+ * @fileoverview Non-Blocking Firestore Write Operations (`non-blocking-updates.tsx`).
+ * @copyright Copyright (C) 2025 Akshay K Rooben Abraham. All rights reserved.
+ *
+ * @description
+ * This file provides helper functions for writing data to the Firestore database
+ * in a "non-blocking" or "fire-and-forget" manner. These functions are designed
+ * to improve UI responsiveness by not waiting for the database to confirm a write.
  *
  * C-like Analogy:
- * This file provides helper functions for writing data to the Firestore database
- * in a "non-blocking" or "fire-and-forget" manner.
+ * In traditional blocking I/O, a function like `write_to_disk()` would pause the
+ * program until the data is fully written. These functions are asynchronous, like
+ * using a separate thread for I/O. When you call `addDocumentNonBlocking`, it's
+ * like spawning a new thread to handle the database write and then immediately
+ * continuing with the main program's execution.
  *
- * Similar to the non-blocking login functions, these functions start a database
- * write operation (like creating, updating, or deleting a document) and then
- * return immediately, without waiting for the database to confirm that the
- * write was successful.
+ * This is useful for "optimistic UI" updates. For example, when a user sends a chat
+ * message, we can call `addDocumentNonBlocking`. The message appears in the UI
+ * instantly, even though it might take a few hundred milliseconds for it to actually
+ * be saved to the database.
  *
- * This is useful for UI interactions where you want the app to feel instantaneous.
- * For example, when a user sends a chat message, we can call `addDocumentNonBlocking`.
- * The message appears in the UI instantly, even though it might take a few hundred
- * milliseconds for it to actually be saved to the database. This is called
- * "optimistic UI".
- *
- * What about errors?
- * Each of these functions includes a `.catch()` block. This is the modern
- * JavaScript way of handling errors for asynchronous operations. If the database
- * write fails in the background (for example, due to a security rule violation),
- * the code inside the `.catch()` block is executed.
- *
- * Inside the `.catch()` block, we:
- * 1. Create a `FirestorePermissionError` (our custom error object from `errors.ts`).
- * 2. Use our global `errorEmitter` to broadcast this error to the rest of the application.
+ * **Error Handling:**
+ * What about errors? Each of these functions includes a `.catch()` block. This is the
+ * modern JavaScript way of handling errors for asynchronous operations. If the database
+ * write fails in the background (e.g., due to a security rule violation), the code
+ * inside the `.catch()` block is executed. Inside this block, we:
+ * 1. Create a detailed `FirestorePermissionError` (from `errors.ts`).
+ * 2. Use our global `errorEmitter` to broadcast this error to the rest of the application,
+ *    where it can be caught and displayed to the developer.
  *
  * This ensures that even though we're not waiting for the result, we still have a
- * robust way to handle failures when they occur.
+ * robust way to handle and debug failures when they occur.
  */
 'use client';
 
@@ -45,10 +47,13 @@ import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 
 /**
- * C-like Explanation: `void setDocumentNonBlocking(DocRef* docRef, void* data, SetOptions options)`
+ * Initiates a `setDoc` operation (creates or overwrites a document) without blocking.
  *
- * Initiates a `setDoc` operation (create or overwrite a document).
- * This function is non-blocking. It returns immediately.
+ * @param {DocumentReference} docRef - A reference to the document to set.
+ * @param {any} data - The data to write to the document.
+ * @param {SetOptions} options - Options for the set operation (e.g., `{ merge: true }`).
+ *
+ * C-like Explanation: `void set_document_non_blocking(DocRef* doc_ref, void* data, SetOptions options)`
  */
 export function setDocumentNonBlocking(
   docRef: DocumentReference,
@@ -59,29 +64,30 @@ export function setDocumentNonBlocking(
   // We attach an error handler to this Promise using `.catch()`.
   setDoc(docRef, data, options).catch((error) => {
     // If an error occurs in the background, this code runs.
-    // We create our detailed error object.
+    // We create our detailed, structured error object.
     const permissionError = new FirestorePermissionError({
       path: docRef.path,
-      operation: 'write', // 'set' can be a create or update.
+      operation: 'write', // 'set' can be a create or update, 'write' is a safe general term.
       requestResourceData: data,
     });
-    // And emit it globally.
+    // And emit it globally for our error listener to catch.
     errorEmitter.emit('permission-error', permissionError);
   });
   // Execution continues immediately after the setDoc call is initiated.
 }
 
 /**
- * C-like Explanation: `Promise<DocRef*> addDocumentNonBlocking(ColRef* colRef, void* data)`
+ * Initiates an `addDoc` operation (creates a new document with an auto-generated ID) without blocking.
  *
- * Initiates an `addDoc` operation (create a new document with an auto-generated ID).
- * This function is non-blocking.
- * The `addDoc` function itself returns a Promise that will eventually resolve with a
- * reference to the newly created document.
+ * @param {CollectionReference} colRef - A reference to the collection to add the document to.
+ * @param {any} data - The data for the new document.
+ * @returns {Promise<DocumentReference>} A Promise that resolves with a reference to the newly created document.
+ *
+ * C-like Explanation: `DocRef* add_document_non_blocking(ColRef* col_ref, void* data)`
  */
 export function addDocumentNonBlocking(colRef: CollectionReference, data: any) {
   const promise = addDoc(colRef, data).catch((error) => {
-    // The error handling is the same as above.
+    // The error handling pattern is the same as above.
     errorEmitter.emit(
       'permission-error',
       new FirestorePermissionError({
@@ -91,16 +97,18 @@ export function addDocumentNonBlocking(colRef: CollectionReference, data: any) {
       }),
     );
   });
-  // Return the promise. The caller could optionally wait for it, but the typical
+  // Return the promise. The caller could optionally `await` it, but the typical
   // use case in this app is "fire-and-forget".
   return promise;
 }
 
 /**
- * C-like Explanation: `void updateDocumentNonBlocking(DocRef* docRef, void* data)`
+ * Initiates an `updateDoc` operation (updates fields in an existing document) without blocking.
  *
- * Initiates an `updateDoc` operation (update fields in an existing document).
- * This function is non-blocking.
+ * @param {DocumentReference} docRef - A reference to the document to update.
+ * @param {any} data - An object containing the fields and values to update.
+ *
+ * C-like Explanation: `void update_document_non_blocking(DocRef* doc_ref, void* data)`
  */
 export function updateDocumentNonBlocking(
   docRef: DocumentReference,
@@ -119,10 +127,11 @@ export function updateDocumentNonBlocking(
 }
 
 /**
- * C-like Explanation: `void deleteDocumentNonBlocking(DocRef* docRef)`
+ * Initiates a `deleteDoc` operation without blocking.
  *
- * Initiates a `deleteDoc` operation.
- * This function is non-blocking.
+ * @param {DocumentReference} docRef - A reference to the document to delete.
+ *
+ * C-like Explanation: `void delete_document_non_blocking(DocRef* doc_ref)`
  */
 export function deleteDocumentNonBlocking(docRef: DocumentReference) {
   deleteDoc(docRef).catch((error) => {

@@ -1,42 +1,47 @@
-// Copyright (C) 2025 Akshay K Rooben abraham
+// Copyright (C) 2025 Akshay K Rooben Abraham
 /**
- * @fileoverview Global Error Emitter (`error-emitter.ts`)
+ * @fileoverview Global Error Emitter (`error-emitter.ts`).
+ * @copyright Copyright (C) 2025 Akshay K Rooben Abraham. All rights reserved.
+ *
+ * @description
+ * This file implements a classic "Publisher-Subscriber" (or "Observer") pattern,
+ * creating a simple, type-safe, global event handling system. This allows
+ * different parts of the application to communicate without being directly coupled.
+ * Specifically, it allows any component to "emit" a `permission-error` event, and
+ * a central listener component (`FirebaseErrorListener`) can "subscribe" to this
+ * event to handle it.
  *
  * C-like Analogy:
- * This file implements a classic "Publisher-Subscriber" (or "Observer") pattern.
- * It creates a global event handling system.
+ * This system is like creating a generic event notification system using function pointers.
  *
- * Imagine in C you want to notify different parts of your program when a specific
- * error happens, without them being directly coupled. You could create a system with
- * function pointers:
- *
- * // 1. A struct to hold a list of callbacks (function pointers).
+ * ```c
+ * // 1. Define a struct to hold a list of callbacks (function pointers).
  * typedef struct {
  *   void (*callbacks[10])(PermissionError* error);
  *   int count;
  * } ErrorListener;
  *
+ * // 2. Create a global instance of this listener.
  * ErrorListener g_permission_error_listener;
  *
- * // 2. A function to register a new callback.
- * void registerPermissionErrorCallback(void (*callback)(PermissionError* error)) {
+ * // 3. A function to register a new callback (subscribe).
+ * void register_permission_error_callback(void (*callback)(PermissionError* error)) {
  *   g_permission_error_listener.callbacks[g_permission_error_listener.count++] = callback;
  * }
  *
- * // 3. A function to trigger (emit) the event.
- * void emitPermissionError(PermissionError* error) {
+ * // 4. A function to trigger the event (publish).
+ * void emit_permission_error(PermissionError* error) {
  *   for (int i = 0; i < g_permission_error_listener.count; i++) {
- *     // Call every registered function.
+ *     // Call every registered function with the error data.
  *     g_permission_error_listener.callbacks[i](error);
  *   }
  * }
- *
- * This TypeScript file creates a generic and type-safe version of that exact system.
- *
+ * ```
+ * This TypeScript file creates a more generic and type-safe version of that exact system.
  * - `createEventEmitter()`: A factory function that builds the event system.
- * - `on(eventName, callback)`: Equivalent to `registerPermissionErrorCallback`. It adds a callback to a list for a specific event.
+ * - `on(eventName, callback)`: Equivalent to `register_permission_error_callback`.
  * - `off(eventName, callback)`: Unregisters a callback.
- * - `emit(eventName, data)`: Equivalent to `emitPermissionError`. It triggers all registered callbacks for an event, passing them the data.
+ * - `emit(eventName, data)`: Equivalent to `emit_permission_error`.
  *
  * The `errorEmitter` instance is a "singleton" — a single, global instance used by the entire application.
  */
@@ -44,14 +49,14 @@
 import { FirestorePermissionError } from '@/firebase/errors';
 
 /**
- * C-like Analogy: `typedef enum` or a set of `#define` constants.
- *
- * This interface defines all the possible events that can be emitted.
+ * Defines all the possible events that can be emitted throughout the application.
  * It maps the event name (as a string) to the type of data that will be sent
  * with that event. This provides type safety, ensuring you can't accidentally
  * send the wrong kind of data for an event.
  *
- * Here, we only have one event: 'permission-error', which sends a `FirestorePermissionError` object.
+ * C-like Analogy: `typedef enum` or a set of `#define` constants for event types.
+ *
+ * @interface AppEvents
  */
 export interface AppEvents {
   'permission-error': FirestorePermissionError;
@@ -62,8 +67,10 @@ export interface AppEvents {
 type Callback<T> = (data: T) => void;
 
 /**
- * A strongly-typed pub/sub event emitter.
- * It uses a generic type T that extends a record of event names to payload types.
+ * Creates a strongly-typed pub/sub event emitter.
+ * @returns An object with `on`, `off`, and `emit` methods.
+ *
+ * @template T - A record of event names to payload types.
  */
 function createEventEmitter<T extends Record<string, any>>() {
   // The `events` object is like a hash map or dictionary.
@@ -73,12 +80,12 @@ function createEventEmitter<T extends Record<string, any>>() {
 
   return {
     /**
-     * Subscribe to an event. (Register a callback)
-     * @param eventName The name of the event (e.g., 'permission-error').
-     * @param callback The function to call when the event is emitted.
+     * Subscribe to an event (i.e., register a callback).
+     * @param {K} eventName - The name of the event (e.g., 'permission-error').
+     * @param {Callback<T[K]>} callback - The function to call when the event is emitted.
      */
     on<K extends keyof T>(eventName: K, callback: Callback<T[K]>) {
-      // If no one is listening to this event yet, create an empty array.
+      // If no one is listening to this event yet, create an empty array for its callbacks.
       if (!events[eventName]) {
         events[eventName] = [];
       }
@@ -87,9 +94,9 @@ function createEventEmitter<T extends Record<string, any>>() {
     },
 
     /**
-     * Unsubscribe from an event. (Remove a callback)
-     * @param eventName The name of the event.
-     * @param callback The specific callback function to remove.
+     * Unsubscribe from an event (i.e., remove a callback).
+     * @param {K} eventName - The name of the event.
+     * @param {Callback<T[K]>} callback - The specific callback function to remove.
      */
     off<K extends keyof T>(eventName: K, callback: Callback<T[K]>) {
       if (!events[eventName]) {
@@ -100,9 +107,9 @@ function createEventEmitter<T extends Record<string, any>>() {
     },
 
     /**
-     * Publish an event to all subscribers. (Trigger all callbacks)
-     * @param eventName The name of the event to emit.
-     * @param data The data payload that corresponds to the event's type.
+     * Publish an event to all subscribers (i.e., trigger all callbacks).
+     * @param {K} eventName - The name of the event to emit.
+     * @param {T[K]} data - The data payload that corresponds to the event's type.
      */
     emit<K extends keyof T>(eventName: K, data: T[K]) {
       if (!events[eventName]) {
@@ -114,6 +121,10 @@ function createEventEmitter<T extends Record<string, any>>() {
   };
 }
 
-// Create and export a singleton instance of the emitter, typed with our AppEvents interface.
-// This `errorEmitter` is the global object that other parts of the app will import and use.
+/**
+ * The singleton instance of the emitter, typed with our `AppEvents` interface.
+ * This `errorEmitter` is the global object that other parts of the app will
+ * import and use to communicate permission errors.
+ * @type {object}
+ */
 export const errorEmitter = createEventEmitter<AppEvents>();

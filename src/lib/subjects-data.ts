@@ -1,4 +1,35 @@
 // Copyright (C) 2025 Akshay K Rooben Abraham
+/**
+ * @fileoverview Subject and Class Data (`subjects-data.ts`).
+ * @copyright Copyright (C) 2025 Akshay K Rooben Abraham. All rights reserved.
+ *
+ * @description
+ * This file serves as a static database for all subjects, classes, and their
+ * relationships within the application. It defines the available subjects with
+ * their associated icons and colors, lists all possible classes and their streams,
+ * and maps subjects to specific grades and streams. This centralized data store
+ * makes it easy to manage and update the academic structure of the app.
+ *
+ * C-like Analogy:
+ * This file is like a set of constant, pre-initialized data structures. It's
+ * similar to having several `const struct` arrays and lookup tables defined
+ * in a `data.c` file, which are then compiled into the program.
+ *
+ * ```c
+ * // In data.h
+ * typedef struct { const char* name; IconType icon; const char* color; } SubjectData;
+ * extern const SubjectData ALL_SUBJECTS[];
+ *
+ * // In data.c
+ * const SubjectData ALL_SUBJECTS[] = {
+ *   { "English", ICON_BOOK, "#4A90E2" },
+ *   { "Maths", ICON_SIGMA, "#8B5CF6" },
+ *   // ... and so on
+ * };
+ * ```
+ * The functions in this file, like `getSubjectsForUser`, act as query functions
+ * that operate on these static data arrays.
+ */
 
 import {
   BookOpen,
@@ -23,12 +54,20 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 
+/**
+ * @typedef {object} SubjectData
+ * @description Represents a single subject, including its name, icon, and display color.
+ */
 export type SubjectData = {
   name: string;
   icon: LucideIcon;
   color: string;
 };
 
+/**
+ * @typedef {string} Stream
+ * @description Represents the academic streams for higher grades (11-12).
+ */
 export type Stream =
   | 'Bio-Maths'
   | 'CS'
@@ -36,13 +75,21 @@ export type Stream =
   | 'Commerce'
   | 'Humanities';
 
+/**
+ * @typedef {object} ClassData
+ * @description Represents a single class, including its name, grade level, and optional stream.
+ */
 export type ClassData = {
   name: string;
   grade: number;
   stream?: Stream;
 };
 
-// Function to convert number to Roman numeral for grades 1-12
+/**
+ * Converts a number from 1-12 into its Roman numeral representation.
+ * @param {number} num - The grade number.
+ * @returns {string} The Roman numeral string.
+ */
 const toRoman = (num: number): string => {
   const roman: { [key: string]: number } = { X: 10, IX: 9, V: 5, IV: 4, I: 1 };
   let result = '';
@@ -59,6 +106,13 @@ const toRoman = (num: number): string => {
   return result;
 };
 
+/**
+ * Creates a `ClassData` object.
+ * @param {number} grade - The grade number.
+ * @param {string} division - The class division (e.g., 'A', 'B').
+ * @param {Stream} [stream] - The optional academic stream.
+ * @returns {ClassData} The created class data object.
+ */
 const createClass = (
   grade: number,
   division: string,
@@ -73,6 +127,12 @@ const createClass = (
   };
 };
 
+/**
+ * Creates an array of `ClassData` objects for a given grade and its divisions.
+ * @param {number} grade - The grade number.
+ * @param {string[]} divisions - An array of division letters.
+ * @returns {ClassData[]} An array of class data objects.
+ */
 const createClassesForGrade = (
   grade: number,
   divisions: string[],
@@ -80,6 +140,10 @@ const createClassesForGrade = (
   return divisions.map((div) => createClass(grade, div));
 };
 
+/**
+ * A comprehensive list of all subjects offered.
+ * @const {SubjectData[]}
+ */
 export const allSubjects: SubjectData[] = [
   { name: 'English', icon: BookOpen, color: '#4A90E2' },
   { name: 'Malayalam', icon: PenTool, color: '#D0021B' },
@@ -109,6 +173,10 @@ export const allSubjects: SubjectData[] = [
   { name: 'Other', icon: PenTool, color: '#9E9E9E' },
 ];
 
+/**
+ * A comprehensive list of all classes offered in the school.
+ * @const {ClassData[]}
+ */
 export const allClasses: ClassData[] = [
   ...createClassesForGrade(1, ['a', 'b']),
   ...createClassesForGrade(2, ['a', 'b']),
@@ -132,6 +200,10 @@ export const allClasses: ClassData[] = [
   createClass(12, 'e', 'Humanities'),
 ];
 
+/**
+ * A mapping of academic streams to their respective subjects.
+ * @const {Record<Stream, string[]>}
+ */
 export const streamSubjects: Record<Stream, string[]> = {
   'Bio-Maths': ['Physics', 'Chemistry', 'Biology', 'Maths Core', 'English'],
   CS: ['Physics', 'Chemistry', 'Maths', 'Computer Science', 'English'],
@@ -161,6 +233,10 @@ export const streamSubjects: Record<Stream, string[]> = {
   ],
 };
 
+/**
+ * A mapping of grades (1-10) to their respective subjects.
+ * @const {Record<number, string[]>}
+ */
 export const gradeSubjects: Record<number, string[]> = {
   1: ['English', 'Malayalam', 'Hindi', 'EVS', 'Maths', 'GK'],
   2: ['English', 'Malayalam', 'Hindi', 'EVS', 'Maths', 'GK'],
@@ -228,16 +304,29 @@ export const gradeSubjects: Record<number, string[]> = {
   ],
 };
 
+/**
+ * A type representing the name of any valid subject.
+ * This is generated dynamically from the `allSubjects` array for type safety.
+ */
 export type SubjectName = (typeof allSubjects)[number]['name'];
 
+/**
+ * Gets the list of available subjects for a given user role and class.
+ *
+ * @param {string | null} role - The user's role ('student' or 'teacher').
+ * @param {string | null} className - The user's class name (for students).
+ * @returns {SubjectData[]} An array of subject data objects.
+ */
 export function getSubjectsForUser(
   role: string | null,
   className: string | null,
 ): SubjectData[] {
+  // Teachers can see all subjects for customization purposes.
   if (role === 'teacher') {
     return allSubjects.filter((s) => s.name !== 'Other');
   }
 
+  // If no class is specified, show all subjects as a fallback.
   if (!className) {
     return allSubjects;
   }
@@ -259,6 +348,12 @@ export function getSubjectsForUser(
   return allSubjects.filter((subject) => subjectNames.includes(subject.name));
 }
 
+/**
+ * Gets a combined list of all unique subjects taught across multiple classes.
+ *
+ * @param {string[]} classNames - An array of class names.
+ * @returns {SubjectData[]} A unique array of subject data objects.
+ */
 export function getSubjectsForClasses(classNames: string[]): SubjectData[] {
   if (!classNames || classNames.length === 0) {
     return [];
@@ -281,6 +376,13 @@ export function getSubjectsForClasses(classNames: string[]): SubjectData[] {
 
   return allSubjects.filter((subject) => subjectNameSet.has(subject.name));
 }
+
+/**
+ * Gets a list of subjects for a specific academic stream.
+ *
+ * @param {Stream} stream - The academic stream.
+ * @returns {string[]} An array of subject names for that stream.
+ */
 export function getSubjectsByStream(stream: Stream): string[] {
   return streamSubjects[stream] || [];
 }

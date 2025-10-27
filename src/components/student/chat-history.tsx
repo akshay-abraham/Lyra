@@ -1,24 +1,34 @@
-// Copyright (C) 2025 Akshay K Rooben abraham
+// Copyright (C) 2025 Akshay K Rooben Abraham
 /**
- * @fileoverview Chat History Component (`chat-history.tsx`)
+ * @fileoverview Chat History Component (`chat-history.tsx`).
+ * @copyright Copyright (C) 2025 Akshay K Rooben Abraham. All rights reserved.
+ *
+ * @description
+ * This component is responsible for fetching and displaying the user's past chat
+ * sessions in the sidebar. It uses a real-time listener to automatically update
+ * as new chats are created or titles are updated.
  *
  * C-like Analogy:
- * This file defines a UI component whose sole responsibility is to fetch and display
- * the user's past chat sessions in the sidebar. It's like a C function,
- * `displayChatHistory()`, that does the following:
+ * Think of this as a C function, `void display_chat_history_list()`, that does the following:
  *
- * 1.  Constructs a database query to get all documents from the user's `chatSessions`
- *     collection, ordered by most recent first.
- * 2.  Subscribes to that query to get real-time updates. If a new chat is started in
- *     another tab, it will appear here automatically.
- * 3.  While the data is being fetched, it displays a "loading skeleton" UI.
- * 4.  Once the data arrives, it groups the chats by subject (e.g., "Maths", "Science").
- * 5.  It then renders this grouped list as a series of expandable accordions. Each
- *     accordion item is a subject, and inside it is a list of links to the chats
- *     for that subject.
+ * 1.  **Constructs a Database Query:** It builds a query to get all documents from the
+ *     current user's `chatSessions` subcollection, ordered by most recent first.
+ *     `const char* query = "SELECT * FROM chat_sessions WHERE user_id = ? ORDER BY start_time DESC";`
  *
- * It uses our custom `useCollection` hook to handle all the complexities of
- * real-time data fetching from Firestore.
+ * 2.  **Subscribes to Query:** It subscribes to this query to get real-time updates.
+ *     This is like setting up a callback that the database server will call whenever
+ *     the result of that query changes.
+ *
+ * 3.  **Shows Loading State:** While the initial data is being fetched, it displays a
+ *     "loading skeleton" UI to give the user feedback.
+ *
+ * 4.  **Groups and Renders Data:** Once the data arrives, it processes the list of chats,
+ *     groups them by subject (e.g., "Maths", "Science"), and then renders this grouped
+ *     list as a series of expandable accordions. Each accordion item represents a subject,
+ *     and inside it is a list of links to the individual chats for that subject.
+ *
+ * It uses our custom `useCollection` hook to abstract away all the complexities of
+ * managing the real-time data subscription from Firestore.
  */
 'use client';
 
@@ -41,41 +51,37 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { allSubjects, type SubjectData } from '@/lib/subjects-data';
-
-// This defines the structure of a chat session document, like a `typedef struct` in C.
-interface ChatSession {
-  id: string;
-  title: string;
-  subject: string;
-}
+import { COLLECTIONS, FIELDS } from '@/lib/constants';
+import type { ChatSession } from '@/types';
 
 // Create a lookup map for subject data (like an icon and color).
 // This is an optimization to quickly find a subject's metadata by its name.
-// It's like a hash map or `std::map` in C++.
+// It's like a hash map or `std::map` in C++, providing O(1) average-time access.
 const subjectDataMap = new Map<string, SubjectData>(
   allSubjects.map((s) => [s.name, s]),
 );
 
 /**
+ * Renders the user's chat history, grouped by subject, in the sidebar.
+ *
+ * @param {object} props - The component's properties.
+ * @param {function} props.onLinkClick - A callback function that gets called when a chat link is
+ *   clicked. This is used by the parent `SidebarLayout` to close the mobile menu.
+ * @returns {JSX.Element} The rendered chat history list or a loading/empty state.
+ *
  * C-like Explanation: `function ChatHistory(props) -> returns JSX_Element`
- *
- * This is the main component function for displaying the chat history.
- *
- * Props (Inputs):
- *   - `onLinkClick`: A function pointer (callback) that gets called when a chat link is
- *     clicked. This is used by the parent component (`sidebar-layout`) to close the
- *     mobile menu.
  *
  * Hooks (Special Lifecycle Functions):
  *   - `useFirebase`, `useUser`: Get access to the database and current user.
- *   - `usePathname`: Get the current URL to highlight the active chat.
+ *   - `usePathname`: Get the current URL to highlight the active chat link.
  *   - `useMemoFirebase`: A critical hook to "memoize" the Firestore query. This prevents
  *     the query object from being recreated on every render, which would cause an
  *     infinite loop of data fetching.
  *   - `useCollection`: Our custom hook that subscribes to the Firestore query and
  *     returns the data, loading state, and any errors.
  *   - `React.useMemo`: Another optimization hook. It's used here to re-calculate the
- *     `groupedSessions` only when the `chatSessions` data actually changes.
+ *     `groupedSessions` only when the `chatSessions` data actually changes, not on
+ *     every single re-render.
  */
 export function ChatHistory({ onLinkClick }: { onLinkClick: () => void }) {
   const { firestore } = useFirebase();
@@ -83,31 +89,35 @@ export function ChatHistory({ onLinkClick }: { onLinkClick: () => void }) {
   const pathname = usePathname();
 
   // 1. Construct the Firestore query.
-  // `useMemoFirebase` ensures this query object is stable across re-renders.
+  // `useMemoFirebase` ensures this query object is stable across re-renders. If the
+  // query object were a new instance on every render, `useEffect` in `useCollection`
+  // would fire endlessly.
   const chatSessionsQuery = useMemoFirebase(() => {
-    // If we don't have a user or database connection yet, return null.
+    // If we don't have a user or database connection yet, we can't build a query. Return null.
     if (!user || !firestore) return null;
+
     // This is the query definition:
-    // "Get documents from the `chatSessions` collection for the current user,
+    // "Get documents from the `chatSessions` subcollection for the current user,
     // ordered by `startTime` in descending order."
     return query(
-      collection(firestore, 'users', user.uid, 'chatSessions'),
-      orderBy('startTime', 'desc'),
+      collection(firestore, COLLECTIONS.USERS, user.uid, COLLECTIONS.CHAT_SESSIONS),
+      orderBy(FIELDS.START_TIME, 'desc'),
     );
   }, [user, firestore]); // Dependencies: only re-create the query if `user` or `firestore` changes.
 
   // 2. Subscribe to the query using our custom hook.
-  // This hook handles all the real-time subscription logic.
+  // This hook handles all the real-time subscription logic behind the scenes.
   // `chatSessions` will be an array of `ChatSession` structs (or null).
   // `isLoading` will be `true` during the initial fetch.
   const { data: chatSessions, isLoading } =
     useCollection<ChatSession>(chatSessionsQuery);
 
   // 3. Group the fetched sessions by subject.
-  // `React.useMemo` ensures this grouping logic only runs when `chatSessions` data changes.
+  // `React.useMemo` ensures this potentially expensive grouping logic only runs when
+  // the `chatSessions` data actually changes.
   const groupedSessions = React.useMemo(() => {
     // PSEUDOCODE:
-    // function groupSessions(sessions_array):
+    // function group_sessions_by_subject(sessions_array):
     //   if (sessions_array is NULL) return empty_map;
     //   map<string, Session[]> grouped_map;
     //   for each session in sessions_array:
@@ -130,9 +140,9 @@ export function ChatHistory({ onLinkClick }: { onLinkClick: () => void }) {
     );
   }, [chatSessions]); // Dependency: only re-run when `chatSessions` changes.
 
-  // 4. Render the UI based on the state.
+  // 4. Render the UI based on the current state.
 
-  // If data is currently being fetched, show a loading UI.
+  // If data is currently being fetched, show a loading skeleton UI.
   if (isLoading) {
     return (
       <div className='px-2'>
@@ -159,18 +169,18 @@ export function ChatHistory({ onLinkClick }: { onLinkClick: () => void }) {
       className='w-full group-data-[collapsible=icon]:hidden px-2'
     >
       {/*
-              `Object.entries(groupedSessions)` turns our map into an array of [key, value] pairs
-              so we can loop over it.
-              for each ([subject, sessions_for_subject] in groupedSessions):
-                  // render an AccordionItem for this subject...
-            */}
+        `Object.entries(groupedSessions)` turns our map into an array of [key, value] pairs
+        so we can loop over it.
+        for each ([subject, sessions_for_subject] in groupedSessions):
+            // render an AccordionItem for this subject...
+      */}
       {Object.entries(groupedSessions).map(([subject, sessions]) => {
         const subjectInfo = subjectDataMap.get(subject);
         const Icon = subjectInfo?.icon || MessageSquareText;
 
         return (
           <AccordionItem value={subject} key={subject} className='border-b-0'>
-            {/* The trigger is the part the user clicks to expand/collapse. */}
+            {/* The trigger is the part the user clicks to expand/collapse the accordion. */}
             <AccordionTrigger className='py-2 px-2 hover:no-underline hover:bg-sidebar-accent rounded-md text-sm font-medium'>
               <div className='flex items-center gap-2'>
                 <Icon
@@ -185,7 +195,7 @@ export function ChatHistory({ onLinkClick }: { onLinkClick: () => void }) {
               <div className='flex flex-col gap-1'>
                 {sessions.map((session) => (
                   <SidebarMenuItem key={session.id}>
-                    {/* Each item is a link to the chat page with the specific `chatId`. */}
+                    {/* Each item is a link to the chat page with the specific `chatId` in the URL. */}
                     <Link href={`/?chatId=${session.id}`} onClick={onLinkClick}>
                       <SidebarMenuButton
                         isActive={pathname.includes(session.id)}

@@ -1,6 +1,46 @@
-// Copyright (C) 2025 Akshay K Rooben abraham
+// Copyright (C) 2025 Akshay K Rooben Abraham
+/**
+ * @fileoverview Loading Text Messages (`loading-texts.ts`).
+ * @copyright Copyright (C) 2025 Akshay K Rooben Abraham. All rights reserved.
+ *
+ * @description
+ * This file contains a collection of fun, subject-specific loading messages that are
+ * displayed in the chat interface while the user is waiting for the AI to respond.
+ * It helps make the waiting experience more engaging and less monotonous.
+ *
+ * C-like Analogy:
+ * Think of this as a set of string arrays, each associated with a specific key.
+ *
+ * ```c
+ * const char* loading_texts_math[] = {
+ *   "Calculating the hypotenuse...",
+ *   "Solving for x...",
+ *   NULL
+ * };
+ *
+ * const char* loading_texts_science[] = {
+ *   "Analyzing the molecular structure...",
+ *   "Calibrating the Bunsen burner...",
+ *   NULL
+ * };
+ *
+ * const char* get_random_loading_text(Subject subject) {
+ *   const char** texts;
+ *   switch (subject) {
+ *     case MATH: texts = loading_texts_math; break;
+ *     case SCIENCE: texts = loading_texts_science; break;
+ *     default: texts = loading_texts_default; break;
+ *   }
+ *   int count = 0;
+ *   while (texts[count] != NULL) count++;
+ *   return texts[rand() % count];
+ * }
+ * ```
+ */
+
 import { allSubjects, type SubjectName } from './subjects-data';
 
+// A record where each key is a `SubjectName` and the value is an array of strings.
 const loadingTexts: Record<SubjectName, string[]> = {
   // Grade 1-5
   English: [
@@ -155,12 +195,19 @@ const loadingTexts: Record<SubjectName, string[]> = {
   ],
 };
 
-// Function to get a random loading text for a given subject
+/**
+ * Returns a random loading text string for a given subject.
+ *
+ * @param {string | null} subject - The name of the subject. If the subject is not found, it defaults to 'Other'.
+ * @returns {string} A randomly selected loading message.
+ */
 export function getLoadingText(subject: string | null): string {
+  // Validate that the provided subject is a known subject. If not, default to 'Other'.
   const validSubject =
     subject && allSubjects.find((s) => s.name === subject)
       ? (subject as SubjectName)
       : 'Other';
   const texts = loadingTexts[validSubject];
+  // Return a random string from the selected array.
   return texts[Math.floor(Math.random() * texts.length)];
 }

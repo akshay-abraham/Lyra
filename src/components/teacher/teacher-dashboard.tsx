@@ -1,33 +1,35 @@
-// Copyright (C) 2025 Akshay K Rooben abraham
+// Copyright (C) 2025 Akshay K Rooben Abraham
 /**
- * @fileoverview Teacher Dashboard Component (`teacher-dashboard.tsx`)
+ * @fileoverview Teacher Dashboard Component (`teacher-dashboard.tsx`).
+ * @copyright Copyright (C) 2025 Akshay K Rooben Abraham. All rights reserved.
  *
- * C-like Analogy:
- * This file defines the Teacher Dashboard, the main screen for teachers.
- * It acts as a sophisticated configuration utility for the AI tutor. Think of it as a
- * graphical settings panel (`config_panel.c`) for a complex program.
+ * @description
+ * This file defines the Teacher Dashboard, the main screen for teachers. It acts as
+ * a sophisticated configuration utility for the AI tutor, allowing teachers to
+ * customize the AI's behavior for each subject they teach.
  *
  * Core Functionalities:
- * 1.  **AI Personality (System Prompt):** Teachers can write a detailed prompt that tells the
- *     AI its role, its tone, and the rules it must follow (e.g., "You are a friendly 5th-grade
- *     math tutor. Never give the direct answer."). This is like editing a `config.ini` file.
- * 2.  **Answer Examples (Few-Shot Prompting):** Teachers can provide examples of good, guiding
- *     responses. The AI uses these examples to learn the desired teaching style. This is
- *     like providing a set of test cases for the AI to learn from.
- * 3.  **Testing Sandbox:** Teachers can ask a sample student question and see how the AI
+ * 1.  **Subject Selection:** A dropdown allows teachers who teach multiple subjects
+ *     to switch between different customization profiles.
+ * 2.  **AI Personality (System Prompt):** Teachers can write a detailed prompt that tells the
+ *     AI its role, tone, and pedagogical rules (e.g., "You are a friendly 5th-grade
+ *     math tutor. Never give the direct answer.").
+ * 3.  **Answer Examples (Few-Shot Prompting):** Teachers can provide a dynamic list of
+ *     good, guiding responses. The AI uses these examples to learn the desired teaching style.
+ * 4.  **Testing Sandbox:** Teachers can type a sample student question and see how the AI
  *     responds with the current settings, allowing for quick iteration and debugging.
- * 4.  **Custom Knowledge (RAG):** A tab that leads to the RAG management UI, where teachers
- *     can upload their own course materials (like PDFs or notes).
- * 5.  **Subject Selection:** If a teacher teaches multiple subjects, they can switch between
- *     them to create different AI settings for each one. The UI adapts based on the number
- *     of subjects taught.
+ * 5.  **Saving & Loading:** All settings are saved to and loaded from Firestore on a per-teacher,
+ *     per-subject basis.
  *
- * It uses `react-hook-form` to manage the form state, validation, and saving, and it
- * interacts with Firestore to load and save these settings for each teacher and subject.
+ * C-like Analogy:
+ * Think of this as a graphical settings panel (`config_panel.c`) for a complex program.
+ * It reads configuration from a file (`load_settings_from_db`), displays it in a user-friendly
+ * form, allows the user to modify it, and writes it back (`save_settings_to_db`). It also
+ * provides a "Test" button to see the effect of the changes immediately.
  */
 'use client';
 
-// Like `#include` in C, these lines import necessary code from other files.
+// Import necessary React hooks, UI components, and Firebase functions.
 import { useState, useEffect, useCallback } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -69,15 +71,7 @@ import remarkGfm from 'remark-gfm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RagManagement } from './rag-management';
 import { useFirebase, useUser } from '@/firebase';
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  setDoc,
-  doc,
-  getDoc,
-} from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import {
   Select,
   SelectContent,
@@ -85,6 +79,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
+import type { TeacherSettings, UserProfile } from '@/types';
+import { COLLECTIONS } from '@/lib/constants';
 
 // `zod` is a library for data validation. This defines the "shape" of our settings form.
 // It's like defining a `struct` in C and then writing a function to check if
@@ -101,23 +97,23 @@ const settingsSchema = z.object({
   ),
 });
 
-// A simpler schema just for the "Test AI" form.
+// A simpler schema just for the "Test AI" sandbox form.
 const testSchema = z.object({
   studentQuestion: z.string().min(5, {
     message: 'Test question must be at least 5 characters.',
   }),
 });
 
-// A default system prompt to use for new settings.
+// A default system prompt to use for new settings or subjects.
 const defaultSystemPrompt =
   'You are Lyra, an AI tutor. Your goal is to help the student verbalize their problem and guide them towards the solution by providing hints, analogies, and questions instead of direct answers. You should never give the direct answer. Emulate the Socratic method. Be patient and encouraging. You can use Markdown for formatting.';
 
 /**
- * =================================================================================
- * MAIN TEACHER DASHBOARD COMPONENT
- * C-like Explanation: `function TeacherDashboard() -> returns JSX_Element`
+ * The main component for the teacher's dashboard.
  *
- * This is the main component function for the teacher's UI.
+ * @returns {JSX.Element} The rendered teacher dashboard.
+ *
+ * C-like Explanation: `function TeacherDashboard() -> returns JSX_Element`
  *
  * Internal State (Variables):
  *   - `isSaving`: A boolean flag to show a spinner on the save button.
@@ -128,19 +124,17 @@ const defaultSystemPrompt =
  *   - `isLoadingSettings`: A boolean flag for when we are fetching settings from the database.
  *
  * Hooks (Special Functions):
- *   - `useForm`: From `react-hook-form`, this manages the entire state of our main
- *     settings form (system prompt, example answers). It handles data, validation, and submission.
- *   - `useFieldArray`: A helper from `react-hook-form` to manage the dynamic list of "Example Answers".
+ *   - `useForm`, `useFieldArray`: From `react-hook-form`, these manage the entire state of our main
+ *     settings form, including the dynamic list of "Example Answers".
  *   - `useFirebase`, `useUser`: Our custom hooks to get access to the database and current user info.
  *   - `useEffect`: Used to react to changes, like when the user selects a different subject
  *     from the dropdown, which triggers a data fetch from the database.
- * =================================================================================
  */
 export function TeacherDashboard() {
   const [isSaving, setIsSaving] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
   const [testResult, setTestResult] = useState('');
-  const [teacherData, setTeacherData] = useState<any>(null);
+  const [teacherData, setTeacherData] = useState<UserProfile | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string>('');
   const [isLoadingSettings, setIsLoadingSettings] = useState(true);
 
@@ -148,42 +142,38 @@ export function TeacherDashboard() {
   const { firestore } = useFirebase();
   const { user } = useUser();
 
+  // Initialize the main settings form.
   const form = useForm<z.infer<typeof settingsSchema>>({
     resolver: zodResolver(settingsSchema),
     defaultValues: {
       systemPrompt: defaultSystemPrompt,
-      exampleAnswers: [
-        {
-          value:
-            "Instead of solving it for you, can you tell me what you've tried so far?",
-        },
-      ],
+      exampleAnswers: [{ value: "Instead of solving it for you, can you tell me what you've tried so far?" }],
     },
   });
 
+  // `useFieldArray` is a hook for managing dynamic arrays of form fields.
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: 'exampleAnswers',
   });
 
+  // Initialize the "Test AI" form.
   const testForm = useForm<z.infer<typeof testSchema>>({
     resolver: zodResolver(testSchema),
     defaultValues: { studentQuestion: '' },
   });
 
   /**
-   * C-like Explanation: `useCallback(async function loadTeacherData() ...)`
-   *
-   * This function fetches the teacher's profile from Firestore. `useCallback` is an
-   * optimization that prevents the function from being recreated on every render.
+   * Fetches the teacher's profile from Firestore to get their list of subjects.
+   * `useCallback` is an optimization that prevents the function from being recreated on every render.
    */
   const loadTeacherData = useCallback(async () => {
     if (user && firestore) {
       setIsLoadingSettings(true);
-      const userDocRef = doc(firestore, 'users', user.uid);
+      const userDocRef = doc(firestore, COLLECTIONS.USERS, user.uid);
       const docSnap = await getDoc(userDocRef);
       if (docSnap.exists()) {
-        const data = docSnap.data();
+        const data = docSnap.data() as UserProfile;
         setTeacherData(data);
         // If the teacher teaches at least one subject, select the first one by default.
         if (data.subjectsTaught && data.subjectsTaught.length > 0) {
@@ -192,7 +182,7 @@ export function TeacherDashboard() {
           setIsLoadingSettings(false);
         }
       } else {
-        setIsLoadingSettings(false);
+        setIsLoadingSettings(false); // No profile found.
       }
     }
   }, [user, firestore]);
@@ -203,10 +193,8 @@ export function TeacherDashboard() {
   }, [loadTeacherData]);
 
   /**
-   * C-like Explanation: `useEffect` for loading settings.
-   *
-   * This hook runs whenever `selectedSubject` changes. It fetches the specific
-   * AI settings for that subject from the database.
+   * This `useEffect` hook runs whenever `selectedSubject` changes. It fetches the
+   * specific AI settings for that subject from the `teacherSettings` collection.
    */
   useEffect(() => {
     async function loadSettings() {
@@ -214,28 +202,21 @@ export function TeacherDashboard() {
         setIsLoadingSettings(true);
         // Construct a unique ID for the settings document (e.g., "teacher123_Maths").
         const settingsId = `${user.uid}_${selectedSubject.replace(/\s+/g, '-')}`;
-        const settingsDocRef = doc(firestore, 'teacherSettings', settingsId);
+        const settingsDocRef = doc(firestore, COLLECTIONS.TEACHER_SETTINGS, settingsId);
         const docSnap = await getDoc(settingsDocRef);
 
         if (docSnap.exists()) {
-          // If settings exist, load them into the form.
-          const settings = docSnap.data();
+          // If settings exist for this subject, load them into the form.
+          const settings = docSnap.data() as TeacherSettings;
           form.reset({
             systemPrompt: settings.systemPrompt,
-            exampleAnswers: settings.exampleAnswers.map((e: string) => ({
-              value: e,
-            })),
+            exampleAnswers: settings.exampleAnswers.map((e: string) => ({ value: e })),
           });
         } else {
-          // Otherwise, reset the form to the default prompt and examples.
+          // Otherwise, reset the form to the default prompt and examples for a fresh start.
           form.reset({
             systemPrompt: defaultSystemPrompt,
-            exampleAnswers: [
-              {
-                value:
-                  "Instead of solving it for you, can you tell me what you've tried so far?",
-              },
-            ],
+            exampleAnswers: [{ value: "Instead of solving it for you, can you tell me what you've tried so far?" }],
           });
         }
         setIsLoadingSettings(false);
@@ -247,9 +228,8 @@ export function TeacherDashboard() {
   }, [selectedSubject, user, firestore, form]);
 
   /**
-   * C-like Explanation: `async function onSubmit(values)`
-   * This function is called when the main settings form is submitted.
-   * `values` is a struct containing the data from the form fields.
+   * Called when the main settings form is submitted. Saves the settings to Firestore.
+   * @param {z.infer<typeof settingsSchema>} values - The validated data from the form.
    */
   async function onSubmit(values: z.infer<typeof settingsSchema>) {
     if (!selectedSubject || !user || !firestore) return;
@@ -257,7 +237,7 @@ export function TeacherDashboard() {
     try {
       const settingsId = `${user.uid}_${selectedSubject.replace(/\s+/g, '-')}`;
       // `setDoc` will create the document if it doesn't exist, or overwrite it if it does.
-      await setDoc(doc(firestore, 'teacherSettings', settingsId), {
+      await setDoc(doc(firestore, COLLECTIONS.TEACHER_SETTINGS, settingsId), {
         teacherId: user.uid,
         subject: selectedSubject,
         systemPrompt: values.systemPrompt,
@@ -281,9 +261,8 @@ export function TeacherDashboard() {
   }
 
   /**
-   * C-like Explanation: `async function onTest(values)`
-   * This function is called when the "Test AI" form is submitted.
-   * `values` is a struct containing the student's test question.
+   * Called when the "Test AI" sandbox form is submitted.
+   * @param {z.infer<typeof testSchema>} values - The validated data from the test form.
    */
   async function onTest(values: z.infer<typeof testSchema>) {
     setIsTesting(true);
@@ -304,9 +283,8 @@ export function TeacherDashboard() {
       setTestResult(result.aiResponse); // Update state to display the AI's response.
     } catch (error) {
       console.error(error);
-      setTestResult(
-        'An error occurred while testing. Please check the console.',
-      );
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+      setTestResult(`An error occurred while testing: ${errorMessage}`);
       toast({
         variant: 'destructive',
         title: 'Test Failed',
@@ -318,7 +296,6 @@ export function TeacherDashboard() {
   }
 
   // ========================== RETURN JSX (The View) ==========================
-  // The rest of this file is the JSX code that describes what the component looks like.
   return (
     <div className='space-y-8'>
       <div className='animate-fade-in-down'>
@@ -329,7 +306,6 @@ export function TeacherDashboard() {
         </p>
       </div>
 
-      {/* The Tabs component allows switching between "Teaching Style" and "Custom Knowledge". */}
       <Tabs defaultValue='style' className='w-full space-y-8'>
         <TabsList className='grid w-full grid-cols-2 bg-card/80 backdrop-blur-sm animate-fade-in-up'>
           <TabsTrigger value='style'>
@@ -348,14 +324,13 @@ export function TeacherDashboard() {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className='space-y-6 lg:col-span-2'
               >
-                {/* Subject Selector */}
-                {teacherData?.subjectsTaught?.length > 0 ? (
+                {/* Subject Selector Dropdown */}
+                {teacherData?.subjectsTaught && teacherData.subjectsTaught.length > 0 ? (
                   <div className='mb-6 animate-fade-in-up'>
                     <FormLabel>Select Subject to Customize</FormLabel>
                     <Select
                       onValueChange={setSelectedSubject}
                       value={selectedSubject}
-                      disabled={teacherData.subjectsTaught.length <= 1}
                     >
                       <SelectTrigger className='w-full md:w-1/2 mt-2'>
                         <SelectValue placeholder='Select a subject...' />
@@ -371,21 +346,22 @@ export function TeacherDashboard() {
                   </div>
                 ) : (
                   !isLoadingSettings && (
-                    <p className='text-muted-foreground'>
-                      You are not assigned to any subjects. Please update your
-                      profile.
-                    </p>
+                    <Alert>
+                      <AlertTitle>No Subjects Found</AlertTitle>
+                      <AlertDescription>
+                        You are not assigned to any subjects. Please update your profile in the 'Account' page to begin customizing the AI.
+                      </AlertDescription>
+                    </Alert>
                   )
                 )}
 
                 {/* If settings are loading, show a spinner. Otherwise, show the form cards. */}
                 {isLoadingSettings ? (
-                  <div className='flex justify-center items-center p-8'>
-                    <Loader2 className='h-8 w-8 animate-spin' />
+                  <div className='flex justify-center items-center p-8 h-64'>
+                    <Loader2 className='h-8 w-8 animate-spin text-primary' />
                   </div>
                 ) : (
                   <>
-                    {/* Card for AI Personality / System Prompt */}
                     <Card
                       className='bg-card/80 backdrop-blur-sm border-primary/20 shadow-lg animate-fade-in-up'
                       style={{ animationDelay: '0.2s' }}
@@ -393,11 +369,10 @@ export function TeacherDashboard() {
                       <CardHeader>
                         <CardTitle className='font-headline text-2xl flex items-center gap-2'>
                           <Wand2 /> AI Personality for{' '}
-                          {selectedSubject || 'Your Subject'}
+                          <span className='text-primary'>{selectedSubject || '...'}</span>
                         </CardTitle>
                         <CardDescription>
-                          This is where you tell the AI how to act. Think of it
-                          as setting the classroom rules!
+                          This is where you tell the AI how to act. Think of it as setting the classroom rules!
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
@@ -416,8 +391,7 @@ export function TeacherDashboard() {
                                 />
                               </FormControl>
                               <FormDescription>
-                                This sets the AI's personality, role, and rules.
-                                Be explicit. Markdown is supported.
+                                This sets the AI's personality, role, and rules. Be explicit. Markdown is supported.
                               </FormDescription>
                               <FormMessage />
                             </FormItem>
@@ -426,7 +400,6 @@ export function TeacherDashboard() {
                       </CardContent>
                     </Card>
 
-                    {/* Card for Answer Examples */}
                     <Card
                       className='bg-card/80 backdrop-blur-sm border-primary/20 shadow-lg animate-fade-in-up'
                       style={{ animationDelay: '0.3s' }}
@@ -436,8 +409,7 @@ export function TeacherDashboard() {
                           <Sparkles /> Answer Examples (Few-shot Prompting)
                         </CardTitle>
                         <CardDescription>
-                          Show the AI what a good response looks like. It learns
-                          from your examples.
+                          Show the AI what a good response looks like. It learns from your examples.
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
@@ -445,48 +417,30 @@ export function TeacherDashboard() {
                           <FormLabel>Example Good Answers</FormLabel>
                           <div className='space-y-2'>
                             {fields.map((field, index) => (
-                              <div
-                                key={field.id}
-                                className='flex items-center gap-2'
-                              >
+                              <div key={field.id} className='flex items-center gap-2'>
                                 <FormField
                                   control={form.control}
                                   name={`exampleAnswers.${index}.value`}
                                   render={({ field }) => (
                                     <FormItem className='flex-grow'>
                                       <FormControl>
-                                        <Input
-                                          placeholder={`Example ${index + 1}`}
-                                          {...field}
-                                        />
+                                        <Input placeholder={`Example ${index + 1}`} {...field} />
                                       </FormControl>
                                       <FormMessage />
                                     </FormItem>
                                   )}
                                 />
-                                <Button
-                                  type='button'
-                                  variant='ghost'
-                                  size='icon'
-                                  onClick={() => remove(index)}
-                                  aria-label='Remove example'
-                                >
+                                <Button type='button' variant='ghost' size='icon' onClick={() => remove(index)} aria-label='Remove example'>
                                   <X className='h-4 w-4' />
                                 </Button>
                               </div>
                             ))}
                           </div>
-                          <Button
-                            type='button'
-                            variant='outline'
-                            size='sm'
-                            onClick={() => append({ value: '' })}
-                          >
+                          <Button type='button' variant='outline' size='sm' onClick={() => append({ value: '' })}>
                             Add Example
                           </Button>
                           <FormDescription>
-                            Show the AI what a good hint or guiding question
-                            looks like.
+                            Show the AI what a good hint or guiding question looks like.
                           </FormDescription>
                         </div>
                       </CardContent>
@@ -499,11 +453,7 @@ export function TeacherDashboard() {
                       className='animate-fade-in-up group transition-all duration-300 ease-in-out hover:scale-105'
                       style={{ animationDelay: '0.4s' }}
                     >
-                      {isSaving ? (
-                        <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                      ) : (
-                        <BookCopy className='mr-2 h-4 w-4' />
-                      )}
+                      {isSaving ? <Loader2 className='mr-2 h-4 w-4 animate-spin' /> : <BookCopy className='mr-2 h-4 w-4' />}
                       Save for {selectedSubject || '...'}
                     </Button>
                   </>
@@ -523,15 +473,12 @@ export function TeacherDashboard() {
                   </CardTitle>
                   <CardDescription>
                     See how the AI will respond with your current settings for{' '}
-                    {selectedSubject || 'this subject'}.
+                    <span className='font-bold text-accent'>{selectedSubject || 'this subject'}</span>.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Form {...testForm}>
-                    <form
-                      onSubmit={testForm.handleSubmit(onTest)}
-                      className='space-y-4'
-                    >
+                    <form onSubmit={testForm.handleSubmit(onTest)} className='space-y-4'>
                       <FormField
                         control={testForm.control}
                         name='studentQuestion'
@@ -539,24 +486,14 @@ export function TeacherDashboard() {
                           <FormItem>
                             <FormLabel>Student's Question</FormLabel>
                             <FormControl>
-                              <Textarea
-                                placeholder='e.g., How do I solve for x in 2x + 5 = 15?'
-                                {...field}
-                                className='animate-glow'
-                              />
+                              <Textarea placeholder='e.g., How do I solve for x in 2x + 5 = 15?' {...field} className='animate-glow' />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                      <Button
-                        type='submit'
-                        disabled={isTesting || !selectedSubject}
-                        className='w-full'
-                      >
-                        {isTesting ? (
-                          <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                        ) : null}
+                      <Button type='submit' disabled={isTesting || !selectedSubject} className='w-full'>
+                        {isTesting ? <Loader2 className='mr-2 h-4 w-4 animate-spin' /> : null}
                         Run Test
                       </Button>
                     </form>
@@ -565,14 +502,10 @@ export function TeacherDashboard() {
                   {testResult && (
                     <Alert>
                       <Bot className='h-4 w-4' />
-                      <AlertTitle className='font-headline'>
-                        AI Response
-                      </AlertTitle>
+                      <AlertTitle className='font-headline'>AI Response</AlertTitle>
                       <AlertDescription>
                         <div className='prose-sm dark:prose-invert max-w-none whitespace-pre-wrap'>
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                            {testResult}
-                          </ReactMarkdown>
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{testResult}</ReactMarkdown>
                         </div>
                       </AlertDescription>
                     </Alert>
@@ -583,7 +516,7 @@ export function TeacherDashboard() {
           </div>
         </TabsContent>
 
-        {/* CONTENT for the "Custom Knowledge" tab. It just renders the RagManagement component. */}
+        {/* CONTENT for the "Custom Knowledge" tab. It just renders the RagManagement component mockup. */}
         <TabsContent value='rag'>
           <RagManagement />
         </TabsContent>

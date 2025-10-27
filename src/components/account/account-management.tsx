@@ -1,19 +1,24 @@
-// Copyright (C) 2025 Akshay K Rooben abraham
+// Copyright (C) 2025 Akshay K Rooben Abraham
 /**
- * @fileoverview Account Management Component (`account-management.tsx`)
+ * @fileoverview Account Management Component (`account-management.tsx`).
+ * @copyright Copyright (C) 2025 Akshay K Rooben Abraham. All rights reserved.
  *
- * C-like Analogy:
+ * @description
  * This file defines the UI and logic for the "Account Management" page.
- * Think of it as a dedicated C module (`account_ui.c`) that is responsible for:
+ * It is responsible for:
  * 1.  Displaying a form with the user's current profile information (name, email, class, etc.).
  * 2.  Handling user input to change this information.
- * 3.  Validating the input to make sure it's correct (e.g., email has a valid format).
- * 4.  Submitting the updated data to the database (Firebase Auth and Firestore).
- * 5.  Providing options for security actions like resetting a password or deleting data.
+ * 3.  Validating the input to ensure it's correct (e.g., email has a valid format).
+ * 4.  Submitting the updated data to Firebase Auth and Firestore.
+ * 5.  Providing security actions like resetting a password or deleting chat history.
  *
- * It uses a powerful library called `react-hook-form` to manage the form's state,
- * validation, and submission. This is like using a pre-built GUI library in C to
- * handle all the complexities of form management instead of writing it all from scratch.
+ * C-like Analogy:
+ * Think of this as a dedicated C module (`account_ui.c`) that handles a complex
+ * settings screen. It uses a powerful library (`react-hook-form`) to manage the
+ * form's state, validation, and submission, much like using a pre-built GUI library
+ * in C (like GTK or Qt) to avoid writing all the complex input and state management
+ * from scratch. It handles fetching current data, validating new data, and writing
+ * it back to the database.
  */
 'use client';
 
@@ -80,6 +85,8 @@ import {
   getSubjectsForClasses,
   type ClassData,
 } from '@/lib/subjects-data';
+import type { UserProfile, School } from '@/types';
+import { COLLECTIONS } from '@/lib/constants';
 
 // `zod` is used to define the "schema" or structure of our form data.
 // It's like defining a `struct` in C and also providing validation rules for each member.
@@ -94,36 +101,28 @@ const profileSchema = z.object({
   subjectsTaught: z.array(z.string()).optional(),
 });
 
-// A type definition derived from the schema, like `typedef struct ProfileFormDataType {...}`
+// A type definition derived from the schema, like `typedef struct ProfileFormData {...}`
 type ProfileFormData = z.infer<typeof profileSchema>;
 
-// A type for the user's profile data stored in Firestore.
-interface UserInfo {
-  name: string;
-  email: string;
-  school: string;
-  role: 'student' | 'teacher';
-  class?: string;
-  classesTaught?: string[];
-  subjectsTaught?: string[];
-}
-
 /**
+ * The main component for the account management UI.
+ *
+ * @returns {JSX.Element} The rendered account management form and settings.
+ *
  * C-like Explanation: `function AccountManagement() -> returns JSX_Element`
  *
- * This is the main component function for the account management UI.
- *
  * Internal State (Global Variables for this function):
- *   - `isSaving`, `isDeletingChat`, `isResetting`: Boolean flags to show loading spinners.
+ *   - `isSaving`, `isDeletingChat`, `isResetting`: Boolean flags to show loading spinners on buttons.
  *   - `userInfo`: A struct-like object to hold the user's full profile from Firestore.
- *   - `availableSubjects`: An array of strings for the subjects a teacher can select.
+ *   - `availableSubjects`: An array of strings for the subjects a teacher can select, updated dynamically.
  *
  * Hooks (Special Lifecycle Functions):
  *   - `useUser`, `useFirebase`: Get access to auth status and database services.
  *   - `useToast`: Get a function to show pop-up notifications.
- *   - `useForm`: The main hook from `react-hook-form` to manage the entire form.
+ *   - `useForm`: The main hook from `react-hook-form` to manage the entire form state, validation, and submission.
  *   - `useEffect`: Used to fetch the user's full profile when the component first loads
- *     and to react to changes (like when a teacher changes the classes they teach).
+ *     and to react to changes (like when a teacher changes the classes they teach, which
+ *     triggers a recalculation of available subjects).
  */
 export function AccountManagement() {
   const { user } = useUser();
@@ -134,14 +133,14 @@ export function AccountManagement() {
   const [isSaving, setIsSaving] = useState(false);
   const [isDeletingChat, setIsDeletingChat] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [userInfo, setUserInfo] = useState<UserProfile | null>(null);
   const [availableSubjects, setAvailableSubjects] = useState<string[]>([]);
 
-  // Initialize the form using the `useForm` hook.
+  // Initialize the form using the `useForm` hook from `react-hook-form`.
   const form = useForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema), // Use our Zod schema for validation.
+    resolver: zodResolver(profileSchema), // Use our Zod schema for live validation.
     defaultValues: {
-      // Initial values before data is loaded.
+      // Initial values before data is loaded from the database.
       name: '',
       email: '',
       school: 'Girideepam Bethany Central School',
@@ -151,34 +150,40 @@ export function AccountManagement() {
     },
   });
 
-  const selectedClasses = form.watch('classesTaught'); // Watch for changes to this specific field.
+  // `form.watch` allows us to subscribe to changes in a specific form field.
+  const selectedClasses = form.watch('classesTaught');
 
-  // This `useEffect` hook runs when `selectedClasses` changes.
-  // Its job is to update the list of available subjects for a teacher.
+  // This `useEffect` hook runs whenever `selectedClasses` changes.
+  // Its job is to update the list of available subjects a teacher can select.
   useEffect(() => {
     if (
       userInfo?.role === 'teacher' &&
       selectedClasses &&
       selectedClasses.length > 0
     ) {
+      // Get the corresponding subjects for the selected classes.
       const subjects = getSubjectsForClasses(selectedClasses);
       setAvailableSubjects(subjects.map((s) => s.name));
-      // Reset the selected subjects if the classes they are based on have changed.
+      // Reset the selected subjects if the classes they are based on have changed,
+      // to prevent invalid selections.
       form.setValue('subjectsTaught', []);
     } else {
+      // If no classes are selected, there are no subjects to choose from.
       setAvailableSubjects([]);
     }
   }, [selectedClasses, userInfo?.role, form]);
 
-  // `useCallback` is an optimization. It "memoizes" the function, meaning it won't
-  // be recreated on every render unless its dependencies change.
-  // This function fetches the complete user profile from Firestore.
+  /**
+   * Fetches the complete user profile from Firestore and populates the form.
+   * `useCallback` is an optimization. It "memoizes" the function, meaning it won't
+   * be recreated on every render unless its dependencies (user, firestore, form) change.
+   */
   const fetchUserInfo = useCallback(async () => {
     if (user && firestore) {
-      const userDocRef = doc(firestore, 'users', user.uid);
+      const userDocRef = doc(firestore, COLLECTIONS.USERS, user.uid);
       const userDoc = await getDoc(userDocRef);
       if (userDoc.exists()) {
-        const data = userDoc.data() as UserInfo;
+        const data = userDoc.data() as UserProfile;
         setUserInfo(data);
         // Once data is fetched, reset the form with these new default values.
         form.reset({
@@ -189,6 +194,7 @@ export function AccountManagement() {
           classesTaught: data.classesTaught || [],
           subjectsTaught: data.subjectsTaught || [],
         });
+        // If the user is a teacher, pre-calculate the available subjects.
         if (data.role === 'teacher' && data.classesTaught) {
           const subjects = getSubjectsForClasses(data.classesTaught);
           setAvailableSubjects(subjects.map((s) => s.name));
@@ -203,9 +209,10 @@ export function AccountManagement() {
   }, [fetchUserInfo]);
 
   /**
-   * C-like Explanation: `async function onProfileSubmit(values)`
-   * This function is the callback that gets executed when the user clicks "Save Changes".
-   * `react-hook-form` automatically handles collecting the data into the `values` struct.
+   * The callback function that gets executed when the main profile form is submitted.
+   * `react-hook-form` automatically handles collecting the data into the `values` object.
+   *
+   * @param {ProfileFormData} values - The validated data from the form.
    */
   async function onProfileSubmit(values: ProfileFormData) {
     if (!user || !userInfo) return;
@@ -217,16 +224,17 @@ export function AccountManagement() {
         await updateProfile(user, { displayName: values.name });
       }
       if (values.email !== user.email) {
-        await updateEmail(user, values.email); // Note: This might require re-authentication.
+        // Note: This operation is sensitive and might require recent re-authentication.
+        await updateEmail(user, values.email);
       }
 
       // --- Update Firestore Document Profile ---
-      // This updates our custom user profile document in the database.
-      const userDocRef = doc(firestore, 'users', user.uid);
-      const updateData: Partial<UserInfo> = {
+      // This updates our custom user profile document in the `users` collection.
+      const userDocRef = doc(firestore, COLLECTIONS.USERS, user.uid);
+      const updateData: Partial<UserProfile> = {
         name: values.name,
         email: values.email,
-        school: values.school,
+        school: values.school as School,
       };
       if (userInfo.role === 'student') {
         updateData.class = values.class;
@@ -237,7 +245,7 @@ export function AccountManagement() {
       await updateDoc(userDocRef, updateData);
 
       // --- Update Local Session Storage ---
-      // This keeps the locally cached user info in sync.
+      // This keeps the locally cached user info in `sessionStorage` in sync.
       const storedInfo = sessionStorage.getItem('lyra-user-info');
       if (storedInfo) {
         const currentInfo = JSON.parse(storedInfo);
@@ -265,8 +273,7 @@ export function AccountManagement() {
   }
 
   /**
-   * C-like Explanation: `async function handlePasswordReset()`
-   * This function sends a password reset email using Firebase's built-in functionality.
+   * Sends a password reset email using Firebase's built-in functionality.
    */
   async function handlePasswordReset() {
     if (!user?.email) return;
@@ -292,10 +299,9 @@ export function AccountManagement() {
   }
 
   /**
-   * C-like Explanation: `async function handleDeleteChatHistory()`
-   * This function deletes all documents in the user's `chatSessions` subcollection.
+   * Deletes all documents in the user's `chatSessions` subcollection.
    * It uses a "batch write" for efficiency, which groups multiple delete operations
-   * into a single request to the server.
+   * into a single request to the server, making it faster and more atomic.
    */
   async function handleDeleteChatHistory() {
     if (!user) return;
@@ -303,9 +309,9 @@ export function AccountManagement() {
 
     const chatSessionsRef = collection(
       firestore,
-      'users',
+      COLLECTIONS.USERS,
       user.uid,
-      'chatSessions',
+      COLLECTIONS.CHAT_SESSIONS,
     );
     const snapshot = await getDocs(chatSessionsRef);
 
@@ -334,7 +340,7 @@ export function AccountManagement() {
   }
 
   // Options for the UI dropdowns.
-  const schoolOptions = ['Girideepam Bethany Central School'];
+  const schoolOptions: School[] = ['Girideepam Bethany Central School'];
   const groupedClasses = allClasses.reduce(
     (acc, currentClass) => {
       const grade = `Grade ${currentClass.grade}`;
@@ -365,10 +371,10 @@ export function AccountManagement() {
       </div>
 
       {/*
-          The `<Form {...form}>` component is a "Provider" from `react-hook-form`.
-          It's like making the `form` object (with all its state and functions) globally
-          available to all the child components nested inside it.
-        */}
+        The `<Form {...form}>` component is a "Provider" from `react-hook-form`.
+        It's like making the `form` object (with all its state and functions) globally
+        available to all the child components nested inside it, like `<FormField>`.
+      */}
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onProfileSubmit)}
@@ -384,10 +390,10 @@ export function AccountManagement() {
             </CardHeader>
             <CardContent className='space-y-6'>
               {/*
-                          Each `<FormField>` is a controlled component from `react-hook-form`.
-                          It links a specific UI input (like `<Input>`) to a field in our form schema
-                          (e.g., "name"), automatically handling its value, changes, and validation errors.
-                        */}
+                Each `<FormField>` is a controlled component from `react-hook-form`.
+                It links a specific UI input (like `<Input>`) to a field in our form schema
+                (e.g., "name"), automatically handling its value, changes, and validation errors.
+              */}
               <FormField
                 control={form.control}
                 name='name'
@@ -566,7 +572,7 @@ export function AccountManagement() {
         </CardContent>
       </Card>
 
-      {/* Danger Zone Card */}
+      {/* Danger Zone Card for destructive actions */}
       <Card className='border-destructive bg-destructive/5'>
         <CardHeader>
           <CardTitle className='flex items-center gap-2 font-headline text-2xl text-destructive'>
@@ -585,9 +591,10 @@ export function AccountManagement() {
               </p>
             </div>
             {/*
-                      An `<AlertDialog>` is a special type of modal that forces the user
-                      to make a choice before continuing. It's used for destructive actions.
-                    */}
+              An `<AlertDialog>` is a special type of modal that forces the user
+              to make a choice before continuing. It's used for destructive actions
+              to prevent accidental data loss.
+            */}
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant='destructive' disabled={isDeletingChat}>

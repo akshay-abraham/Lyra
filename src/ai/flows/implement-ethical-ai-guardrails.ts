@@ -1,18 +1,22 @@
-// Copyright (C) 2025 Akshay K Rooben abraham
+// Copyright (C) 2025 Akshay K Rooben Abraham
 /**
- * @fileoverview Flow to Implement Ethical AI Guardrails (`implement-ethical-ai-guardrails.ts`)
+ * @fileoverview Flow to Implement Ethical AI Guardrails (`implement-ethical-ai-guardrails.ts`).
+ * @copyright Copyright (C) 2025 Akshay K Rooben Abraham. All rights reserved.
  *
- * C-like Analogy:
+ * @description
  * This file defines a foundational AI capability focused on safety and ethics. Its
  * main purpose is to ensure that any AI response adheres to a predefined set of
- * ethical rules (the "guardrails").
+ * ethical rules (the "guardrails") defined in a system prompt.
  *
  * While other flows focus on specific tasks (like tutoring), this one is more general.
  * It takes a user's input and a system prompt defining the rules, and it generates a
  * response that complies with those rules. In a more complex system, this might be
- * chained with other flows as a final safety check.
+ * chained with other flows as a final safety check before sending a response to the user.
  *
- * The primary exported function is `implementEthicalAIGuardrails`.
+ * C-like Analogy:
+ * This is like a validation or sanitization function. `char* sanitize_response(const char* input, const char* rules);`.
+ * It takes raw input, applies a set of rules, and produces a "safe" output. Here, the
+ * "sanitization" is done by an AI that understands the rules.
  */
 'use server';
 
@@ -22,12 +26,18 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
 /**
- * C-like Analogy: Input Struct Definition
+ * @typedef {object} ImplementEthicalAIGuardrailsInput
+ * @description The input schema for the ethical guardrails flow.
  *
+ * C-like Analogy: Input Struct Definition
+ * ```c
  * typedef struct {
  *     char* userInput;       // The input text from the user.
  *     char* systemPrompt;    // The set of rules (guardrails) the AI must follow.
  * } ImplementEthicalAIGuardrailsInput;
+ * ```
+ * @property {string} userInput - The user input or question.
+ * @property {string} systemPrompt - The system prompt defining the AI tutor's behavior and ethical guidelines.
  */
 const ImplementEthicalAIGuardrailsInputSchema = z.object({
   userInput: z.string().describe('The user input or question.'),
@@ -43,11 +53,16 @@ export type ImplementEthicalAIGuardrailsInput = z.infer<
 >;
 
 /**
- * C-like Analogy: Output Struct Definition
+ * @typedef {object} ImplementEthicalAIGuardrailsOutput
+ * @description The output schema for the ethical guardrails flow.
  *
+ * C-like Analogy: Output Struct Definition
+ * ```c
  * typedef struct {
  *     char* aiResponse; // The final, safety-checked AI response.
  * } ImplementEthicalAIGuardrailsOutput;
+ * ```
+ * @property {string} aiResponse - The AI tutor's response, adhering to ethical guidelines.
  */
 const ImplementEthicalAIGuardrailsOutputSchema = z.object({
   aiResponse: z
@@ -60,9 +75,16 @@ export type ImplementEthicalAIGuardrailsOutput = z.infer<
 >;
 
 /**
- * C-like Analogy: `ImplementEthicalAIGuardrailsOutput* implementEthicalAIGuardrails(ImplementEthicalAIGuardrailsInput* input)`
+ * The main exported function. It's a simple wrapper that calls the internal Genkit flow.
  *
- * This is the main exported function. It's a simple wrapper that calls the internal Genkit flow.
+ * @param {ImplementEthicalAIGuardrailsInput} input - The input data containing the user message and system prompt.
+ * @returns {Promise<ImplementEthicalAIGuardrailsOutput>} A promise that resolves with the AI's compliant response.
+ *
+ * C-like Analogy:
+ * ```c
+ * // The public API function defined in a header file.
+ * ImplementEthicalAIGuardrailsOutput* implementEthicalAIGuardrails(ImplementEthicalAIGuardrailsInput* input);
+ * ```
  */
 export async function implementEthicalAIGuardrails(
   input: ImplementEthicalAIGuardrailsInput,
@@ -71,13 +93,13 @@ export async function implementEthicalAIGuardrails(
 }
 
 /**
- * C-like Analogy: The AI Prompt Template (like a `printf` format string)
+ * The AI Prompt Template. This is a very straightforward prompt that simply
+ * combines the system prompt (the rules) with the user's input and asks the
+ * AI to generate a response based on them.
  *
- * This is a very straightforward prompt. It simply combines the system prompt
- * (the rules) with the user's input, and asks the AI to generate a response.
- *
- * - `{{systemPrompt}}`: The ethical guardrails and behavior rules.
- * - `{{{userInput}}}`: The user's message.
+ * C-like Analogy: A `printf` format string for the AI.
+ * `const char* PROMPT_TEMPLATE = "%s\n\nUser Input: %s";`
+ * `sprintf(final_prompt, PROMPT_TEMPLATE, system_prompt, user_input);`
  */
 const ethicalAIGuardrailsPrompt = ai.definePrompt({
   name: 'ethicalAIGuardrailsPrompt',
@@ -87,9 +109,10 @@ const ethicalAIGuardrailsPrompt = ai.definePrompt({
 });
 
 /**
- * C-like Analogy: The Core Logic Function
+ * The core logic function, defining the Genkit "flow".
  *
- * This defines the Genkit "flow", the managed server-side function that does the work.
+ * @param {object} config - The flow's configuration.
+ * @param {function(ImplementEthicalAIGuardrailsInput): Promise<ImplementEthicalAIGuardrailsOutput>} flowFunction - The async function that performs the work.
  */
 const implementEthicalAIGuardrailsFlow = ai.defineFlow(
   {

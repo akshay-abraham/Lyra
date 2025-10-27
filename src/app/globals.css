@@ -1,45 +1,56 @@
 /*
-  This is the main global stylesheet for the entire application.
-  It works in layers, similar to how layers are used in image editing software.
+  @fileoverview Global Stylesheet (`globals.css`).
+  @copyright Copyright (C) 2025 Akshay K Rooben Abraham. All rights reserved.
 
-  1. `@tailwind base`: This brings in Tailwind CSS's foundational styles.
-     It's a "reset" stylesheet that makes browsers render elements more consistently.
-     For example, it removes default margins from many elements.
+  @description
+  This is the main global stylesheet for the entire application. It uses Tailwind CSS's
+  `@layer` directive to structure the CSS in a logical order, similar to how layers
+  are used in image editing software.
 
-  2. `@tailwind components`: This layer is for component-specific styles.
-     Tailwind can inject styles for pre-built components here.
+  1. `@tailwind base`: This brings in Tailwind CSS's foundational styles. It's a
+     "reset" stylesheet that makes browsers render elements more consistently across
+     different vendors (e.g., removes default margins, sets box-sizing).
+
+  2. `@tailwind components`: This layer is for component-specific styles that are
+     composed of utility classes. For example, a custom `.btn-primary` class could
+     be defined here.
 
   3. `@tailwind utilities`: This is the most important layer. It brings in all of
-     Tailwind's utility classes like `p-4` (padding), `flex` (flexbox), `text-white`, etc.
+     Tailwind's utility classes like `p-4` (padding), `flex` (flexbox), `text-white`,
+     etc. These are the building blocks for styling components directly in the JSX.
 
-  Think of it as setting up the "standard library" of styles for the project.
+  C-like Analogy:
+  Think of this file as a global `style_config.h`. The `@layer base` section,
+  especially where we define CSS variables, is like a series of `#define` statements
+  for global constants that can be reused throughout the application's styling.
 */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /*
-  The `@layer base` directive allows us to add our own custom base styles.
-  It's like defining global variables or default styles for HTML tags.
+  The `@layer base` directive allows us to add our own custom base styles or
+  override default styles provided by Tailwind. It's like defining global
+  variables or default styles for core HTML tags.
 */
 @layer base {
   /*
     The `:root` selector targets the root element of the document (the `<html>` tag).
     This is where we define our CSS Custom Properties (variables) for our color theme.
-    This is the "light mode" theme.
+    This block defines the default "light mode" theme.
 
     C-like Analogy:
     Think of these as global constants defined with `#define` in C.
-    For example: `#define BACKGROUND_COLOR "0 0% 100%"`
-    These variables can then be reused throughout the CSS.
+    For example: `#define BACKGROUND_COLOR_HSL "0 0% 100%"`
+    These variables can then be reused throughout the CSS using `hsl(var(--variable-name))`.
 
     The values are in HSL (Hue, Saturation, Lightness) format without the `hsl()` part.
-    This is a requirement for how ShadCN UI (our component library) works.
-    For example, `background: 0 0% 100%` corresponds to `hsl(0, 0%, 100%)`, which is white.
+    This is a requirement for how ShadCN UI (our component library) dynamically
+    builds color classes like `bg-primary` or `text-destructive`.
   */
   :root {
     --background: 0 0% 100%;
-    --foreground: 222.2 47.4% 11.2%; /* Text color */
+    --foreground: 222.2 47.4% 11.2%; /* Main text color */
     --card: 0 0% 100%;
     --card-foreground: 222.2 47.4% 11.2%;
     --popover: 0 0% 100%;
@@ -56,7 +67,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%; /* Default border color */
     --input: 214.3 31.8% 91.4%; /* Input field background */
-    --ring: 262.1 83.3% 57.8%; /* Color for focus rings */
+    --ring: 262.1 83.3% 57.8%; /* Color for focus rings on interactive elements */
     --chart-1: 210 40% 98%;
     --chart-2: 150 40% 98%;
     --chart-3: 30 40% 98%;
@@ -64,7 +75,7 @@
     --chart-5: 330 40% 98%;
     --radius: 0.75rem; /* Default border radius for rounded corners */
 
-    /* Custom variables for the sidebar component */
+    /* Custom variables specifically for the sidebar component */
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 222.2 47.4% 11.2%;
     --sidebar-primary: 262.1 83.3% 57.8%;
@@ -118,15 +129,15 @@
 }
 
 /*
-  This is another `@layer base` block. You can have multiple.
-  Here, we're defining some truly global styles.
+  This is another `@layer base` block. It's perfectly fine to have multiple.
+  Here, we're defining some truly global styles that apply to all elements.
 */
 @layer base {
   /*
     The `*` is a universal selector. It applies these styles to EVERY element.
     Here, we're making every element's border color default to our `--border` variable.
     The `@apply` directive is a Tailwind feature that lets you use utility classes
-    inside your CSS.
+    directly inside your CSS file, which is useful for setting defaults.
   */
   * {
     @apply border-border;
@@ -134,7 +145,7 @@
   /*
     This applies default background and text colors to the entire `<body>` of the page.
     It uses the CSS variables we defined above, so it will automatically adapt to
-    light or dark mode.
+    light or dark mode based on the presence of the `.dark` class on the `<html>` tag.
   */
   body {
     @apply bg-background text-foreground;
@@ -142,8 +153,9 @@
 
   /*
     This defines a custom animation called `glow`.
-    `@keyframes` is standard CSS for creating animations.
-    This animation creates a pulsing shadow effect using the primary theme color.
+    `@keyframes` is standard CSS for creating animations. This animation creates a
+    subtle, pulsing shadow effect using the primary theme color, giving a "glow"
+    to important elements like input fields.
   */
   @keyframes glow {
     0%,
@@ -156,7 +168,7 @@
   }
   /*
     This creates a utility class `.animate-glow` that we can add to any element
-    to apply our custom `glow` animation.
+    in our JSX to apply our custom `glow` animation.
   */
   .animate-glow {
     animation: glow 3s ease-in-out infinite;
@@ -164,7 +176,7 @@
 
   /*
     Another custom animation. This one cycles the border color of an element
-    through a series of bright, gradient-like colors.
+    through a series of bright, gradient-like colors, creating a "living" border effect.
   */
   @keyframes colorful-border {
     0% {
@@ -185,7 +197,7 @@
   }
 
   /*
-    A utility class to apply the colorful border animation.
+    A utility class to apply the colorful border animation to an element.
   */
   .animate-colorful-border {
     border-width: 1px;
@@ -195,8 +207,9 @@
 
   /*
     A utility class to create gradient-colored text.
-    It applies a background gradient and then "clips" the background to the text,
-    making the text itself appear to be a gradient.
+    It applies a background gradient and then "clips" that background to the text,
+    making the text itself appear to be a gradient. The text color is set to
+    transparent to allow the background gradient to show through.
   */
   .gradient-text {
     background: linear-gradient(
@@ -211,7 +224,7 @@
     animation: gradient-animation 4s ease infinite;
   }
 
-  /* The animation that makes the text gradient shift over time. */
+  /* The animation that makes the text gradient shift its position over time. */
   @keyframes gradient-animation {
     0% {
       background-position: 0% 50%;

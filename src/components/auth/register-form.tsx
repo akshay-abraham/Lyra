@@ -1,25 +1,27 @@
 // Copyright (C) 2025 Akshay K Rooben Abraham
 /**
- * @fileoverview Registration Form Component (`register-form.tsx`)
- * @copyright Copyright (C) 2025 Akshay K Rooben Abraham
+ * @fileoverview Registration Form Component (`register-form.tsx`).
+ * @copyright Copyright (C) 2025 Akshay K Rooben Abraham. All rights reserved.
  *
  * @description
- * This file defines the UI and logic for the user registration screen. It's a more
- * complex form than the login form. It is responsible for:
+ * This file defines the UI and logic for the user registration screen. It is one of the
+ * most complex forms in the application, responsible for:
  * 1.  Displaying input fields for name, email, password, role, school, class, etc.
- * 2.  Conditionally showing/hiding fields based on the user's selected role.
- * 3.  Performing real-time password strength validation and providing feedback.
- * 4.  Validating all inputs against a complex set of rules.
+ * 2.  Conditionally showing/hiding fields based on the user's selected role (student vs. teacher).
+ * 3.  Performing real-time password strength validation and providing visual feedback.
+ * 4.  Validating all inputs against a complex set of rules using Zod, including custom
+ *     cross-field validation (e.g., ensuring password and confirm password match).
  * 5.  Creating a new user account with Firebase Authentication.
- * 6.  Creating a corresponding user profile document in the Firestore database.
- * 7.  Handling success (redirecting) and error (showing a notification) scenarios.
+ * 6.  Creating a corresponding user profile document in the Firestore database with the correct structure.
+ * 7.  Handling success (redirecting) and error (showing notifications) scenarios.
  *
  * C-like Analogy:
- * Think of it as a dedicated module (`register_ui.c`) for the registration screen.
- * Like the login form, it relies heavily on `react-hook-form` and `zod` to manage
+ * This is a major module, like `register_ui.c`, handling a multi-step, complex data
+ * entry form. It relies heavily on libraries (`react-hook-form` and `zod`) to manage
  * the form's complexity, abstracting away much of the manual state and validation logic.
+ * It's a prime example of composing smaller UI components (`Input`, `Select`, `Card`)
+ * into a larger, functional feature.
  */
-
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -67,9 +69,11 @@ import {
 import { Progress } from '../ui/progress';
 import { cn } from '@/lib/utils';
 import { calculatePasswordStrength } from '@/lib/utils';
+import { COLLECTIONS } from '@/lib/constants';
+import type { UserProfile, UserRole, School } from '@/types';
 
-// This Zod schema is more complex. It defines validation rules for all possible fields.
-// It also uses `.refine()` for custom validation logic that depends on multiple fields.
+// This Zod schema is more complex. It defines validation rules for all possible fields
+// and uses `.refine()` for custom validation logic that depends on multiple fields.
 const formSchema = z
   .object({
     name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -129,8 +133,9 @@ const formSchema = z
 /**
  * The main component function for the registration form.
  *
- * C-like Analogy:
- * This is the main function for the registration UI.
+ * @returns {JSX.Element} The JSX for the registration form.
+ *
+ * C-like Explanation: `function RegisterForm() -> returns JSX_Element`
  *
  * Internal State (Global Variables for this function):
  *   - `isSubmitting`: A boolean flag for the submit button's loading state.
@@ -138,8 +143,6 @@ const formSchema = z
  *   - `passwordStrength`: An integer (0-100) representing the current password's strength.
  *   - `strengthColor`: A string for the color of the password strength bar.
  *   - `showPassword`, `showConfirmPassword`: Booleans to toggle password visibility.
- *
- * @returns {JSX.Element} The JSX for the registration form.
  */
 export function RegisterForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -175,8 +178,8 @@ export function RegisterForm() {
   const password = form.watch('password');
 
   // This `useEffect` hook runs whenever the `password` value changes.
+  // It calculates the strength and updates the state for the progress bar.
   useEffect(() => {
-    // It calculates the strength and updates the state for the progress bar.
     const strength = calculatePasswordStrength(password);
     setPasswordStrength(strength);
 
@@ -208,16 +211,14 @@ export function RegisterForm() {
   }, [selectedClasses, selectedRole, form]);
 
   /**
-   * Handles the form submission for registration.
-   * C-like Analogy: This is the callback for form submission.
-   * `data` is a struct (`z.infer<typeof formSchema>`) containing the validated form data.
+   * Handles the form submission for registration after validation passes.
    *
    * @param {z.infer<typeof formSchema>} data - The validated form data.
    */
   const handleRegisterSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     try {
-      // 1. Create the user in Firebase Authentication.
+      // 1. Create the user in Firebase Authentication with email and password.
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         data.email,
@@ -227,16 +228,16 @@ export function RegisterForm() {
 
       if (user) {
         // 2. Prepare the user profile data for Firestore.
-        const userProfileData: any = {
+        const userProfileData: Partial<UserProfile> = {
           uid: user.uid,
           name: data.name,
           email: data.email,
-          role: data.role,
-          school: data.school,
-          createdAt: serverTimestamp(), // Use the database's timestamp.
+          role: data.role as UserRole,
+          school: data.school as School,
+          createdAt: serverTimestamp(), // Use the database's timestamp for consistency.
         };
 
-        // Add role-specific fields.
+        // Add role-specific fields to the profile data object.
         if (data.role === 'student') {
           userProfileData.class = data.class;
         } else {
@@ -244,12 +245,12 @@ export function RegisterForm() {
           userProfileData.subjectsTaught = data.subjectsTaught;
         }
 
-        // 3. Create the user profile document in the 'users' collection.
-        const userDocRef = doc(firestore, 'users', user.uid);
+        // 3. Create the user profile document in the 'users' collection in Firestore.
+        const userDocRef = doc(firestore, COLLECTIONS.USERS, user.uid);
         // `setDoc` creates or overwrites a document with the given data.
         await setDoc(userDocRef, userProfileData);
 
-        // 4. Store user info in session storage for quick access.
+        // 4. Store user info in session storage for quick access in the current session.
         sessionStorage.setItem(
           'lyra-user-info',
           JSON.stringify(userProfileData),
@@ -286,7 +287,7 @@ export function RegisterForm() {
   };
 
   // Prepare options for the various dropdowns in the form.
-  const schoolOptions = ['Girideepam Bethany Central School'];
+  const schoolOptions: School[] = ['Girideepam Bethany Central School'];
   const groupedClasses = allClasses.reduce(
     (acc, currentClass) => {
       const grade = `Grade ${currentClass.grade}`;

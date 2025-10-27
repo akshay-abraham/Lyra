@@ -1,24 +1,27 @@
 // Copyright (C) 2025 Akshay K Rooben Abraham
 /**
- * @fileoverview About Page (`/about`)
- * @copyright Copyright (C) 2025 Akshay K Rooben Abraham
+ * @fileoverview About Page (`/about`).
+ * @copyright Copyright (C) 2025 Akshay K Rooben Abraham. All rights reserved.
  *
  * @description
- * This file renders the static "About Lyra" page, which explains the project's
- * motivation, the technology it uses, and its open-source license.
+ * This file renders the static "About Lyra" page. It explains the project's
+ * motivation, the core technologies it uses (RAG, Vector DBs, Prompt Engineering),
+ * and its open-source license. As a static page, it doesn't involve complex state
+ * management or user interactions.
  *
  * C-like Analogy:
  * This file is like a very simple C program that only uses `printf` statements
- * to display static information to the console. It doesn't take any user input
- * or have complex logic. Its sole purpose is to render a pre-defined screen.
+ * to display pre-defined, static information to the console. It takes no user
+ * input and has no complex logic. Its sole purpose is to render a pre-written
+ * screen of information.
  *
- * It's a "Server Component" by default in Next.js, meaning it runs on the server
- * to generate the HTML, which is then sent to the user's browser. This is very
- * efficient for static pages like this one.
+ * In Next.js, this is a "Server Component" by default. This means the server
+ * generates the complete HTML for the page, which is then sent to the user's
+ * browser. This is very efficient for pages with static content like this one.
  */
 
 // Like `#include` in C, these lines import necessary "libraries" or components.
-// We are importing UI components (like Card, Button) and icons.
+// We are importing UI components (like Card, Button) and icons to build the page.
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   BrainCircuit,
@@ -37,26 +40,26 @@ import Image from 'next/image'; // Next.js's optimized image component.
  * In Next.js, a file named `page.tsx` inside a folder (like `/about`)
  * automatically becomes a page accessible at that URL (e.g., your-website.com/about).
  *
+ * @returns {JSX.Element} The JSX code that represents the page's structure and content.
+ *
  * C-like Analogy:
  * Think of this as the `main()` function for this specific page. Its `return`
- * value is what gets "printed" to the user's screen.
- *
- * @returns {JSX.Element} The JSX code that represents the page's structure and content.
+ * value is the visual output that gets "printed" to the user's screen.
  */
 export default function AboutPage() {
   // The `return` statement contains the JSX that defines the page's structure.
   // It's like a series of nested `printf` statements building the visual layout.
   return (
     // All content is wrapped in `<SidebarLayout>`, which provides the consistent
-    // navigation sidebar and overall page structure.
+    // navigation sidebar and overall page structure found on most pages.
     <SidebarLayout>
       {/*
         This is the main content area for the page. The classNames are for styling
-        (e.g., `container` for centering, `p-4` for padding, `animate-fade-in-down`
-        for a simple animation).
+        using Tailwind CSS (e.g., `container` for centering, `p-4` for padding,
+        `animate-fade-in-down` for a simple entry animation).
       */}
       <div className='container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8 animate-fade-in-down'>
-        {/* A `<Card>` component is used to group content in a visually distinct box. */}
+        {/* A `<Card>` component is used to group content in a visually distinct box with a border and background. */}
         <Card className='overflow-hidden shadow-2xl shadow-primary/10 bg-card/80 backdrop-blur-sm border-primary/20'>
           <CardHeader
             className='text-center bg-primary/5 p-10 animate-fade-in-down'
@@ -108,7 +111,7 @@ export default function AboutPage() {
                 Core Components
               </h2>
               <div className='grid grid-cols-1 md:grid-cols-3 gap-8 text-center'>
-                {/* Each item uses an icon, a heading, and a short description. */}
+                {/* Each item uses an icon, a heading, and a short description to explain a concept. */}
                 <div
                   className='flex flex-col items-center p-6 rounded-xl transition-all duration-500 hover:bg-primary/5 hover:shadow-xl hover:-translate-y-2 animate-fade-in-up'
                   style={{ animationDelay: '0.7s' }}

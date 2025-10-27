@@ -1,34 +1,43 @@
-// Copyright (C) 2025 Akshay K Rooben abraham
+// Copyright (C) 2025 Akshay K Rooben Abraham
 /**
- * @fileoverview Logo Component (`logo.tsx`)
+ * @fileoverview Logo Component (`logo.tsx`).
+ * @copyright Copyright (C) 2025 Akshay K Rooben Abraham. All rights reserved.
+ *
+ * @description
+ * This file defines a very simple, reusable UI component that renders the Lyra logo.
+ * The logo is defined as an SVG (Scalable Vector Graphic), which allows it to scale
+ * to any size without losing quality. This component can be imported and used anywhere
+ * in the application to display a consistent brand logo.
  *
  * C-like Analogy:
- * This file defines a very simple, reusable UI component. Think of it as a
- * small, self-contained C function that prints a specific, pre-defined ASCII art
- * to the console.
+ * Think of this as a small, self-contained C function that prints a specific,
+ * pre-defined ASCII art logo to the console.
  *
- * `void printLogo() { ... }`
- *
- * In this case, instead of ASCII art, it returns an SVG (Scalable Vector Graphic)
- * which is a standard way to draw images and icons on the web. This component
- * can be imported and used anywhere in the application to display the Lyra logo.
- *
- * It's a "stateless" component, meaning it doesn't have any internal variables
+ * ```c
+ * void print_logo() {
+ *   printf("   *   \n");
+ *   printf(" * * * \n");
+ *   printf("   *   \n");
+ * }
+ * ```
+ * In this case, instead of ASCII art, it returns an SVG element for rendering in a web browser.
+ * It's a "stateless" or "pure" component, meaning it doesn't have any internal variables
  * that change. It always renders the same thing every time it's called.
  */
 
 /**
+ * Renders the Lyra logo as an SVG element.
+ *
+ * @returns {JSX.Element} The SVG logo component.
+ *
  * C-like Explanation: `function Logo() -> returns JSX_Element`
  *
- * This is the main function for this component. It takes no arguments (props)
- * and returns a JSX element representing the SVG logo.
- *
- * The SVG code itself defines the shape, color, and stroke of the logo.
- * The `className="text-primary"` is a Tailwind CSS class that makes the logo's
- * color inherit from the `--primary` CSS variable defined in `globals.css`.
- * The `stroke="currentColor"` property within the SVG means the lines of the
- * SVG will take on the color of the parent element's text color, which we set
- * to be the primary theme color.
+ * This function takes no arguments (props) and returns a JSX element representing
+ * the SVG logo. The `className="text-primary"` is a Tailwind CSS class that makes
+ * the logo's color inherit from the `--primary` CSS variable defined in `globals.css`.
+ * The `stroke="currentColor"` property within the SVG means the lines of the SVG
+ * will take on the color of the parent element's text color, which we've set to be
+ * the primary theme color. This makes the logo's color theme-aware.
  */
 export function Logo() {
   return (

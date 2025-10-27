@@ -1,24 +1,33 @@
-// Copyright (C) 2025 Akshay K Rooben abraham
+// Copyright (C) 2025 Akshay K Rooben Abraham
 /**
- * @fileoverview Main Sidebar Layout (`sidebar-layout.tsx`)
+ * @fileoverview Main Sidebar Layout (`sidebar-layout.tsx`).
+ * @copyright Copyright (C) 2025 Akshay K Rooben Abraham. All rights reserved.
+ *
+ * @description
+ * This file defines the main structural layout for most pages of the application.
+ * It creates a consistent UI shell with a navigation sidebar on the left (which
+ * can be collapsed) and a main content area. It also handles the responsive
+ * behavior, switching to a slide-out "sheet" menu on mobile devices.
  *
  * C-like Analogy:
- * This file defines the main structural layout for most pages of the application.
- * Think of it as a master function that draws the consistent parts of the UI,
- * like the navigation sidebar on the left and the top header on mobile.
+ * Think of this as a master function that draws the consistent parts of the UI,
+ * like the application's main window frame, menu bar, and status bar. It takes a
+ * `children` prop, which is like a function pointer to a function that will render
+ * the specific content for the current page.
  *
- * It takes a `children` prop, which is like a placeholder. Any page that uses
- * this layout will have its content rendered inside this placeholder.
+ * ```c
+ * void render_main_layout(void (*render_page_content)()) {
+ *   draw_sidebar_with_navigation_links();
+ *   draw_mobile_header_with_hamburger_menu();
  *
- * `void renderMainLayout(void (*renderPageContent)()) {`
- * `  drawSidebar();`
- * `  drawHeader();`
- * `  renderPageContent(); // The actual page content goes here.`
- * `}`
- *
- * It's responsible for the overall look and feel, including handling the
- * collapsible state of the sidebar, the logout functionality, and the
- * navigation links.
+ *   // The main content area where the page-specific UI will be drawn.
+ *   main_content_area {
+ *     render_page_content(); // The actual page content goes here.
+ *   }
+ * }
+ * ```
+ * It's responsible for the overall look and feel, including the collapsible
+ * state of the sidebar, the logout functionality, and the navigation links.
  */
 'use client';
 
@@ -51,38 +60,44 @@ import React from 'react';
 import { useFirebase } from '@/firebase';
 import { Button } from '../ui/button';
 import { ChatHistory } from '../student/chat-history'; // Component that shows the list of past chats.
+import type { UserProfile } from '@/types';
 
 /**
+ * A helper component that contains the actual list of navigation items
+ * (New Chat, Teacher, Account, About). Separating it into its own component keeps
+ * the main layout component cleaner and more organized.
+ *
+ * @returns {JSX.Element} The rendered list of sidebar menu items.
+ *
  * C-like Explanation: `function SidebarMenuItems() -> returns JSX_Element`
  *
- * This is a helper component that contains the actual list of navigation items
- * (New Chat, Teacher, Account, About). Separating it into its own component keeps
- * the main layout component cleaner.
- *
  * It uses hooks to get the current URL (`usePathname`) and the sidebar's state
- * (`useSidebar`) to determine which menu item is "active" and to automatically
- * close the mobile menu after a link is clicked.
+ * (`useSidebar`) to determine which menu item is "active" (highlighted) and to
+ * automatically close the mobile menu after a link is clicked.
  */
 function SidebarMenuItems() {
   const pathname = usePathname(); // Hook to get the current URL path.
   const { setOpenMobile, isMobile } = useSidebar(); // Hook to control the mobile sidebar.
-  const [userInfo, setUserInfo] = React.useState<{ role?: string } | null>(
+  const [userInfo, setUserInfo] = React.useState<Partial<UserProfile> | null>(
     null,
   );
 
-  // This `useEffect` hook runs whenever the page URL changes.
+  // This `useEffect` hook runs when the component mounts and whenever the page URL changes.
   // It reads the user's role from session storage to decide whether to show the "Teacher" link.
   React.useEffect(() => {
     const storedInfo = sessionStorage.getItem('lyra-user-info');
     if (storedInfo) {
       setUserInfo(JSON.parse(storedInfo));
     }
-  }, [pathname]); // Dependency: re-run if the path changes.
+  }, [pathname]); // Dependency: re-run if the path changes to ensure UI is up-to-date.
 
-  // This function is called when a user clicks a link in the mobile menu.
+  /**
+   * This function is called when a user clicks a link in the mobile menu.
+   * It closes the mobile sidebar to provide a better user experience.
+   */
   const handleLinkClick = () => {
     if (isMobile) {
-      setOpenMobile(false); // Close the mobile sidebar.
+      setOpenMobile(false);
     }
   };
 
@@ -92,7 +107,7 @@ function SidebarMenuItems() {
         <SidebarMenuItem>
           {/* Each link is wrapped in Next.js's `<Link>` component for fast client-side navigation. */}
           <Link href='/' onClick={handleLinkClick}>
-            {/* The `isActive` prop highlights the button if the URL matches. */}
+            {/* The `isActive` prop highlights the button if the current URL matches its link. */}
             <SidebarMenuButton isActive={pathname === '/'} tooltip='New Chat'>
               <PlusCircle />
               <span>New Chat</span>
@@ -103,9 +118,10 @@ function SidebarMenuItems() {
 
       <SidebarSeparator />
       {/*
-          This component is responsible for fetching and displaying the list of
-          past chat sessions from Firestore.
-        */}
+        This component is responsible for fetching and displaying the list of
+        past chat sessions from Firestore. It's a complex component in itself,
+        encapsulated here for clarity.
+      */}
       <ChatHistory onLinkClick={handleLinkClick} />
       <SidebarSeparator />
 
@@ -152,29 +168,26 @@ function SidebarMenuItems() {
 }
 
 /**
- * C-like Explanation: `function SidebarLayout({ children }) -> returns JSX_Element`
+ * The main layout component.
  *
- * This is the main layout component.
- *
- * Props (Inputs):
- *   - `children`: A special prop that represents any components nested inside this one.
- *     This is where the main content of a specific page (like the chat interface or
- *     the account form) will be rendered. It's the `(*renderPageContent)()` part
- *     of our C analogy.
+ * @param {object} props - The component's properties.
+ * @param {React.ReactNode} props.children - A special prop that represents any components
+ *   nested inside this one. This is where the main content of a specific page
+ *   (like the chat interface or the account form) will be rendered.
+ * @returns {JSX.Element} The rendered sidebar layout.
  */
 export function SidebarLayout({ children }: { children: React.ReactNode }) {
   const { auth } = useFirebase();
   const router = useRouter();
 
   /**
-   * C-like Explanation: `async function handleLogout()`
-   * This function signs the user out of Firebase, clears their data from the
+   * Signs the user out of Firebase, clears their data from the
    * local session, and redirects them to the login page.
    */
   const handleLogout = async () => {
     await auth.signOut(); // Call Firebase SDK to sign out.
     sessionStorage.removeItem('lyra-user-info'); // Clean up local session data.
-    router.push('/login'); // Redirect.
+    router.push('/login'); // Redirect to login page.
   };
 
   return (
@@ -215,12 +228,12 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
       </Sidebar>
       {/*
         `<SidebarInset>` is the main content area of the page. It automatically
-        adjusts its margin to make space for the sidebar.
+        adjusts its margin to make space for the sidebar on desktop.
       */}
       <SidebarInset>
         {/*
           This header is only visible on mobile screens (`md:hidden`). It contains
-          the "hamburger" menu trigger to open the sidebar.
+          the "hamburger" menu trigger to open the slide-out sidebar.
         */}
         <header className='flex h-14 items-center justify-start border-b px-4 md:hidden bg-card/80 backdrop-blur-sm sticky top-0 z-10'>
           <SidebarTrigger />

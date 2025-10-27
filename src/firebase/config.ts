@@ -1,34 +1,46 @@
-// Copyright (C) 2025 Akshay K Rooben abraham
+// Copyright (C) 2025 Akshay K Rooben Abraham
 /**
- * @fileoverview Firebase Configuration (`config.ts`)
+ * @fileoverview Firebase Configuration (`config.ts`).
+ * @copyright Copyright (C) 2025 Akshay K Rooben Abraham. All rights reserved.
+ *
+ * @description
+ * This file serves as a configuration store for connecting to a specific Firebase
+ * project. It holds the essential credentials required by the Firebase SDK.
  *
  * C-like Analogy:
- * This file is the direct equivalent of a `config.h` or a `.properties` file.
- * Its sole purpose is to store hard-coded configuration values needed to connect
- * to a specific Firebase project.
+ * This file is the direct equivalent of a `config.h` header file or a `.properties`
+ * file in a C/Java project. Its sole purpose is to store hard-coded configuration
+ * values as constants.
  *
- * In C, you might have:
- *
+ * ```c
  * #ifndef CONFIG_H
  * #define CONFIG_H
  *
  * #define FIREBASE_API_KEY "AIzaSyD..."
- * #define FIREBASE_PROJECT_ID "studio-1148187791-ff9d6"
+ * #define FIREBASE_PROJECT_ID "my-firebase-project"
  * // etc.
  *
  * #endif // CONFIG_H
+ * ```
  *
- * This TypeScript file does the same thing. It exports a constant object named
- * `firebaseConfig` which holds all the necessary keys and identifiers. These
- * values are provided by Firebase when you create a new web app in your project.
+ * This TypeScript file achieves the same goal by exporting a constant object named
+ * `firebaseConfig`. These values are provided by Firebase when you create a new
+ * web app in your project console.
  *
- * This configuration is used as a fallback by `initializeFirebase()` if it
- * cannot find the automatic configuration provided by Firebase Hosting. This
- * is very common during local development.
+ * This configuration is used by `initializeFirebase()` as a fallback if it cannot
+ * find the automatic configuration provided by Firebase Hosting. This is a common
+ * pattern for local development, where Hosting's environment variables aren't available.
  */
 
-// `export const` makes the `firebaseConfig` object available to be imported by other files.
-// It's a read-only, global-like constant for the project.
+/**
+ * The Firebase configuration object for your web app.
+ *
+ * These details are obtained from the Firebase console:
+ * Project settings > General > Your apps > Web app > Firebase SDK snippet > Config.
+ *
+ * It is safe to expose these values in a client-side app. Firebase security is
+ * handled by Firestore Security Rules, not by hiding these keys.
+ */
 export const firebaseConfig = {
   projectId: 'studio-1148187791-ff9d6',
   appId: '1:702313910835:web:3bbc0cbe1759c742b5c946',
