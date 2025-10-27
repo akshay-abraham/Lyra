@@ -13,6 +13,11 @@
  * - A clean header with the application logo and name.
  * - A central "hero" section with a bold headline and a descriptive paragraph.
  * - The login form component is the primary call-to-action, placed centrally.
+ *
+ * C-like Analogy:
+ * Think of this as the main function for a graphical application's startup screen.
+ * It sets up the main window (`div` with `min-h-screen`), draws the background,
+ * renders the header, and then displays the main content (the hero text and login form).
  */
 
 import { LoginForm } from '@/components/auth/login-form';
@@ -23,16 +28,11 @@ import { Logo } from '@/components/layout/logo';
 /**
  * The main component for the redesigned login page.
  *
- * C-like Analogy:
- * Think of this as the main function for a graphical application's startup screen.
- * It sets up the main window (`div` with `min-h-screen`), draws the background,
- * renders the header, and then displays the main content (the hero text and login form).
- *
  * @returns {JSX.Element} The JSX that describes the structure of the login page.
  */
 export default function LoginPage() {
   return (
-    <div className='relative min-h-screen w-full overflow-hidden'>
+    <div className='relative min-h-screen w-full overflow-hidden bg-background'>
       {/* The animated background is a separate div placed behind everything else. */}
       <div className='animated-background'></div>
 
@@ -50,10 +50,10 @@ export default function LoginPage() {
             className='mb-8 max-w-2xl animate-fade-in-up'
             style={{ animationDelay: '0.2s' }}
           >
-            <h1 className='text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl font-headline gradient-text'>
+            <h1 className='text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl font-headline gradient-text'>
               The Future of AI in Education Starts Here.
             </h1>
-            <p className='mt-6 text-lg leading-8 text-gray-300'>
+            <p className='mt-6 text-lg leading-8 text-muted-foreground'>
               Lyra is an ethical AI tutor designed to guide students toward
               solutions, not just give them away. Empower students and support
               teachers with customizable, pedagogical guardrails.

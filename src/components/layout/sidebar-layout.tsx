@@ -69,6 +69,12 @@ import type { UserProfile } from '@/types';
  *
  * @returns {JSX.Element} The rendered list of sidebar menu items.
  *
+ * @description
+ * This component renders the navigation links in the sidebar. It uses hooks like
+ * `usePathname` to determine which link is currently active and `useSidebar` to
+ator
+ * handle mobile-specific behavior, such as closing the menu after a link is clicked.
+ *
  * C-like Explanation: `function SidebarMenuItems() -> returns JSX_Element`
  *
  * It uses hooks to get the current URL (`usePathname`) and the sidebar's state
@@ -242,8 +248,10 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
             <span className='font-bold font-headline'>Lyra</span>
           </Link>
         </header>
-        {/* This is the placeholder where the actual page content is rendered. */}
-        {children}
+        <div className='relative'>
+          <div className='animated-background absolute inset-0 -z-10'></div>
+          {children}
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );

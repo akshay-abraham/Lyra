@@ -179,7 +179,7 @@ export default function AboutPage() {
                   Open Source License
                 </CardTitle>
               </CardHeader>
-              <CardContent className='prose prose-sm max-w-none dark:prose-invert'>
+              <CardContent className='prose prose-base max-w-none dark:prose-invert'>
                 <p>
                   <strong>Copyright © 2025 Akshay K. Rooben Abraham.</strong>
                 </p>
@@ -188,9 +188,12 @@ export default function AboutPage() {
                   <strong>GNU Affero General Public License v3.0</strong>. This
                   license is designed to ensure that the software remains free
                   and open-source, and that any modifications made available
-                  over a network are also shared back with the community.
+                  over a network are also shared back with the community. It's a commitment
+                  to transparency and collaborative improvement in educational technology.
                 </p>
-                <p>You can view the full license text on GitHub:</p>
+                <p>You are free to use, study, share, and modify this software.
+                   For full details, please review the complete license text.
+                </p>
                 <Button asChild>
                   <a
                     href='https://github.com/akshay-abraham/Lyra/blob/main/LICENSE'
