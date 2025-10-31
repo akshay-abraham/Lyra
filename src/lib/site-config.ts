@@ -31,27 +31,27 @@ export const siteConfig = {
   technologies: [
     {
       name: 'Next.js',
-      logo: '/tech/nextjs.svg',
+      logo: '/tech/nextjs-new.svg',
     },
     {
       name: 'Firebase',
-      logo: '/tech/firebase.svg',
+      logo: '/tech/firebase-new.svg',
     },
     {
       name: 'Genkit',
-      logo: '/tech/genkit.svg',
+      logo: '/tech/genkit.png',
     },
     {
       name: 'React',
-      logo: '/tech/react.svg',
+      logo: '/tech/react-new.svg',
     },
     {
       name: 'Tailwind CSS',
-      logo: '/tech/tailwind.svg',
+      logo: '/tech/tailwind-new.svg',
     },
     {
       name: 'Vercel',
-      logo: '/tech/vercel.svg',
+      logo: '/tech/vercel-new.svg',
     },
   ],
 };
