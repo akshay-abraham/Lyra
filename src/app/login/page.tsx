@@ -80,7 +80,7 @@ export default function LoginPage() {
               target='_blank'
               rel='noopener noreferrer'
             >
-              <GitHubLogo className='h-8 w-8' />
+              <GitHubLogo className='h-6 w-6' />
             </Link>
           </Button>
         </div>

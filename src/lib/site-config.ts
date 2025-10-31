@@ -39,7 +39,7 @@ export const siteConfig = {
     },
     {
       name: 'Genkit',
-      logo: '/tech/genkit.png',
+      logo: '/genkit.png',
     },
     {
       name: 'React',
