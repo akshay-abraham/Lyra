@@ -74,13 +74,13 @@ export default function LoginPage() {
               Lyra
             </span>
           </div>
-          <Button asChild variant='ghost'>
+          <Button asChild variant='ghost' size='icon'>
             <Link
               href={siteConfig.github}
               target='_blank'
               rel='noopener noreferrer'
             >
-              <GitHubLogo className='h-6 w-6' />
+              <GitHubLogo className='h-8 w-8' />
             </Link>
           </Button>
         </div>
