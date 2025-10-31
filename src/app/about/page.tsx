@@ -30,10 +30,13 @@ import {
   ArrowRight,
   Shield,
   Scale,
+  Github,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SidebarLayout } from '@/components/layout/sidebar-layout'; // The main layout with the navigation sidebar.
 import Image from 'next/image'; // Next.js's optimized image component.
+import { siteConfig } from '@/lib/site-config';
+import Link from 'next/link';
 
 /**
  * The main component function for the About Page.
@@ -181,29 +184,42 @@ export default function AboutPage() {
               </CardHeader>
               <CardContent className='prose prose-base max-w-none dark:prose-invert'>
                 <p>
-                  <strong>Copyright © 2025 Akshay K. Rooben Abraham.</strong>
+                  <strong>Copyright © 2025 {siteConfig.developer.name}.</strong>
                 </p>
                 <p>
                   This project is licensed under the{' '}
                   <strong>GNU Affero General Public License v3.0</strong>. This
                   license is designed to ensure that the software remains free
                   and open-source, and that any modifications made available
-                  over a network are also shared back with the community. It's a commitment
-                  to transparency and collaborative improvement in educational technology.
+                  over a network are also shared back with the community. It's a
+                  commitment to transparency and collaborative improvement in
+                  educational technology.
                 </p>
-                <p>You are free to use, study, share, and modify this software.
-                   For full details, please review the complete license text.
+                <p>
+                  You are free to use, study, share, and modify this software.
+                  For full details, please review the complete license text.
                 </p>
-                <Button asChild>
-                  <a
-                    href='https://github.com/akshay-abraham/Lyra/blob/main/LICENSE'
-                    target='_blank'
-                    rel='noopener noreferrer'
-                  >
-                    View AGPL-3.0 License{' '}
-                    <ArrowRight className='ml-2 h-4 w-4' />
-                  </a>
-                </Button>
+                <div className='flex gap-4'>
+                  <Button asChild>
+                    <a
+                      href='https://github.com/akshay-abraham/Lyra/blob/main/LICENSE'
+                      target='_blank'
+                      rel='noopener noreferrer'
+                    >
+                      View AGPL-3.0 License{' '}
+                      <ArrowRight className='ml-2 h-4 w-4' />
+                    </a>
+                  </Button>
+                  <Button asChild variant='secondary'>
+                    <Link
+                      href={siteConfig.github}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                    >
+                      <Github className='mr-2 h-4 w-4' /> View on GitHub
+                    </Link>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </CardContent>
@@ -214,24 +230,30 @@ export default function AboutPage() {
           >
             <div className='flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-4 text-sm text-muted-foreground mb-4'>
               <span className='flex items-center gap-1.5'>
-                <Shield className='h-4 w-4' /> Copyright © 2025 Akshay K.
-                Rooben Abraham.
+                <Shield className='h-4 w-4' /> Copyright © 2025{' '}
+                {siteConfig.developer.name}.
               </span>
             </div>
-            {/* This button links to an external website. */}
-            <Button
-              asChild
-              className='group transition-all duration-300 ease-in-out hover:scale-105'
-            >
+            <p className='text-sm text-muted-foreground'>
+              Created by{' '}
               <a
-                href='https://akshayabraham.vercel.app/'
+                href={siteConfig.developer.url}
                 target='_blank'
                 rel='noopener noreferrer'
+                className='font-medium text-primary hover:underline'
               >
-                Contact Developer{' '}
-                <ArrowRight className='ml-2 h-4 w-4 transition-transform group-hover:translate-x-1' />
+                {siteConfig.developer.name}
               </a>
-            </Button>
+            </p>
+            <p className='text-sm text-muted-foreground'>
+              Mentored by{' '}
+              <a
+                href={`mailto:${siteConfig.mentor.email}`}
+                className='font-medium text-primary hover:underline'
+              >
+                {siteConfig.mentor.name}
+              </a>
+            </p>
           </div>
         </Card>
       </div>
