@@ -179,38 +179,39 @@ export default function AboutPage() {
               <CardHeader className='flex flex-row items-center gap-4'>
                 <Scale className='h-8 w-8 text-accent' />
                 <CardTitle className='font-headline text-2xl'>
-                  Open Source License
+                  Proprietary License
                 </CardTitle>
               </CardHeader>
               <CardContent className='prose prose-base max-w-none dark:prose-invert'>
                 <p>
-                  <strong>Copyright © 2025 {siteConfig.developer.name}.</strong>
+                  <strong>© 2025 {siteConfig.developer.name}. All rights reserved.</strong>
                 </p>
                 <p>
-                  This project is licensed under the{' '}
-                  <strong>GNU Affero General Public License v3.0</strong>. This
-                  license is designed to ensure that the software remains free
-                  and open-source, and that any modifications made available
-                  over a network are also shared back with the community. It's a
-                  commitment to transparency and collaborative improvement in
-                  educational technology.
+                  This software and all associated materials, including but not
+                  limited to the codebase, design, architecture, content, and
+                  branding of “Lyra”, are proprietary intellectual property
+                  owned by {siteConfig.developer.name}.
                 </p>
                 <p>
-                  You are free to use, study, share, and modify this software.
-                  For full details, please review the complete license text.
+                  Unauthorized reproduction, distribution, modification, or
+                  deployment of this system, in whole or in part, is strictly
+                  prohibited.
+                </p>
+                <p>
+                  Usage of Lyra is limited to testing in the current stage.
+                </p>
+                <p>
+                  Violators will be subject to legal action under applicable
+                  intellectual property and cyber laws.
+                </p>
+                <p>
+                  For licensing and partnership inquiries, please contact:{' '}
+                  <a href={`mailto:akshaykroobenabraham@gmail.com`}>
+                    akshaykroobenabraham@gmail.com
+                  </a>
                 </p>
                 <div className='flex gap-4'>
                   <Button asChild>
-                    <a
-                      href='https://github.com/akshay-abraham/Lyra/blob/main/LICENSE'
-                      target='_blank'
-                      rel='noopener noreferrer'
-                    >
-                      View AGPL-3.0 License{' '}
-                      <ArrowRight className='ml-2 h-4 w-4' />
-                    </a>
-                  </Button>
-                  <Button asChild variant='secondary'>
                     <Link
                       href={siteConfig.github}
                       target='_blank'
@@ -228,31 +229,8 @@ export default function AboutPage() {
             className='bg-primary/5 p-6 text-center animate-fade-in border-t border-primary/10'
             style={{ animationDelay: '1.3s' }}
           >
-            <div className='flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-4 text-sm text-muted-foreground mb-4'>
-              <span className='flex items-center gap-1.5'>
-                <Shield className='h-4 w-4' /> Copyright © 2025{' '}
-                {siteConfig.developer.name}.
-              </span>
-            </div>
             <p className='text-sm text-muted-foreground'>
-              Created by{' '}
-              <a
-                href={siteConfig.developer.url}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='font-medium text-primary hover:underline'
-              >
-                {siteConfig.developer.name}
-              </a>
-            </p>
-            <p className='text-sm text-muted-foreground'>
-              Mentored by{' '}
-              <a
-                href={`mailto:${siteConfig.mentor.email}`}
-                className='font-medium text-primary hover:underline'
-              >
-                {siteConfig.mentor.name}
-              </a>
+              ©2025 {siteConfig.developer.name} All rights reserved.
             </p>
           </div>
         </Card>

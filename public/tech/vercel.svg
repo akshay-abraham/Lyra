@@ -1,11 +1,1 @@
-<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g clip-path="url(#clip0_105_4)">
-<path d="M256 128C256 198.704 198.704 256 128 256C57.296 256 0 198.704 0 128C0 57.296 57.296 0 128 0C198.704 0 256 57.296 256 128Z" fill="black"/>
-<path d="M128 42.6667L224 213.333H32L128 42.6667Z" fill="white"/>
-</g>
-<defs>
-<clipPath id="clip0_105_4">
-<rect width="256" height="256" fill="white"/>
-</clipPath>
-</defs>
-</svg>
+<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Vercel</title><path d="m12 1.608 12 20.784H0Z"/></svg>

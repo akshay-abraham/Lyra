@@ -31,6 +31,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { siteConfig } from '@/lib/site-config';
+import { GitHubLogo } from '@/components/auth/github-logo';
 
 /**
  * The main component for the redesigned login page.
@@ -74,8 +75,12 @@ export default function LoginPage() {
             </span>
           </div>
           <Button asChild variant='ghost'>
-            <Link href={siteConfig.github} target='_blank' rel='noopener noreferrer'>
-              GitHub
+            <Link
+              href={siteConfig.github}
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              <GitHubLogo className='h-6 w-6' />
             </Link>
           </Button>
         </div>
@@ -152,7 +157,8 @@ export default function LoginPage() {
               style={{ animationDelay: '1.4s' }}
             >
               {siteConfig.technologies.map((tech, index) => (
-                <div
+                <a
+                  href='#'
                   key={tech.name}
                   className='flex flex-col items-center gap-3 group'
                 >
@@ -167,7 +173,7 @@ export default function LoginPage() {
                   <span className='font-semibold text-muted-foreground group-hover:text-foreground transition-colors'>
                     {tech.name}
                   </span>
-                </div>
+                </a>
               ))}
             </div>
           </div>
@@ -175,27 +181,8 @@ export default function LoginPage() {
 
         {/* Footer */}
         <footer className='w-full p-8 text-center border-t border-border'>
-          <p className='text-muted-foreground'>
-            Created by{' '}
-            <a
-              href={siteConfig.developer.url}
-              target='_blank'
-              rel='noopener noreferrer'
-              className='font-medium text-primary hover:underline'
-            >
-              {siteConfig.developer.name}
-            </a>
-            {' | '}
-            Mentored by{' '}
-            <a
-              href={`mailto:${siteConfig.mentor.email}`}
-              className='font-medium text-primary hover:underline'
-            >
-              {siteConfig.mentor.name}
-            </a>
-          </p>
-          <p className='text-xs text-muted-foreground mt-2'>
-            Copyright © 2025 {siteConfig.developer.name}. All Rights Reserved.
+          <p className='text-sm text-muted-foreground'>
+            ©2025 Akshay K Rooben Abraham All rights reserved.
           </p>
         </footer>
       </div>
