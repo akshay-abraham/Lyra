@@ -30,13 +30,13 @@ import {
   ArrowRight,
   Shield,
   Scale,
-  Github,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SidebarLayout } from '@/components/layout/sidebar-layout'; // The main layout with the navigation sidebar.
 import Image from 'next/image'; // Next.js's optimized image component.
 import { siteConfig } from '@/lib/site-config';
 import Link from 'next/link';
+import { GitHubLogo } from '@/components/auth/github-logo';
 
 /**
  * The main component function for the About Page.
@@ -216,7 +216,7 @@ export default function AboutPage() {
                       target='_blank'
                       rel='noopener noreferrer'
                     >
-                      <Github className='mr-2 h-4 w-4' /> View on GitHub
+                      <GitHubLogo className='mr-2 h-4 w-4' /> View on GitHub
                     </Link>
                   </Button>
                 </div>
