@@ -85,7 +85,6 @@ export default function LoginPage() {
       name: 'Genkit',
       component: (
         <Image
-          data-ai-hint='genkit logo'
           src='/genkit.webp'
           alt='Genkit logo'
           width={48}
@@ -175,7 +174,7 @@ export default function LoginPage() {
                 </p>
               </div>
               <CollapsibleContent>
-                <div className='text-muted-foreground text-sm max-w-prose text-left mx-auto mt-8 space-y-4 animate-fade-in-up'>
+                <div className='text-muted-foreground text-sm max-w-prose text-left mx-auto mt-8 space-y-2 animate-fade-in-up'>
                   <p>
                     Educators worry that students will{' '}
                     <strong className='text-foreground'>

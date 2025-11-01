@@ -127,9 +127,15 @@ export function RagManagement() {
             <div className='flex justify-between items-center'>
               <h3 className='font-headline text-xl'>Your Course Materials</h3>
               {/* This button is for display purposes only right now; it has no `onClick` handler. */}
-              <Button className='group transition-all duration-300 ease-in-out hover:scale-105'>
+              <Button
+                disabled
+                className='group transition-all duration-300 ease-in-out hover:scale-105'
+              >
                 <FileUp className='mr-2 h-4 w-4 transition-transform group-hover:rotate-[-5deg]' />
                 Upload New File
+                <Badge variant='destructive' className='ml-2'>
+                  In Development
+                </Badge>
               </Button>
             </div>
 
@@ -162,6 +168,7 @@ export function RagManagement() {
                       variant='ghost'
                       size='icon'
                       className='text-muted-foreground hover:text-destructive group'
+                      disabled
                     >
                       <Trash2 className='h-4 w-4 transition-transform group-hover:scale-110' />
                     </Button>
