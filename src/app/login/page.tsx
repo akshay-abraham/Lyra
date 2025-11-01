@@ -160,15 +160,17 @@ export default function LoginPage() {
                   In today’s classrooms, AI is often met with suspicion. Lyra
                   was born from a different philosophy: that AI can coexist with
                   classrooms under{' '}
-                  <strong>educational and ethical guardrails</strong>.
+                  <strong>educational and ethical guardrails</strong>...{' '}
+                  <CollapsibleTrigger asChild>
+                    <Button
+                      variant='link'
+                      className='text-lg font-headline p-0 text-primary hover:text-accent'
+                    >
+                      (see more)
+                    </Button>
+                  </CollapsibleTrigger>
                 </p>
               </div>
-              <CollapsibleTrigger asChild>
-                <Button variant='link' className='text-lg font-headline mt-4'>
-                  <BookOpen className='mr-2' />
-                  Read the Full Story
-                </Button>
-              </CollapsibleTrigger>
               <CollapsibleContent>
                 <div className='prose prose-lg max-w-none dark:prose-invert mt-8 text-left animate-fade-in-up'>
                   <p>
@@ -260,35 +262,20 @@ export default function LoginPage() {
 
         {/* Footer */}
         <footer className='w-full p-8 text-center border-t border-border'>
-          <div className='container mx-auto space-y-6'>
-            <div className='relative flex justify-center items-center h-24'>
-              <div className='absolute p-4 rounded-lg bg-primary/5 border border-primary/20 shadow-lg shadow-primary/10 animate-pulse-box'>
-                <p className='text-lg font-headline text-foreground'>
-                  Developed by{' '}
-                  <Link
-                    href={siteConfig.developer.url}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    className='font-bold text-primary hover:underline underline-offset-4'
-                  >
-                    {siteConfig.developer.name}
-                  </Link>
-                </p>
-              </div>
-            </div>
-
+          <div className='container mx-auto text-sm text-muted-foreground flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4'>
+            <p>© 2025 {siteConfig.developer.name}. All rights reserved.</p>
             <Accordion
               type='single'
               collapsible
-              className='w-full max-w-4xl mx-auto'
+              className='w-auto sm:border-l sm:pl-4 border-border'
             >
               <AccordionItem value='license' className='border-none'>
-                <AccordionTrigger className='justify-center text-muted-foreground hover:text-foreground text-sm'>
+                <AccordionTrigger className='p-0 hover:no-underline hover:text-foreground'>
                   <Scale className='mr-2 h-4 w-4' />
                   View License
                 </AccordionTrigger>
                 <AccordionContent>
-                  <div className='prose prose-sm max-w-none dark:prose-invert text-muted-foreground text-left mx-auto p-4 bg-card/50 rounded-lg border'>
+                  <div className='prose prose-sm max-w-none dark:prose-invert text-muted-foreground text-left mx-auto mt-4 p-4 bg-card/50 rounded-lg border'>
                     <p>
                       <strong>
                         © 2025 {siteConfig.developer.name}. All rights
@@ -324,9 +311,14 @@ export default function LoginPage() {
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
-            <p className='text-sm text-muted-foreground'>
-              ©2025 {siteConfig.developer.name} All rights reserved.
-            </p>
+            <Link
+              href={siteConfig.developer.url}
+              target='_blank'
+              rel='noopener noreferrer'
+              className='hover:text-foreground sm:border-l sm:pl-4 border-border'
+            >
+              Contact Dev
+            </Link>
           </div>
         </footer>
       </div>
