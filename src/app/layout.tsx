@@ -45,6 +45,7 @@ import { Inter, Sora } from 'next/font/google'; // Google font loading utility f
 import './globals.css'; // The global stylesheet.
 import { Toaster } from '@/components/ui/toaster'; // Component to display pop-up notifications (toasts).
 import { FirebaseClientProvider } from '@/firebase/client-provider'; // The global Firebase provider.
+import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 
 // Load the 'Inter' font for body text. This function from Next.js is highly optimized.
 // It downloads the font at build time and serves it with the rest of the app,
@@ -113,6 +114,8 @@ export default function RootLayout({
             the `/login` page, the content of `login/page.tsx` appears here.
           */}
           {children}
+           {/* This component listens for globally emitted errors and displays them. */}
+          <FirebaseErrorListener />
         </FirebaseClientProvider>
         {/*
           The `<Toaster>` component is placed here at the root. It doesn't display
