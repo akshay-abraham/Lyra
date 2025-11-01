@@ -407,7 +407,7 @@ export function ChatInterface({
         <div className='relative'>
           <form
             onSubmit={handleSubmit}
-            className='w-full flex items-center gap-2 p-1 rounded-full border bg-card/80'
+            className='w-full flex items-center gap-2 p-1 rounded-full border bg-card'
           >
             <Textarea
               ref={inputRef}
