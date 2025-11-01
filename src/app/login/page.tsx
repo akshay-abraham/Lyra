@@ -155,7 +155,7 @@ export default function LoginPage() {
         <section id='motivation' className='w-full py-20 px-4'>
           <div className='container mx-auto max-w-4xl'>
             <Collapsible>
-              <div className='text-base text-muted-foreground max-w-none text-center animate-fade-in-up'>
+              <div className='text-sm text-muted-foreground max-w-none text-center animate-fade-in-up'>
                 <p>
                   In today’s classrooms, AI is often met with suspicion. Lyra
                   was born from a different philosophy: that AI can coexist with
@@ -167,7 +167,7 @@ export default function LoginPage() {
                   <CollapsibleTrigger asChild>
                     <Button
                       variant='link'
-                      className='text-base p-0 text-primary/80 hover:text-accent font-normal'
+                      className='text-sm p-0 text-primary/80 hover:text-accent font-normal'
                     >
                       (see more)
                     </Button>
@@ -175,7 +175,7 @@ export default function LoginPage() {
                 </p>
               </div>
               <CollapsibleContent>
-                <div className='text-base text-muted-foreground max-w-prose text-left mx-auto mt-8 space-y-4 animate-fade-in-up'>
+                <div className='text-muted-foreground text-sm max-w-prose text-left mx-auto mt-8 space-y-4 animate-fade-in-up'>
                   <p>
                     Educators worry that students will{' '}
                     <strong className='text-foreground'>
@@ -274,8 +274,8 @@ export default function LoginPage() {
         <footer className='w-full p-8 text-center border-t border-border'>
           <div className='container mx-auto text-xs text-muted-foreground'>
             <Accordion type='single' collapsible className='w-auto'>
-              <p>
-                © 2025{' '}
+              <div className='flex items-center justify-center space-x-1'>
+                <span>© 2025</span>
                 <Link
                   href={siteConfig.developer.url}
                   target='_blank'
@@ -284,9 +284,9 @@ export default function LoginPage() {
                 >
                   {siteConfig.developer.name} 🔗
                 </Link>
-                .
+                <span>.</span>
                 <AccordionItem value='license' className='border-none inline'>
-                  <AccordionTrigger className='p-0 text-xs hover:no-underline hover:text-foreground inline-flex ml-1'>
+                  <AccordionTrigger className='p-0 text-xs hover:no-underline hover:text-foreground inline-flex'>
                     All rights reserved.
                   </AccordionTrigger>
                   <AccordionContent>
@@ -321,7 +321,7 @@ export default function LoginPage() {
                     </div>
                   </AccordionContent>
                 </AccordionItem>
-              </p>
+              </div>
             </Accordion>
           </div>
         </footer>
