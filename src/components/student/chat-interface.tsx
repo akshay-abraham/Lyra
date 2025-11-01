@@ -38,7 +38,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, User, CornerDownLeft, BookCheck } from 'lucide-react';
+import { Bot, User, Send, BookCheck } from 'lucide-react';
 import ReactMarkdown from 'react-markdown'; // Library to render Markdown text.
 import remarkGfm from 'remark-gfm'; // Plugin for GitHub Flavored Markdown (tables, etc.).
 import mermaid from 'mermaid'; // Library to render diagrams from text.
@@ -481,7 +481,7 @@ export function ChatInterface({
                 size='icon'
                 aria-label='Submit message'
               >
-                <CornerDownLeft className='h-4 w-4' />
+                <Send className='h-4 w-4' />
               </Button>
             </form>
           </CardContent>
