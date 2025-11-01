@@ -21,11 +21,14 @@ import { Logo } from './logo';
 import { useState, useEffect } from 'react';
 
 const loadingTexts = [
-  'Loading...',
-  'Brewing thoughts...',
-  'Warming up the circuits...',
-  'Gathering knowledge...',
-  'Just a moment...',
+  'Brewing cosmic thoughts...',
+  'Warming up the idea engine...',
+  'Gathering stardust and knowledge...',
+  'Juggling neurons...',
+  'Asking the big questions...',
+  'Finding the perfect analogy...',
+  'Reticulating splines...',
+  'Polishing the answer...',
 ];
 
 /**
@@ -35,25 +38,37 @@ const loadingTexts = [
  */
 export function LoadingScreen() {
   const [currentText, setCurrentText] = useState(loadingTexts[0]);
+  const [textKey, setTextKey] = useState(0);
 
   useEffect(() => {
     let index = 0;
     const intervalId = setInterval(() => {
       index = (index + 1) % loadingTexts.length;
       setCurrentText(loadingTexts[index]);
+      setTextKey(prevKey => prevKey + 1); // Increment key to re-trigger animation
     }, 2000); // Change text every 2 seconds
 
     return () => clearInterval(intervalId);
   }, []);
 
   return (
-    <div className='flex h-screen w-screen flex-col items-center justify-center bg-background'>
-      <div className='animate-pulse'>
-        <Logo />
+    <div className='flex h-screen w-screen flex-col items-center justify-center bg-background overflow-hidden relative'>
+      {/* Animated background shapes */}
+      <div className='absolute inset-0 z-0'>
+        <div className='absolute top-[10%] left-[10%] h-72 w-72 rounded-full bg-primary/20 blur-3xl animate-float1' />
+        <div className='absolute bottom-[10%] right-[10%] h-72 w-72 rounded-full bg-accent/20 blur-3xl animate-float2' />
+        <div className='absolute top-[50%] right-[20%] h-48 w-48 rounded-full bg-secondary/20 blur-2xl animate-float3' />
       </div>
-      <p className='mt-4 text-sm text-muted-foreground transition-opacity duration-500'>
-        {currentText}
-      </p>
+
+      {/* Content */}
+      <div className='relative z-10 flex flex-col items-center justify-center'>
+        <div className='animate-bounce-in'>
+          <Logo />
+        </div>
+        <p key={textKey} className='mt-6 text-sm text-muted-foreground animate-pop-in'>
+          {currentText}
+        </p>
+      </div>
     </div>
   );
 }
