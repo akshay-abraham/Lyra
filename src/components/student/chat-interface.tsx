@@ -138,50 +138,6 @@ const CodeBlock: React.FC<any> = ({
 };
 CodeBlock.displayName = 'CodeBlock';
 
-const AnimatedSubjectIcon = ({
-  Icon,
-  subject,
-}: {
-  Icon: LucideIcon;
-  subject: SubjectData | null;
-}) => {
-  if (!subject) return null;
-
-  const animationClass = () => {
-    switch (subject.name) {
-      case 'Maths':
-      case 'Maths Core':
-      case 'Applied Maths':
-        return 'animate-[spin_2s_ease-in-out]';
-      case 'Science':
-      case 'Physics':
-      case 'Chemistry':
-        return 'animate-[spin_4s_linear_infinite]';
-      case 'Biology':
-        return 'animate-[heartbeat_1.5s_ease-in-out_infinite]';
-      case 'Computer Science':
-      case 'AI':
-        return 'animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite]';
-      default:
-        return 'animate-bounce-in';
-    }
-  };
-
-  return (
-    <div
-      key={subject.name}
-      className='absolute inset-0 flex items-center justify-center -z-10'
-    >
-      <Icon
-        className={`h-48 w-48 text-primary/5 ${animationClass()}`}
-        style={{ color: subject.color, opacity: 0.1 }}
-        strokeWidth={1}
-      />
-    </div>
-  );
-};
-AnimatedSubjectIcon.displayName = 'AnimatedSubjectIcon';
-
 /**
  * This component is shown only when a new chat is started (`chatId` is null).
  * It displays a welcome message and a dropdown menu for the user to select a subject.
@@ -204,12 +160,6 @@ const NewChatView = React.memo(
 
     return (
       <div className='flex flex-col items-center justify-center h-full text-center text-muted-foreground p-4 animate-fade-in-up relative overflow-hidden'>
-        {selectedSubjectData && (
-          <AnimatedSubjectIcon
-            Icon={selectedSubjectData.icon}
-            subject={selectedSubjectData}
-          />
-        )}
         <div className='p-3 rounded-full border-2 border-primary/20 bg-primary/10 mb-4 animate-scale-in'>
           <Icon className='h-8 w-8 text-primary' />
         </div>
