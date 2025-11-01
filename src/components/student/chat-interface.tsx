@@ -38,7 +38,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, User, Send, BookCheck, LucideIcon } from 'lucide-react';
+import { Bot, User, ArrowUp, BookCheck, type LucideIcon } from 'lucide-react';
 import ReactMarkdown from 'react-markdown'; // Library to render Markdown text.
 import remarkGfm from 'remark-gfm'; // Plugin for GitHub Flavored Markdown (tables, etc.).
 import mermaid from 'mermaid'; // Library to render diagrams from text.
@@ -403,48 +403,39 @@ export function ChatInterface({
       </div>
 
       <div className='w-full max-w-3xl mx-auto p-4 sm:p-6'>
-        <Card
-          className={cn(
-            'shadow-lg bg-card/80 backdrop-blur-sm',
-            isLoading ||
-              (!subject && !currentChatId && availableSubjects.length > 0)
-              ? ''
-              : '',
-          )}
-        >
-          <CardContent className='p-2'>
-            <form
-              onSubmit={handleSubmit}
-              className='w-full flex items-center gap-2'
+        <div className='relative'>
+          <form
+            onSubmit={handleSubmit}
+            className='w-full flex items-center gap-2 p-2 pr-1 rounded-full border bg-card/80 backdrop-blur-sm shadow-lg'
+          >
+            <Textarea
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={
+                !subject && !currentChatId && availableSubjects.length > 0
+                  ? 'Please select a subject above to begin.'
+                  : 'Message Lyra...'
+              }
+              className='flex-grow resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent max-h-48 p-2'
+              rows={1}
+              disabled={
+                isLoading ||
+                (!subject && !currentChatId && availableSubjects.length > 0)
+              }
+            />
+            <Button
+              type='submit'
+              disabled={isLoading || !input.trim()}
+              size='icon'
+              aria-label='Submit message'
+              className='rounded-full h-9 w-9 bg-foreground text-background hover:bg-foreground/80'
             >
-              <Textarea
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder={
-                  !subject && !currentChatId && availableSubjects.length > 0
-                    ? 'Please select a subject above to begin.'
-                    : 'Message Lyra...'
-                }
-                className='flex-grow resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent max-h-48'
-                rows={1}
-                disabled={
-                  isLoading ||
-                  (!subject && !currentChatId && availableSubjects.length > 0)
-                }
-              />
-              <Button
-                type='submit'
-                disabled={isLoading || !input.trim()}
-                size='icon'
-                aria-label='Submit message'
-              >
-                <Send className='h-4 w-4' />
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+              <ArrowUp className='h-4 w-4' />
+            </Button>
+          </form>
+        </div>
         <p className='text-xs text-center text-muted-foreground mt-2'>
           Lyra can make mistakes. Consider checking important information with
           your teachers.
