@@ -100,7 +100,11 @@ export default function LoginPage() {
   return (
     <div className='relative min-h-screen w-full overflow-x-hidden bg-background text-foreground'>
       {/* The animated background is a separate div placed behind everything else. */}
-      <div className='animated-background'></div>
+      <div className='animated-background'>
+        <div className='blob blob-1'></div>
+        <div className='blob blob-2'></div>
+        <div className='blob blob-3'></div>
+      </div>
 
       {/* Header */}
       <header className='fixed top-0 left-0 w-full p-4 sm:p-6 z-20 bg-background/50 backdrop-blur-sm'>
