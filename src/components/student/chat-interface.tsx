@@ -59,6 +59,7 @@ import {
   allSubjects,
 } from '@/lib/subjects-data';
 import type { Message } from '@/types';
+import { Logo } from '../layout/logo';
 
 /**
  * A specialized component to render Mermaid diagrams from a string.
@@ -347,8 +348,8 @@ export function ChatInterface({
               >
                 {message.role === 'assistant' && (
                   <Avatar className='h-8 w-8 border bg-card'>
-                    <AvatarFallback className='bg-transparent'>
-                      <Bot className='text-primary h-5 w-5' />
+                    <AvatarFallback className='bg-transparent p-1.5'>
+                      <Logo />
                     </AvatarFallback>
                   </Avatar>
                 )}
@@ -387,8 +388,8 @@ export function ChatInterface({
             {isLoading && (
               <div className='flex items-start gap-4 animate-fade-in-up'>
                 <Avatar className='h-8 w-8 border bg-card'>
-                  <AvatarFallback className='bg-transparent'>
-                    <Bot className='text-primary h-5 w-5' />
+                  <AvatarFallback className='bg-transparent p-1.5'>
+                    <Logo />
                   </AvatarFallback>
                 </Avatar>
                 <div className='max-w-md rounded-lg p-3 bg-card/80 backdrop-blur-sm border flex items-center'>
