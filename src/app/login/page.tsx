@@ -221,7 +221,7 @@ export default function LoginPage() {
             {features.map((feature, index) => (
               <div
                 key={feature.title}
-                className='flex flex-col items-start animate-fade-in-up'
+                className='flex flex-col items-start animate-fade-in-up opacity-0'
                 style={{ animationDelay: `${0.5 + index * 0.2}s` }}
               >
                 <div className='p-3 rounded-full border-2 border-primary/10 bg-card mb-4'>
@@ -242,20 +242,20 @@ export default function LoginPage() {
         <section id='tech' className='w-full py-20 px-4'>
           <div className='container mx-auto'>
             <h2
-              className='text-center text-3xl font-headline font-bold mb-4 animate-fade-in-up'
+              className='text-center text-3xl font-headline font-bold mb-4 animate-fade-in-up opacity-0'
               style={{ animationDelay: '1.2s' }}
             >
               Powered by a Modern Stack
             </h2>
             <p
-              className='text-center text-muted-foreground mb-12 max-w-xl mx-auto animate-fade-in-up'
+              className='text-center text-muted-foreground mb-12 max-w-xl mx-auto animate-fade-in-up opacity-0'
               style={{ animationDelay: '1.3s' }}
             >
               Built with industry-leading technologies for a reliable,
               scalable, and performant user experience.
             </p>
             <div
-              className='flex justify-center items-center gap-x-8 md:gap-x-12 gap-y-6 flex-wrap animate-fade-in-up'
+              className='flex justify-center items-center gap-x-8 md:gap-x-12 gap-y-6 flex-wrap animate-fade-in-up opacity-0'
               style={{ animationDelay: '1.4s' }}
             >
               {technologies.map((tech) => (
