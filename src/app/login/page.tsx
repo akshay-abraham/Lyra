@@ -50,6 +50,7 @@ import { FirebaseLogo } from '@/components/auth/firebase-logo';
 import { NextJsLogo } from '@/components/auth/nextjs-logo';
 import { ReactLogo } from '@/components/auth/react-logo';
 import { TailwindCssLogo } from '@/components/auth/tailwind-css-logo';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
 /**
  * The main component for the redesigned login page.
@@ -217,23 +218,27 @@ export default function LoginPage() {
 
         {/* Features Section */}
         <section id='features' className='w-full py-20 px-4 bg-primary/5'>
-          <div className='container mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 text-left'>
+          <div className='container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-left'>
             {features.map((feature, index) => (
-              <div
+              <Card
                 key={feature.title}
-                className='flex flex-col items-start animate-fade-in-up opacity-0'
+                className='flex flex-col items-start p-6 bg-card/50 backdrop-blur-sm border-border/50 animate-fade-in-up opacity-0 transition-all duration-300 hover:border-primary/50 hover:shadow-primary/10 hover:shadow-2xl hover:-translate-y-2'
                 style={{ animationDelay: `${0.5 + index * 0.2}s` }}
               >
-                <div className='p-3 rounded-full border-2 border-primary/10 bg-card mb-4'>
-                  {feature.icon}
-                </div>
-                <h3 className='text-xl font-headline font-bold mb-2 text-foreground'>
-                  {feature.title}
-                </h3>
-                <p className='text-muted-foreground'>
-                  {feature.description}
-                </p>
-              </div>
+                <CardHeader className='p-0 mb-4'>
+                  <div className='p-3 rounded-full border-2 border-primary/10 bg-card mb-4 w-fit'>
+                    {feature.icon}
+                  </div>
+                  <h3 className='text-xl font-headline font-bold text-foreground'>
+                    {feature.title}
+                  </h3>
+                </CardHeader>
+                <CardContent className='p-0'>
+                  <p className='text-muted-foreground'>
+                    {feature.description}
+                  </p>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </section>
@@ -255,7 +260,7 @@ export default function LoginPage() {
               scalable, and performant user experience.
             </p>
             <div
-              className='flex justify-center items-center gap-x-8 md:gap-x-12 gap-y-6 flex-wrap animate-fade-in-up opacity-0'
+              className='flex justify-center items-center gap-x-6 md:gap-x-12 gap-y-6 flex-wrap animate-fade-in-up opacity-0'
               style={{ animationDelay: '1.4s' }}
             >
               {technologies.map((tech) => (
