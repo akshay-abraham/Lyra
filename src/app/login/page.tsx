@@ -13,8 +13,8 @@
  * - A clean header with the application logo and name.
  * - A central "hero" section with a bold headline and the login form.
  * - Visual, icon-driven cards that highlight Lyra's core pedagogical features.
- * - A visually rich "Powered by" section showcasing the core technologies with logos.
- * - A footer with credits for the developer and mentor.
+ * - A "Motivation" section in a collapsible drawer.
+ * - A minimal, collapsible license and credits section in the footer.
  */
 
 import { LoginForm } from '@/components/auth/login-form';
@@ -26,12 +26,25 @@ import {
   GraduationCap,
   Sparkles,
   ArrowRight,
+  BookOpen,
+  Scale,
 } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { siteConfig } from '@/lib/site-config';
 import { GitHubLogo } from '@/components/auth/github-logo';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 
 /**
  * The main component for the redesigned login page.
@@ -136,8 +149,46 @@ export default function LoginPage() {
           </div>
         </section>
 
+        {/* Motivation Section */}
+        <section id='motivation' className='w-full py-20 px-4'>
+          <div className='container mx-auto max-w-4xl'>
+            <Collapsible>
+              <CollapsibleTrigger asChild>
+                <Button variant='ghost' className='text-lg font-headline'>
+                  <BookOpen className='mr-2' />
+                  Our Motivation: A New Approach to AI in Education
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className='prose prose-lg max-w-none dark:prose-invert mt-8 text-left animate-fade-in-up'>
+                  <p>
+                    In today’s classrooms, AI is often met with suspicion.
+                    Educators worry that students will{' '}
+                    <strong>outsource thinking</strong> — generating essays,
+                    solving problem sets, or even writing code entirely with AI.
+                    The immediate institutional response has often been
+                    prohibition: <em>ban AI outright</em>.
+                  </p>
+                  <p>
+                    But a good human tutor rarely gives the solution directly.
+                    Instead, they ask guiding questions, offer hints, and
+                    encourage students to verbalize their thought process.
+                  </p>
+                  <p>
+                    Thus, Lyra was born — as a{' '}
+                    <strong>central AI backend</strong> designed with{' '}
+                    <em>pedagogical principles</em> at its core to reduce
+                    over-reliance on direct answers and guide learning through
+                    hints, analogies, and Socratic questioning.
+                  </p>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          </div>
+        </section>
+
         {/* Technology Section */}
-        <section id='tech' className='w-full py-20 px-4'>
+        <section id='tech' className='w-full py-20 px-4 bg-primary/5'>
           <div className='container mx-auto'>
             <h2
               className='text-center text-3xl font-headline font-bold mb-4 animate-fade-in-up'
@@ -156,7 +207,7 @@ export default function LoginPage() {
               className='flex justify-center items-center gap-x-8 md:gap-x-12 gap-y-6 flex-wrap animate-fade-in-up'
               style={{ animationDelay: '1.4s' }}
             >
-              {siteConfig.technologies.map((tech, index) => (
+              {siteConfig.technologies.map((tech) => (
                 <a
                   href='#'
                   key={tech.name}
@@ -181,9 +232,56 @@ export default function LoginPage() {
 
         {/* Footer */}
         <footer className='w-full p-8 text-center border-t border-border'>
-          <p className='text-sm text-muted-foreground'>
-            ©2025 Akshay K Rooben Abraham All rights reserved.
-          </p>
+          <div className='container mx-auto space-y-4'>
+            <Accordion type='single' collapsible className='w-full max-w-4xl mx-auto'>
+                <AccordionItem value='license' className='border-none'>
+                    <AccordionTrigger className='justify-center text-muted-foreground hover:text-foreground text-sm'>
+                        <Scale className='mr-2 h-4 w-4' />
+                        View License
+                    </AccordionTrigger>
+                    <AccordionContent>
+                        <div className='prose prose-sm max-w-none dark:prose-invert text-muted-foreground text-left mx-auto p-4 bg-card/50 rounded-lg border'>
+                            <p>
+                                <strong>© 2025 {siteConfig.developer.name}. All rights reserved.</strong>
+                            </p>
+                             <p>
+                              This software and all associated materials, including but not
+                              limited to the codebase, design, architecture, content, and
+                              branding of “Lyra”, are proprietary intellectual property
+                              owned by {siteConfig.developer.name}.
+                            </p>
+                            <p>
+                              Unauthorized reproduction, distribution, modification, or
+                              deployment of this system, in whole or in part, is strictly
+                              prohibited.
+                            </p>
+                            <p>
+                              Usage of Lyra is limited to testing in the current stage.
+                            </p>
+                            <p>
+                              Violators will be subject to legal action under applicable
+                              intellectual property and cyber laws.
+                            </p>
+                            <p>
+                              For licensing and partnership inquiries, please contact:{' '}
+                              <a href={`mailto:akshaykroobenabraham@gmail.com`}>
+                                akshaykroobenabraham@gmail.com
+                              </a>
+                            </p>
+                        </div>
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
+             <p className='text-sm text-muted-foreground'>
+               Developed by{' '}
+              <Link href={siteConfig.developer.url} target='_blank' rel='noopener noreferrer' className='font-medium text-foreground hover:text-primary underline-offset-4 hover:underline'>
+                {siteConfig.developer.name}
+              </Link>
+            </p>
+            <p className='text-sm text-muted-foreground'>
+              ©2025 {siteConfig.developer.name} All rights reserved.
+            </p>
+          </div>
         </footer>
       </div>
     </div>
