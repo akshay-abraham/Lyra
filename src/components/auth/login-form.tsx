@@ -114,14 +114,18 @@ export function LoginForm() {
     } catch (error: any) {
       // 4. Handle any errors during the process.
       console.error('Google sign-in failed:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Google Sign-In Failed',
-        description:
-          error.code === 'auth/popup-closed-by-user'
-            ? 'The sign-in window was closed.'
-            : 'Could not sign in with Google. Please try again.',
-      });
+      if (error.code === 'auth/popup-closed-by-user') {
+        toast({
+          title: 'Sign-In Canceled',
+          description: 'You can sign in with Google at any time.',
+        });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Google Sign-In Failed',
+          description: 'Could not sign in with Google. Please try again.',
+        });
+      }
     } finally {
       // 5. Always stop the loading spinner, whether success or failure.
       setIsSubmitting(false);
