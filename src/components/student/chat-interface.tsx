@@ -342,9 +342,9 @@ export function ChatInterface({
             {safeMessages.map((message: Message, index) => (
               <div
                 key={message.id || index}
-                className={`flex items-start gap-4 ${
-                  message.role === 'user' ? 'justify-end' : ''
-                } animate-fade-in-up`}
+                className={cn('flex items-start gap-4 animate-fade-in-up', {
+                  'justify-end': message.role === 'user',
+                })}
               >
                 {message.role === 'assistant' && (
                   <Avatar className='h-8 w-8 border bg-card'>
