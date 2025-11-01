@@ -65,6 +65,7 @@ import {
 } from '@/lib/subjects-data';
 import { COLLECTIONS } from '@/lib/constants';
 import type { UserProfile, UserRole, School } from '@/types';
+import { Combobox } from '../ui/combobox';
 
 // The Zod schema defines validation rules for the profile completion form.
 const formSchema = z
@@ -72,7 +73,7 @@ const formSchema = z
     name: z.string().min(2, 'Name must be at least 2 characters'),
     email: z.string().email('Please enter a valid email'),
     role: z.enum(['student', 'teacher']),
-    school: z.string().min(1, 'Please select a school'),
+    school: z.string().min(1, 'Please select or enter a school'),
     // Student fields
     class: z.string().optional(),
     // Teacher fields
@@ -264,7 +265,10 @@ export function RegisterForm() {
   };
 
   // Prepare options for the various dropdowns in the form.
-  const schoolOptions: School[] = ['Girideepam Bethany Central School'];
+  const schoolOptions = [
+    { value: 'Girideepam Bethany Central School', label: 'Girideepam Bethany Central School' },
+  ];
+
   const groupedClasses = allClasses.reduce(
     (acc, currentClass) => {
       const grade = `Grade ${currentClass.grade}`;
@@ -342,25 +346,14 @@ export function RegisterForm() {
               name='school'
               control={form.control}
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex flex-col">
                   <FormLabel>School</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder='Select your school' />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {schoolOptions.map((s) => (
-                        <SelectItem key={s} value={s}>
-                          {s}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Combobox
+                    options={schoolOptions}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Select or type school name..."
+                  />
                   <FormMessage />
                 </FormItem>
               )}
