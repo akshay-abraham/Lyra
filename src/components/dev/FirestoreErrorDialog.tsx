@@ -17,12 +17,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogFooter,
-  AlertDialogCancel,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { FirestorePermissionError } from '@/firebase/errors';
-import { ShieldAlert, Copy } from 'lucide-react';
+import { Copy, ShieldAlert } from 'lucide-react';
 import React from 'react';
 
 interface FirestoreErrorDialogProps {
@@ -50,49 +49,42 @@ export function FirestoreErrorDialog({
 
   return (
     <AlertDialog open={!!error} onOpenChange={onClose}>
-      <AlertDialogContent className='max-w-3xl'>
-        <AlertDialogHeader>
-          <div className='flex items-center gap-4'>
-            <div className='p-3 rounded-full bg-destructive/10 w-fit'>
-              <ShieldAlert className='h-10 w-10 text-destructive' />
-            </div>
-            <div>
-              <AlertDialogTitle className='font-headline text-2xl text-destructive'>
-                Security Rule Blocked a Request!
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                Don't worry, this is a good thing! It means your security rules
-                are working. Here’s the request that was denied.
-              </AlertDialogDescription>
-            </div>
+      <AlertDialogContent className='max-w-3xl bg-destructive/5 border-destructive/20'>
+        <AlertDialogHeader className='text-center'>
+          <div className='mx-auto bg-destructive/10 p-4 rounded-full w-fit'>
+            <ShieldAlert className='h-12 w-12 text-destructive' />
           </div>
+          <AlertDialogTitle className='font-headline text-3xl text-destructive mt-4'>
+            Security Rule Stop!
+          </AlertDialogTitle>
+          <AlertDialogDescription className='text-muted-foreground'>
+            Excellent! Your security rules just did their job and blocked a
+            request. This is a good thing! Below are the details.
+          </AlertDialogDescription>
         </AlertDialogHeader>
 
-        <div className='mt-4 bg-destructive/5 p-4 rounded-lg border border-destructive/20 max-h-[50vh] overflow-y-auto'>
+        <div className='mt-4 bg-destructive/10 p-4 rounded-lg border border-destructive/20 max-h-[40vh] overflow-y-auto'>
           <pre className='text-xs text-destructive-foreground whitespace-pre-wrap break-all'>
             <code>{JSON.stringify(error.request, null, 2)}</code>
           </pre>
         </div>
 
-        <p className='text-sm text-muted-foreground mt-4'>
-          Compare this request object to your Firestore rules (`firestore.rules`)
-          to see why access was denied. This is a{' '}
-          <strong className='gradient-text'>very, very large contribution</strong>{' '}
-          to Lyra's security!
+        <p className='text-sm text-foreground font-medium text-center mt-4'>
+          Debugging this makes a{' '}
+          <strong className='gradient-text'> very, very large contribution </strong>{' '}
+          to Lyra's security. Compare this request to `firestore.rules`.
         </p>
 
-        <AlertDialogFooter className='mt-6'>
+        <AlertDialogFooter className='mt-6 gap-2 sm:gap-0'>
           <Button
             variant='outline'
             className='border-primary/50 text-primary hover:bg-primary/10 hover:text-primary'
             onClick={handleCopy}
           >
             <Copy className='mr-2' />
-            Copy Request Details
+            Copy Request
           </Button>
-          <AlertDialogCancel onClick={onClose} asChild>
-            <Button>Got it, thanks!</Button>
-          </AlertDialogCancel>
+          <Button onClick={onClose}>Got it, I'm on it!</Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
