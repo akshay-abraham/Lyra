@@ -55,6 +55,7 @@ import {
   LogOut,
   PlusCircle,
   User,
+  Menu,
 } from 'lucide-react';
 import React from 'react';
 import { useFirebase } from '@/firebase';
@@ -64,7 +65,7 @@ import type { UserProfile } from '@/types';
 
 /**
  * A helper component that contains the actual list of navigation items
- * (New Chat, Teacher, Account, About). Separating it into its own component keeps
+ * (New Chat, Teacher, Account). Separating it into its own component keeps
  * the main layout component cleaner and more organized.
  *
  * @returns {JSX.Element} The rendered list of sidebar menu items.
@@ -156,17 +157,6 @@ function SidebarMenuItems() {
             </SidebarMenuButton>
           </Link>
         </SidebarMenuItem>
-        <SidebarMenuItem>
-          <Link href='/about' onClick={handleLinkClick}>
-            <SidebarMenuButton
-              isActive={pathname.startsWith('/about')}
-              tooltip='About'
-            >
-              <BookOpen />
-              <span>About</span>
-            </SidebarMenuButton>
-          </Link>
-        </SidebarMenuItem>
       </div>
     </SidebarMenu>
   );
@@ -241,7 +231,9 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
           the "hamburger" menu trigger to open the slide-out sidebar.
         */}
         <header className='flex h-14 items-center justify-start border-b px-4 md:hidden bg-card/80 backdrop-blur-sm sticky top-0 z-10'>
-          <SidebarTrigger />
+          <SidebarTrigger>
+            <Menu />
+          </SidebarTrigger>
           <Link href='/' className='ml-4 flex items-center space-x-2'>
             <Logo />
             <span className='font-bold font-headline'>Lyra</span>
