@@ -155,7 +155,7 @@ export default function LoginPage() {
         <section id='motivation' className='w-full py-20 px-4'>
           <div className='container mx-auto max-w-4xl'>
             <Collapsible>
-              <div className='prose prose-base text-muted-foreground max-w-none text-center animate-fade-in-up'>
+              <div className='text-base text-muted-foreground max-w-none text-center animate-fade-in-up'>
                 <p>
                   In today’s classrooms, AI is often met with suspicion. Lyra
                   was born from a different philosophy: that AI can coexist with
@@ -175,29 +175,36 @@ export default function LoginPage() {
                 </p>
               </div>
               <CollapsibleContent>
-                <div className='prose prose-lg max-w-none dark:prose-invert mt-8 text-left animate-fade-in-up'>
+                <div className='text-base text-muted-foreground max-w-prose text-left mx-auto mt-8 space-y-4 animate-fade-in-up'>
                   <p>
                     Educators worry that students will{' '}
-                    <strong>outsource thinking</strong> — generating essays,
-                    solving problem sets, or even writing code entirely with AI.
-                    The immediate institutional response has often been
-                    prohibition: <em>ban AI outright</em>.
+                    <strong className='text-foreground'>
+                      outsource thinking
+                    </strong>{' '}
+                    — generating essays, solving problem sets, or even writing
+                    code entirely with AI. The immediate institutional response
+                    has often been prohibition: <em>ban AI outright</em>.
                   </p>
                   <p>
                     But a good human tutor rarely gives the solution directly.
                     Instead, they ask guiding questions, offer hints, and
                     encourage students to verbalize their thought process. This
                     project was inspired by experiences with the{' '}
-                    <strong>CS50 Rubber Duck Assistant</strong>, which proved
-                    that structured, pedagogical guidance is often more valuable
-                    than a powerful but undirected AI like GitHub Copilot.
+                    <strong className='text-foreground'>
+                      CS50 Rubber Duck Assistant
+                    </strong>
+                    , which proved that structured, pedagogical guidance is
+                    often more valuable than a powerful but undirected AI like
+                    GitHub Copilot.
                   </p>
                   <p>
                     Thus, Lyra was born — as a{' '}
-                    <strong>central AI backend</strong> designed with{' '}
-                    <em>pedagogical principles</em> at its core to reduce
-                    over-reliance on direct answers and guide learning through
-                    hints, analogies, and Socratic questioning.
+                    <strong className='text-foreground'>
+                      central AI backend
+                    </strong>{' '}
+                    designed with <em>pedagogical principles</em> at its core to
+                    reduce over-reliance on direct answers and guide learning
+                    through hints, analogies, and Socratic questioning.
                   </p>
                 </div>
               </CollapsibleContent>
@@ -265,60 +272,56 @@ export default function LoginPage() {
 
         {/* Footer */}
         <footer className='w-full p-8 text-center border-t border-border'>
-          <div className='container mx-auto text-xs text-muted-foreground flex flex-wrap items-center justify-center gap-x-4 gap-y-2'>
-            <p>
-              © 2025{' '}
-              <Link
-                href={siteConfig.developer.url}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='underline-offset-4 hover:underline hover:text-foreground'
-              >
-                {siteConfig.developer.name} 🔗
-              </Link>
-            </p>
-
+          <div className='container mx-auto text-xs text-muted-foreground'>
             <Accordion type='single' collapsible className='w-auto'>
-              <AccordionItem value='license' className='border-none'>
-                <AccordionTrigger className='p-0 text-xs hover:no-underline hover:text-foreground'>
-                  All rights reserved. View License
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className='prose prose-sm max-w-none dark:prose-invert text-muted-foreground text-left mx-auto mt-4 p-4 bg-card/50 rounded-lg border'>
-                    <p>
-                      <strong>
-                        © 2025 {siteConfig.developer.name}. All rights
-                        reserved.
-                      </strong>
-                    </p>
-                    <p>
-                      This software and all associated materials, including but
-                      not limited to the codebase, design, architecture,
-                      content, and branding of “Lyra”, are proprietary
-                      intellectual property owned by {siteConfig.developer.name}
-                      .
-                    </p>
-                    <p>
-                      Unauthorized reproduction, distribution, modification, or
-                      deployment of this system, in whole or in part, is
-                      strictly prohibited.
-                    </p>
-                    <p>
-                      Usage of Lyra is limited to testing in the current stage.
-                    </p>
-                    <p>
-                      Violators will be subject to legal action under applicable
-                      intellectual property and cyber laws.
-                    </p>
-                    <p>
-                      For licensing and partnership inquiries, please contact:{' '}
-                      <a href={`mailto:akshaykroobenabraham@gmail.com`}>
-                        akshaykroobenabraham@gmail.com
-                      </a>
-                    </p>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
+              <p>
+                © 2025{' '}
+                <Link
+                  href={siteConfig.developer.url}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='underline-offset-4 hover:underline hover:text-foreground'
+                >
+                  {siteConfig.developer.name} 🔗
+                </Link>
+                .
+                <AccordionItem value='license' className='border-none inline'>
+                  <AccordionTrigger className='p-0 text-xs hover:no-underline hover:text-foreground inline-flex ml-1'>
+                    All rights reserved.
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className='text-xs text-muted-foreground max-w-prose text-left mx-auto mt-4 p-4 bg-card/50 rounded-lg border space-y-2'>
+                      <p>
+                        <strong>
+                          © 2025 {siteConfig.developer.name}. All rights
+                          reserved.
+                        </strong>
+                      </p>
+                      <p>
+                        This software and all associated materials, including
+                        but not limited to the codebase, design, architecture,
+                        content, and branding of “Lyra”, are proprietary
+                        intellectual property owned by{' '}
+                        {siteConfig.developer.name}.
+                      </p>
+                      <p>
+                        Unauthorized reproduction, distribution, modification,
+                        or deployment of this system, in whole or in part, is
+                        strictly prohibited.
+                      </p>
+                      <p>
+                        For licensing and partnership inquiries, please contact:{' '}
+                        <a
+                          href={`mailto:akshaykroobenabraham@gmail.com`}
+                          className='underline'
+                        >
+                          akshaykroobenabraham@gmail.com
+                        </a>
+                      </p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </p>
             </Accordion>
           </div>
         </footer>
