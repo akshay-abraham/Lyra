@@ -406,7 +406,7 @@ export function ChatInterface({
         <div className='relative'>
           <form
             onSubmit={handleSubmit}
-            className='w-full flex items-center gap-2 p-2 pr-1 rounded-full border bg-card/80 backdrop-blur-sm shadow-lg'
+            className='w-full flex items-center gap-2 p-1 rounded-full border bg-card/80'
           >
             <Textarea
               ref={inputRef}
@@ -430,7 +430,8 @@ export function ChatInterface({
               disabled={isLoading || !input.trim()}
               size='icon'
               aria-label='Submit message'
-              className='rounded-full h-9 w-9 bg-foreground text-background hover:bg-foreground/80'
+              className='rounded-full h-9 w-9 text-primary-foreground'
+              style={{ backgroundColor: 'var(--chat-accent-color)' }}
             >
               <ArrowUp className='h-4 w-4' />
             </Button>
