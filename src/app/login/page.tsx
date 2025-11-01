@@ -12,8 +12,9 @@
  * - A full-screen container with a powerful, animated gradient background.
  * - A clean header with the application logo and name.
  * - A central "hero" section with a bold headline and the login form.
+ * - A collapsible "Motivation" section to share the project's story.
  * - Visual, icon-driven cards that highlight Lyra's core pedagogical features.
- * - A "Motivation" section in a collapsible drawer.
+ * - A "Powered By" section showcasing the technology stack.
  * - A minimal, collapsible license and credits section in the footer.
  */
 
@@ -25,7 +26,6 @@ import {
   BrainCircuit,
   GraduationCap,
   Sparkles,
-  ArrowRight,
   BookOpen,
   Scale,
 } from 'lucide-react';
@@ -45,6 +45,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { VercelLogo } from '@/components/auth/vercel-logo';
+import { FirebaseLogo } from '@/components/auth/firebase-logo';
+import { NextJsLogo } from '@/components/auth/nextjs-logo';
+import { ReactLogo } from '@/components/auth/react-logo';
+import { TailwindCssLogo } from '@/components/auth/tailwind-css-logo';
 
 /**
  * The main component for the redesigned login page.
@@ -71,6 +76,26 @@ export default function LoginPage() {
       description:
         'With RAG, Lyra answers questions based on your uploaded course materials for fact-checked accuracy.',
     },
+  ];
+
+  const technologies = [
+    { name: 'Next.js', component: <NextJsLogo className='h-12 w-12' /> },
+    { name: 'Firebase', component: <FirebaseLogo className='h-12 w-12' /> },
+    {
+      name: 'Genkit',
+      component: (
+        <Image
+          data-ai-hint='genkit logo'
+          src='/genkit.png'
+          alt='Genkit logo'
+          width={48}
+          height={48}
+        />
+      ),
+    },
+    { name: 'React', component: <ReactLogo className='h-12 w-12' /> },
+    { name: 'Tailwind CSS', component: <TailwindCssLogo className='h-12 w-12' /> },
+    { name: 'Vercel', component: <VercelLogo className='h-12 w-12' /> },
   ];
 
   return (
@@ -126,6 +151,55 @@ export default function LoginPage() {
           </Suspense>
         </main>
 
+        {/* Motivation Section */}
+        <section id='motivation' className='w-full py-20 px-4'>
+          <div className='container mx-auto max-w-4xl'>
+            <Collapsible>
+              <div className='prose prose-lg max-w-none dark:prose-invert text-center animate-fade-in-up'>
+                <p>
+                  In today’s classrooms, AI is often met with suspicion. Lyra
+                  was born from a different philosophy: that AI can coexist with
+                  classrooms under{' '}
+                  <strong>educational and ethical guardrails</strong>.
+                </p>
+              </div>
+              <CollapsibleTrigger asChild>
+                <Button variant='link' className='text-lg font-headline mt-4'>
+                  <BookOpen className='mr-2' />
+                  Read the Full Story
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className='prose prose-lg max-w-none dark:prose-invert mt-8 text-left animate-fade-in-up'>
+                  <p>
+                    Educators worry that students will{' '}
+                    <strong>outsource thinking</strong> — generating essays,
+                    solving problem sets, or even writing code entirely with AI.
+                    The immediate institutional response has often been
+                    prohibition: <em>ban AI outright</em>.
+                  </p>
+                  <p>
+                    But a good human tutor rarely gives the solution directly.
+                    Instead, they ask guiding questions, offer hints, and
+                    encourage students to verbalize their thought process. This
+                    project was inspired by experiences with the{' '}
+                    <strong>CS50 Rubber Duck Assistant</strong>, which proved
+                    that structured, pedagogical guidance is often more valuable
+                    than a powerful but undirected AI like GitHub Copilot.
+                  </p>
+                  <p>
+                    Thus, Lyra was born — as a{' '}
+                    <strong>central AI backend</strong> designed with{' '}
+                    <em>pedagogical principles</em> at its core to reduce
+                    over-reliance on direct answers and guide learning through
+                    hints, analogies, and Socratic questioning.
+                  </p>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          </div>
+        </section>
+
         {/* Features Section */}
         <section id='features' className='w-full py-20 px-4 bg-primary/5'>
           <div className='container mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 text-left'>
@@ -149,46 +223,8 @@ export default function LoginPage() {
           </div>
         </section>
 
-        {/* Motivation Section */}
-        <section id='motivation' className='w-full py-20 px-4'>
-          <div className='container mx-auto max-w-4xl'>
-            <Collapsible>
-              <CollapsibleTrigger asChild>
-                <Button variant='ghost' className='text-lg font-headline'>
-                  <BookOpen className='mr-2' />
-                  Our Motivation: A New Approach to AI in Education
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <div className='prose prose-lg max-w-none dark:prose-invert mt-8 text-left animate-fade-in-up'>
-                  <p>
-                    In today’s classrooms, AI is often met with suspicion.
-                    Educators worry that students will{' '}
-                    <strong>outsource thinking</strong> — generating essays,
-                    solving problem sets, or even writing code entirely with AI.
-                    The immediate institutional response has often been
-                    prohibition: <em>ban AI outright</em>.
-                  </p>
-                  <p>
-                    But a good human tutor rarely gives the solution directly.
-                    Instead, they ask guiding questions, offer hints, and
-                    encourage students to verbalize their thought process.
-                  </p>
-                  <p>
-                    Thus, Lyra was born — as a{' '}
-                    <strong>central AI backend</strong> designed with{' '}
-                    <em>pedagogical principles</em> at its core to reduce
-                    over-reliance on direct answers and guide learning through
-                    hints, analogies, and Socratic questioning.
-                  </p>
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
-          </div>
-        </section>
-
         {/* Technology Section */}
-        <section id='tech' className='w-full py-20 px-4 bg-primary/5'>
+        <section id='tech' className='w-full py-20 px-4'>
           <div className='container mx-auto'>
             <h2
               className='text-center text-3xl font-headline font-bold mb-4 animate-fade-in-up'
@@ -207,24 +243,16 @@ export default function LoginPage() {
               className='flex justify-center items-center gap-x-8 md:gap-x-12 gap-y-6 flex-wrap animate-fade-in-up'
               style={{ animationDelay: '1.4s' }}
             >
-              {siteConfig.technologies.map((tech) => (
-                <a
-                  href='#'
+              {technologies.map((tech) => (
+                <div
                   key={tech.name}
                   className='flex flex-col items-center gap-3 group'
                 >
-                  <Image
-                    data-ai-hint={tech.name.toLowerCase()}
-                    src={tech.logo}
-                    alt={`${tech.name} logo`}
-                    width={48}
-                    height={48}
-                    className='object-contain transition-transform duration-300 group-hover:scale-110'
-                  />
+                  {tech.component}
                   <span className='font-semibold text-muted-foreground group-hover:text-foreground transition-colors'>
                     {tech.name}
                   </span>
-                </a>
+                </div>
               ))}
             </div>
           </div>
@@ -232,52 +260,72 @@ export default function LoginPage() {
 
         {/* Footer */}
         <footer className='w-full p-8 text-center border-t border-border'>
-          <div className='container mx-auto space-y-4'>
-            <Accordion type='single' collapsible className='w-full max-w-4xl mx-auto'>
-                <AccordionItem value='license' className='border-none'>
-                    <AccordionTrigger className='justify-center text-muted-foreground hover:text-foreground text-sm'>
-                        <Scale className='mr-2 h-4 w-4' />
-                        View License
-                    </AccordionTrigger>
-                    <AccordionContent>
-                        <div className='prose prose-sm max-w-none dark:prose-invert text-muted-foreground text-left mx-auto p-4 bg-card/50 rounded-lg border'>
-                            <p>
-                                <strong>© 2025 {siteConfig.developer.name}. All rights reserved.</strong>
-                            </p>
-                             <p>
-                              This software and all associated materials, including but not
-                              limited to the codebase, design, architecture, content, and
-                              branding of “Lyra”, are proprietary intellectual property
-                              owned by {siteConfig.developer.name}.
-                            </p>
-                            <p>
-                              Unauthorized reproduction, distribution, modification, or
-                              deployment of this system, in whole or in part, is strictly
-                              prohibited.
-                            </p>
-                            <p>
-                              Usage of Lyra is limited to testing in the current stage.
-                            </p>
-                            <p>
-                              Violators will be subject to legal action under applicable
-                              intellectual property and cyber laws.
-                            </p>
-                            <p>
-                              For licensing and partnership inquiries, please contact:{' '}
-                              <a href={`mailto:akshaykroobenabraham@gmail.com`}>
-                                akshaykroobenabraham@gmail.com
-                              </a>
-                            </p>
-                        </div>
-                    </AccordionContent>
-                </AccordionItem>
+          <div className='container mx-auto space-y-6'>
+            <div
+              className='p-6 rounded-lg bg-primary/5 border border-primary/20 shadow-lg shadow-primary/10 max-w-2xl mx-auto animate-glow'
+              style={{ animationDelay: '1.5s' }}
+            >
+              <p className='text-lg font-headline text-foreground mb-2'>
+                Developed by Akshay K. Rooben Abraham
+              </p>
+              <Button asChild>
+                <Link
+                  href={siteConfig.developer.url}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                >
+                  Visit Personal Website
+                </Link>
+              </Button>
+            </div>
+
+            <Accordion
+              type='single'
+              collapsible
+              className='w-full max-w-4xl mx-auto'
+            >
+              <AccordionItem value='license' className='border-none'>
+                <AccordionTrigger className='justify-center text-muted-foreground hover:text-foreground text-sm'>
+                  <Scale className='mr-2 h-4 w-4' />
+                  View License
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className='prose prose-sm max-w-none dark:prose-invert text-muted-foreground text-left mx-auto p-4 bg-card/50 rounded-lg border'>
+                    <p>
+                      <strong>
+                        © 2025 {siteConfig.developer.name}. All rights
+                        reserved.
+                      </strong>
+                    </p>
+                    <p>
+                      This software and all associated materials, including but
+                      not limited to the codebase, design, architecture,
+                      content, and branding of “Lyra”, are proprietary
+                      intellectual property owned by {siteConfig.developer.name}
+                      .
+                    </p>
+                    <p>
+                      Unauthorized reproduction, distribution, modification, or
+                      deployment of this system, in whole or in part, is
+                      strictly prohibited.
+                    </p>
+                    <p>
+                      Usage of Lyra is limited to testing in the current stage.
+                    </p>
+                    <p>
+                      Violators will be subject to legal action under applicable
+                      intellectual property and cyber laws.
+                    </p>
+                    <p>
+                      For licensing and partnership inquiries, please contact:{' '}
+                      <a href={`mailto:akshaykroobenabraham@gmail.com`}>
+                        akshaykroobenabraham@gmail.com
+                      </a>
+                    </p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
             </Accordion>
-             <p className='text-sm text-muted-foreground'>
-               Developed by{' '}
-              <Link href={siteConfig.developer.url} target='_blank' rel='noopener noreferrer' className='font-medium text-foreground hover:text-primary underline-offset-4 hover:underline'>
-                {siteConfig.developer.name}
-              </Link>
-            </p>
             <p className='text-sm text-muted-foreground'>
               ©2025 {siteConfig.developer.name} All rights reserved.
             </p>
