@@ -53,6 +53,7 @@ import {
 import { allSubjects, type SubjectData } from '@/lib/subjects-data';
 import { COLLECTIONS, FIELDS } from '@/lib/constants';
 import type { ChatSession } from '@/types';
+import { Separator } from '../ui/separator';
 
 // Create a lookup map for subject data (like an icon and color).
 // This is an optimization to quickly find a subject's metadata by its name.
@@ -164,55 +165,39 @@ export function ChatHistory({ onLinkClick }: { onLinkClick: () => void }) {
 
   // If we have data, render the list of accordions.
   return (
-    <Accordion
-      type='multiple'
-      className='w-full group-data-[collapsible=icon]:hidden px-2'
-    >
-      {/*
-        `Object.entries(groupedSessions)` turns our map into an array of [key, value] pairs
-        so we can loop over it.
-        for each ([subject, sessions_for_subject] in groupedSessions):
-            // render an AccordionItem for this subject...
-      */}
+    <div className='w-full group-data-[collapsible=icon]:hidden px-2 space-y-2'>
       {Object.entries(groupedSessions).map(([subject, sessions]) => {
         const subjectInfo = subjectDataMap.get(subject);
         const Icon = subjectInfo?.icon || MessageSquareText;
 
         return (
-          <AccordionItem value={subject} key={subject} className='border-b-0'>
-            {/* The trigger is the part the user clicks to expand/collapse the accordion. */}
-            <AccordionTrigger className='py-2 px-2 hover:no-underline hover:bg-sidebar-accent rounded-md text-sm font-medium'>
-              <div className='flex items-center gap-2'>
-                <Icon
-                  className='h-4 w-4'
-                  style={{ color: subjectInfo?.color }}
-                />
-                <span className='truncate'>{subject}</span>
-              </div>
-            </AccordionTrigger>
-            {/* The content is what's shown when the accordion is open. */}
-            <AccordionContent className='pl-4 pt-1'>
-              <div className='flex flex-col gap-1'>
-                {sessions.map((session) => (
-                  <SidebarMenuItem key={session.id}>
-                    {/* Each item is a link to the chat page with the specific `chatId` in the URL. */}
-                    <Link href={`/?chatId=${session.id}`} onClick={onLinkClick}>
-                      <SidebarMenuButton
-                        isActive={pathname.includes(session.id)}
-                        tooltip={session.title}
-                        className='h-auto py-1.5'
-                      >
-                        <MessageSquareText />
-                        <span className='truncate'>{session.title}</span>
-                      </SidebarMenuButton>
-                    </Link>
-                  </SidebarMenuItem>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
+          <div key={subject}>
+            <h3 className='py-2 px-2 text-xs font-semibold text-sidebar-foreground/70 flex items-center gap-2'>
+              <Icon
+                className='h-4 w-4'
+                style={{ color: subjectInfo?.color }}
+              />
+              <span className='truncate'>{subject}</span>
+            </h3>
+            <div className='flex flex-col gap-1'>
+              {sessions.map((session) => (
+                <SidebarMenuItem key={session.id}>
+                  <Link href={`/?chatId=${session.id}`} onClick={onLinkClick}>
+                    <SidebarMenuButton
+                      isActive={pathname.includes(session.id)}
+                      tooltip={session.title}
+                      className='h-auto py-1.5'
+                    >
+                      <MessageSquareText />
+                      <span className='truncate'>{session.title}</span>
+                    </SidebarMenuButton>
+                  </Link>
+                </SidebarMenuItem>
+              ))}
+            </div>
+          </div>
         );
       })}
-    </Accordion>
+    </div>
   );
 }

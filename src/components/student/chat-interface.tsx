@@ -81,13 +81,16 @@ const Mermaid = React.memo(({ chart }: { chart: string }) => {
   // `useEffect` runs code *after* the component has been rendered to the screen.
   // It's the correct place to interact with browser APIs or external libraries like Mermaid.
   useEffect(() => {
-    mermaid.initialize({ startOnLoad: false, theme: 'neutral' });
     // If our pointer to the screen element is valid and we have a chart string...
     if (chartRef.current && chart) {
       // ...tell mermaid to find that element and render the diagram inside it.
-      mermaid.run({
-        nodes: [chartRef.current],
-      });
+      try {
+        mermaid.run({
+          nodes: [chartRef.current],
+        });
+      } catch (e) {
+        console.error('Mermaid rendering failed:', e);
+      }
     }
   }, [chart]); // This function re-runs only if the `chart` string changes.
 
