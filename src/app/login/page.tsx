@@ -155,16 +155,19 @@ export default function LoginPage() {
         <section id='motivation' className='w-full py-20 px-4'>
           <div className='container mx-auto max-w-4xl'>
             <Collapsible>
-              <div className='prose prose-lg max-w-none dark:prose-invert text-center animate-fade-in-up'>
+              <div className='prose prose-base text-muted-foreground max-w-none text-center animate-fade-in-up'>
                 <p>
                   In today’s classrooms, AI is often met with suspicion. Lyra
                   was born from a different philosophy: that AI can coexist with
                   classrooms under{' '}
-                  <strong>educational and ethical guardrails</strong>...{' '}
+                  <strong className='text-foreground'>
+                    educational and ethical guardrails
+                  </strong>
+                  ...{' '}
                   <CollapsibleTrigger asChild>
                     <Button
                       variant='link'
-                      className='text-lg font-headline p-0 text-primary hover:text-accent'
+                      className='text-base p-0 text-primary/80 hover:text-accent font-normal'
                     >
                       (see more)
                     </Button>
@@ -262,17 +265,23 @@ export default function LoginPage() {
 
         {/* Footer */}
         <footer className='w-full p-8 text-center border-t border-border'>
-          <div className='container mx-auto text-sm text-muted-foreground flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4'>
-            <p>© 2025 {siteConfig.developer.name}. All rights reserved.</p>
-            <Accordion
-              type='single'
-              collapsible
-              className='w-auto sm:border-l sm:pl-4 border-border'
-            >
+          <div className='container mx-auto text-xs text-muted-foreground flex flex-wrap items-center justify-center gap-x-4 gap-y-2'>
+            <p>
+              © 2025{' '}
+              <Link
+                href={siteConfig.developer.url}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='underline-offset-4 hover:underline hover:text-foreground'
+              >
+                {siteConfig.developer.name} 🔗
+              </Link>
+            </p>
+
+            <Accordion type='single' collapsible className='w-auto'>
               <AccordionItem value='license' className='border-none'>
-                <AccordionTrigger className='p-0 hover:no-underline hover:text-foreground'>
-                  <Scale className='mr-2 h-4 w-4' />
-                  View License
+                <AccordionTrigger className='p-0 text-xs hover:no-underline hover:text-foreground'>
+                  All rights reserved. View License
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className='prose prose-sm max-w-none dark:prose-invert text-muted-foreground text-left mx-auto mt-4 p-4 bg-card/50 rounded-lg border'>
@@ -311,14 +320,6 @@ export default function LoginPage() {
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
-            <Link
-              href={siteConfig.developer.url}
-              target='_blank'
-              rel='noopener noreferrer'
-              className='hover:text-foreground sm:border-l sm:pl-4 border-border'
-            >
-              Contact Dev
-            </Link>
           </div>
         </footer>
       </div>
