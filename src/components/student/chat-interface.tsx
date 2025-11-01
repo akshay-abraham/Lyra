@@ -159,14 +159,14 @@ const NewChatView = React.memo(
     const Icon = selectedSubjectData?.icon || BookCheck;
 
     return (
-      <div className='flex flex-col items-center justify-center h-full text-center text-muted-foreground p-4 animate-fade-in-up relative overflow-hidden'>
-        <div className='p-3 rounded-full border-2 border-primary/20 bg-primary/10 mb-4 animate-scale-in'>
+      <div className='flex flex-col items-center justify-center h-full text-center p-4 animate-fade-in-up'>
+        <div className='p-3 rounded-full border-2 border-primary/10 bg-primary/10 mb-4'>
           <Icon className='h-8 w-8 text-primary' />
         </div>
         <h3 className='text-xl font-headline text-foreground mb-2'>
           Ready for a new learning session, {userName || 'friend'}?
         </h3>
-        <p className='max-w-md mb-6 text-sm'>
+        <p className='max-w-md mb-6 text-sm text-muted-foreground'>
           What are we diving into? This helps me tailor my guidance.
         </p>
 
@@ -353,7 +353,7 @@ export function ChatInterface({
                   </Avatar>
                 )}
                 <div
-                  className={`max-w-xl rounded-lg p-3 text-sm transition-all duration-300 ${
+                  className={`max-w-xl rounded-2xl p-3 text-sm transition-all duration-300 ${
                     message.role === 'user'
                       ? 'bg-[var(--chat-accent-color)]/20'
                       : 'bg-card/80 backdrop-blur-sm border'
