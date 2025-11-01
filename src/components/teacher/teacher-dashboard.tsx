@@ -16,9 +16,7 @@
  *     math tutor. Never give the direct answer.").
  * 3.  **Answer Examples (Few-Shot Prompting):** Teachers can provide a dynamic list of
  *     good, guiding responses. The AI uses these examples to learn the desired teaching style.
- * 4.  **Testing Sandbox:** Teachers can type a sample student question and see how the AI
- *     responds with the current settings, allowing for quick iteration and debugging.
- * 5.  **Saving & Loading:** All settings are saved to and loaded from Firestore on a per-teacher,
+ * 4.  **Saving & Loading:** All settings are saved to and loaded from Firestore on a per-teacher,
  *     per-subject basis.
  *
  * C-like Analogy:
@@ -53,11 +51,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { generateGuidedResponse } from '@/ai/flows/guide-ai-response-generation';
 import {
-  Bot,
   Loader2,
   Sparkles,
   Wand2,
@@ -66,8 +61,6 @@ import {
   BookCopy,
 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RagManagement } from './rag-management';
 import { useFirebase, useUser } from '@/firebase';
@@ -97,13 +90,6 @@ const settingsSchema = z.object({
   ),
 });
 
-// A simpler schema just for the "Test AI" sandbox form.
-const testSchema = z.object({
-  studentQuestion: z.string().min(5, {
-    message: 'Test question must be at least 5 characters.',
-  }),
-});
-
 // A default system prompt to use for new settings or subjects.
 const defaultSystemPrompt =
   'You are Lyra, an AI tutor. Your goal is to help the student verbalize their problem and guide them towards the solution by providing hints, analogies, and questions instead of direct answers. You should never give the direct answer. Emulate the Socratic method. Be patient and encouraging. You can use Markdown for formatting.';
@@ -112,28 +98,9 @@ const defaultSystemPrompt =
  * The main component for the teacher's dashboard.
  *
  * @returns {JSX.Element} The rendered teacher dashboard.
- *
- * C-like Explanation: `function TeacherDashboard() -> returns JSX_Element`
- *
- * Internal State (Variables):
- *   - `isSaving`: A boolean flag to show a spinner on the save button.
- *   - `isTesting`: A boolean flag for the "Test AI" button spinner.
- *   - `testResult`: A string to store the AI's response from the test sandbox.
- *   - `teacherData`: A struct-like object holding the teacher's profile (subjects, etc.).
- *   - `selectedSubject`: The subject currently being edited.
- *   - `isLoadingSettings`: A boolean flag for when we are fetching settings from the database.
- *
- * Hooks (Special Functions):
- *   - `useForm`, `useFieldArray`: From `react-hook-form`, these manage the entire state of our main
- *     settings form, including the dynamic list of "Example Answers".
- *   - `useFirebase`, `useUser`: Our custom hooks to get access to the database and current user info.
- *   - `useEffect`: Used to react to changes, like when the user selects a different subject
- *     from the dropdown, which triggers a data fetch from the database.
  */
 export function TeacherDashboard() {
   const [isSaving, setIsSaving] = useState(false);
-  const [isTesting, setIsTesting] = useState(false);
-  const [testResult, setTestResult] = useState('');
   const [teacherData, setTeacherData] = useState<UserProfile | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string>('');
   const [isLoadingSettings, setIsLoadingSettings] = useState(true);
@@ -155,12 +122,6 @@ export function TeacherDashboard() {
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: 'exampleAnswers',
-  });
-
-  // Initialize the "Test AI" form.
-  const testForm = useForm<z.infer<typeof testSchema>>({
-    resolver: zodResolver(testSchema),
-    defaultValues: { studentQuestion: '' },
   });
 
   /**
@@ -260,41 +221,6 @@ export function TeacherDashboard() {
     }
   }
 
-  /**
-   * Called when the "Test AI" sandbox form is submitted.
-   * @param {z.infer<typeof testSchema>} values - The validated data from the test form.
-   */
-  async function onTest(values: z.infer<typeof testSchema>) {
-    setIsTesting(true);
-    setTestResult('');
-    const currentSettings = form.getValues(); // Get the latest settings from the main form.
-    const teacherExamples =
-      currentSettings.exampleAnswers
-        ?.map((e) => e.value)
-        .filter((e) => e.trim() !== '') || [];
-
-    try {
-      // Call the AI flow (like a remote function call) with the test data.
-      const result = await generateGuidedResponse({
-        studentQuestion: values.studentQuestion,
-        teacherExamples: teacherExamples,
-        systemPrompt: currentSettings.systemPrompt,
-      });
-      setTestResult(result.aiResponse); // Update state to display the AI's response.
-    } catch (error) {
-      console.error(error);
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
-      setTestResult(`An error occurred while testing: ${errorMessage}`);
-      toast({
-        variant: 'destructive',
-        title: 'Test Failed',
-        description: 'Could not get a response from the AI. Please try again.',
-      });
-    } finally {
-      setIsTesting(false);
-    }
-  }
-
   // ========================== RETURN JSX (The View) ==========================
   return (
     <div className='space-y-8'>
@@ -318,11 +244,11 @@ export function TeacherDashboard() {
 
         {/* CONTENT for the "AI Teaching Style" tab */}
         <TabsContent value='style'>
-          <div className='grid grid-cols-1 lg:grid-cols-3 gap-8 items-start animate-fade-in-up'>
+          <div className='space-y-8 animate-fade-in-up'>
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className='space-y-6 lg:col-span-2'
+                className='space-y-6'
               >
                 {/* Subject Selector Dropdown */}
                 {teacherData?.subjectsTaught && teacherData.subjectsTaught.length > 0 ? (
@@ -460,59 +386,6 @@ export function TeacherDashboard() {
                 )}
               </form>
             </Form>
-
-            {/* This is the right-hand column for the AI testing sandbox. */}
-            <div className='space-y-6 lg:sticky lg:top-24'>
-              <Card
-                className='bg-card/80 backdrop-blur-sm border-accent/20 shadow-lg animate-fade-in-up'
-                style={{ animationDelay: '0.5s' }}
-              >
-                <CardHeader>
-                  <CardTitle className='font-headline text-2xl'>
-                    Test Your AI
-                  </CardTitle>
-                  <CardDescription>
-                    See how the AI will respond with your current settings for{' '}
-                    <span className='font-bold text-accent'>{selectedSubject || 'this subject'}</span>.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Form {...testForm}>
-                    <form onSubmit={testForm.handleSubmit(onTest)} className='space-y-4'>
-                      <FormField
-                        control={testForm.control}
-                        name='studentQuestion'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Student's Question</FormLabel>
-                            <FormControl>
-                              <Textarea placeholder='e.g., How do I solve for x in 2x + 5 = 15?' {...field} className='animate-glow' />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <Button type='submit' disabled={isTesting || !selectedSubject} className='w-full'>
-                        {isTesting ? <Loader2 className='mr-2 h-4 w-4 animate-spin' /> : null}
-                        Run Test
-                      </Button>
-                    </form>
-                  </Form>
-                  {(isTesting || testResult) && <Separator className='my-6' />}
-                  {testResult && (
-                    <Alert>
-                      <Bot className='h-4 w-4' />
-                      <AlertTitle className='font-headline'>AI Response</AlertTitle>
-                      <AlertDescription>
-                        <div className='prose-sm dark:prose-invert max-w-none whitespace-pre-wrap'>
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{testResult}</ReactMarkdown>
-                        </div>
-                      </AlertDescription>
-                    </Alert>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
           </div>
         </TabsContent>
 

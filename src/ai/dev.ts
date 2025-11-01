@@ -20,10 +20,6 @@
 import { config } from 'dotenv';
 config();
 
-// #include "src/ai/flows/guide-ai-response-generation.ts"
-// This import registers the flow responsible for generating AI responses guided by teacher examples.
-import '@/ai/flows/guide-ai-response-generation.ts';
-
 // #include "src/ai/flows/customize-ai-teaching-style.ts"
 // This import registers the flow that allows teachers to customize the AI's personality.
 import '@/ai/flows/customize-ai-teaching-style.ts';
