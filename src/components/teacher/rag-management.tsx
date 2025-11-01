@@ -124,7 +124,7 @@ export function RagManagement() {
           </Alert>
 
           <div className='space-y-4'>
-            <div className='flex justify-between items-center'>
+            <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4'>
               <h3 className='font-headline text-xl'>Your Course Materials</h3>
               {/* This button is for display purposes only right now; it has no `onClick` handler. */}
               <Button
