@@ -23,5 +23,5 @@ import Image from 'next/image';
  * @returns {JSX.Element} The Image component configured for the logo.
  */
 export function Logo() {
-  return <Image src='/logo.png' alt='Lyra Logo' width={32} height={32} />;
+  return <Image src='/logo.webp' alt='Lyra Logo' width={32} height={32} />;
 }

@@ -86,7 +86,7 @@ export default function LoginPage() {
       component: (
         <Image
           data-ai-hint='genkit logo'
-          src='/genkit.png'
+          src='/genkit.webp'
           alt='Genkit logo'
           width={48}
           height={48}
