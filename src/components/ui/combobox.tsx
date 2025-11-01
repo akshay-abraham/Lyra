@@ -29,6 +29,7 @@ type ComboboxProps = {
   options: ComboboxOption[];
   value: string;
   onChange: (value: string) => void;
+  onNotFound?: (searchTerm: string) => void;
   placeholder?: string;
   notFoundText?: string;
 };
@@ -37,10 +38,12 @@ export function Combobox({
   options,
   value,
   onChange,
+  onNotFound,
   placeholder = 'Select an option...',
   notFoundText = 'No option found.',
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false);
+  const [searchTerm, setSearchTerm] = React.useState('');
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -67,7 +70,9 @@ export function Combobox({
         >
           <CommandInput
             placeholder={placeholder}
+            value={searchTerm}
             onValueChange={(search) => {
+              setSearchTerm(search);
               const match = options.find(o => o.label.toLowerCase() === search.toLowerCase());
               if (!match) {
                 onChange(search);
@@ -75,7 +80,15 @@ export function Combobox({
             }}
           />
           <CommandList>
-            <CommandEmpty>{notFoundText}</CommandEmpty>
+            <CommandEmpty>
+              {onNotFound && searchTerm ? (
+                <Button variant="ghost" className="w-full" onClick={() => onNotFound(searchTerm)}>
+                  Add "{searchTerm}" as a new school
+                </Button>
+              ) : (
+                notFoundText
+              )}
+            </CommandEmpty>
             <CommandGroup>
               {options.map((option) => (
                 <CommandItem
@@ -85,13 +98,14 @@ export function Combobox({
                     const newValue = currentValue === value ? '' : currentValue;
                     const newLabel = options.find(o => o.value === newValue)?.label || newValue;
                     onChange(newLabel);
+                    setSearchTerm('');
                     setOpen(false);
                   }}
                 >
                   <Check
                     className={cn(
                       'mr-2 h-4 w-4',
-                      value === option.value ? 'opacity-100' : 'opacity-0',
+                      value === option.label ? 'opacity-100' : 'opacity-0',
                     )}
                   />
                   {option.label}

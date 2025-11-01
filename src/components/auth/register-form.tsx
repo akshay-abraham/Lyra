@@ -264,6 +264,17 @@ export function RegisterForm() {
     }
   };
 
+  const handleAddSchool = (schoolName: string) => {
+    // In a real app, this would trigger an API call to a backend
+    // to add the new school to a central database after verification.
+    // For now, we will just show a toast.
+    toast({
+      title: 'Feature Not Implemented',
+      description: `In a real app, '${schoolName}' would be sent for verification. For now, it's just used in your profile.`,
+    });
+    form.setValue('school', schoolName);
+  };
+  
   // Prepare options for the various dropdowns in the form.
   const schoolOptions = [
     { value: 'Girideepam Bethany Central School', label: 'Girideepam Bethany Central School' },
@@ -353,6 +364,7 @@ export function RegisterForm() {
                     value={field.value}
                     onChange={field.onChange}
                     placeholder="Select or type school name..."
+                    onNotFound={handleAddSchool}
                   />
                   <FormMessage />
                 </FormItem>
