@@ -1,5 +1,4 @@
 # 🪐 Lyra
-
 ## 📖 Motivation
 
 ### 1. The Current Dilemma in Education and AI
