@@ -146,6 +146,7 @@ CodeBlock.displayName = 'CodeBlock';
  * @param {function} props.onSubjectSelect - A callback function that gets called when the user picks a subject.
  * @param {string | null} props.subject - The currently selected subject.
  * @param {SubjectData[]} props.availableSubjects - The list of subjects to show in the dropdown.
+ * @param {string | null} props.userName - The name of the logged-in user.
  * @returns {JSX.Element} The UI for the new chat screen.
  */
 const NewChatView = React.memo(
@@ -153,17 +154,19 @@ const NewChatView = React.memo(
     onSubjectSelect,
     subject,
     availableSubjects,
+    userName,
   }: {
     onSubjectSelect: (subject: string) => void;
     subject: string | null;
     availableSubjects: SubjectData[];
+    userName: string | null;
   }) => (
     <div className='flex flex-col items-center justify-center h-full text-center text-muted-foreground p-4 animate-fade-in-up'>
       <div className='p-3 rounded-full border-2 border-primary/20 bg-primary/10 mb-4 animate-scale-in'>
         <BookCheck className='h-10 w-10 text-primary' />
       </div>
       <h3 className='text-2xl font-headline text-foreground mb-2'>
-        Start a New Learning Session
+        Ready for a new learning session, {userName || 'friend'}?
       </h3>
       <p className='max-w-md mb-6'>
         What subject are we diving into today? This helps me tailor my guidance.
@@ -213,10 +216,6 @@ const subjectColorMap = new Map<string, string>(
  *   - `subject`: The subject selected for a new chat. (string or null)
  *   - `localLoadingText`: The "AI is thinking..." message, which cycles through different phrases. (string)
  *   - `availableSubjects`: The list of subjects the current student is eligible for.
- *
- * Hooks (Special Functions):
- *   - `useChat`: The most important hook. It's a dedicated module that manages all the chat
- *     logic: fetching messages, sending new messages, and handling loading states.
  */
 export function ChatInterface({
   chatId: currentChatId,
@@ -231,6 +230,7 @@ export function ChatInterface({
     getLoadingText(null),
   );
   const [availableSubjects, setAvailableSubjects] = useState<SubjectData[]>([]);
+  const [userName, setUserName] = useState<string | null>(null);
 
   // Other hooks to get access to common utilities.
   const { toast } = useToast();
@@ -262,6 +262,7 @@ export function ChatInterface({
       if (userInfoStr) {
         const userInfo = JSON.parse(userInfoStr);
         setAvailableSubjects(getSubjectsForUser(userInfo.role, userInfo.class));
+        setUserName(userInfo.name);
       } else {
         setAvailableSubjects(getSubjectsForUser(null, null)); // Fallback
       }
@@ -368,6 +369,7 @@ export function ChatInterface({
                 onSubjectSelect={setSubject}
                 subject={subject}
                 availableSubjects={availableSubjects}
+                userName={userName}
               />
             )}
 
