@@ -1,4 +1,3 @@
-
 // Copyright (C) 2025 Akshay K Rooben Abraham
 /**
  * @fileoverview Login Page (`/login`).
@@ -262,22 +261,20 @@ export default function LoginPage() {
         {/* Footer */}
         <footer className='w-full p-8 text-center border-t border-border'>
           <div className='container mx-auto space-y-6'>
-            <div
-              className='p-6 rounded-lg bg-primary/5 border border-primary/20 shadow-lg shadow-primary/10 max-w-2xl mx-auto animate-glow'
-              style={{ animationDelay: '1.5s' }}
-            >
-              <p className='text-lg font-headline text-foreground mb-2'>
-                Developed by Akshay K. Rooben Abraham
-              </p>
-              <Button asChild>
-                <Link
-                  href={siteConfig.developer.url}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                >
-                  Visit Personal Website
-                </Link>
-              </Button>
+            <div className='relative flex justify-center items-center h-24'>
+              <div className='absolute p-4 rounded-lg bg-primary/5 border border-primary/20 shadow-lg shadow-primary/10 animate-pulse-box'>
+                <p className='text-lg font-headline text-foreground'>
+                  Developed by{' '}
+                  <Link
+                    href={siteConfig.developer.url}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='font-bold text-primary hover:underline underline-offset-4'
+                  >
+                    {siteConfig.developer.name}
+                  </Link>
+                </p>
+              </div>
             </div>
 
             <Accordion

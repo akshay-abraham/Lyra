@@ -253,3 +253,21 @@
   animation: scale-in 0.4s ease-out forwards;
 }
 
+@keyframes pulse-box {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+.animate-pulse-box {
+  animation: pulse-box 6s ease-in-out infinite;
+}
