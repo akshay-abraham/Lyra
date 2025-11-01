@@ -14,14 +14,14 @@
  *
  * ```c
  * #define GITHUB_URL "https://github.com/akshay-abraham/Lyra"
- * #define DEVELOPER_NAME "Akshay K. Rooben Abraham"
+ * #define DEVELOPER_NAME "Akshay Abraham"
  * ```
  */
 
 export const siteConfig = {
   github: 'https://github.com/akshay-abraham/Lyra',
   developer: {
-    name: 'Akshay K. Rooben Abraham',
+    name: 'Akshay Abraham',
     url: 'https://akshayabraham.vercel.app/',
   },
   mentor: {
