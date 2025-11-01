@@ -38,7 +38,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, User, Send, BookCheck } from 'lucide-react';
+import { Bot, User, Send, BookCheck, LucideIcon } from 'lucide-react';
 import ReactMarkdown from 'react-markdown'; // Library to render Markdown text.
 import remarkGfm from 'remark-gfm'; // Plugin for GitHub Flavored Markdown (tables, etc.).
 import mermaid from 'mermaid'; // Library to render diagrams from text.
@@ -138,16 +138,53 @@ const CodeBlock: React.FC<any> = ({
 };
 CodeBlock.displayName = 'CodeBlock';
 
+const AnimatedSubjectIcon = ({
+  Icon,
+  subject,
+}: {
+  Icon: LucideIcon;
+  subject: SubjectData | null;
+}) => {
+  if (!subject) return null;
+
+  const animationClass = () => {
+    switch (subject.name) {
+      case 'Maths':
+      case 'Maths Core':
+      case 'Applied Maths':
+        return 'animate-[spin_2s_ease-in-out]';
+      case 'Science':
+      case 'Physics':
+      case 'Chemistry':
+        return 'animate-[spin_4s_linear_infinite]';
+      case 'Biology':
+        return 'animate-[heartbeat_1.5s_ease-in-out_infinite]';
+      case 'Computer Science':
+      case 'AI':
+        return 'animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite]';
+      default:
+        return 'animate-bounce-in';
+    }
+  };
+
+  return (
+    <div
+      key={subject.name}
+      className='absolute inset-0 flex items-center justify-center -z-10'
+    >
+      <Icon
+        className={`h-48 w-48 text-primary/5 ${animationClass()}`}
+        style={{ color: subject.color, opacity: 0.1 }}
+        strokeWidth={1}
+      />
+    </div>
+  );
+};
+AnimatedSubjectIcon.displayName = 'AnimatedSubjectIcon';
+
 /**
  * This component is shown only when a new chat is started (`chatId` is null).
  * It displays a welcome message and a dropdown menu for the user to select a subject.
- *
- * @param {object} props - Component properties.
- * @param {function} props.onSubjectSelect - A callback function that gets called when the user picks a subject.
- * @param {string | null} props.subject - The currently selected subject.
- * @param {SubjectData[]} props.availableSubjects - The list of subjects to show in the dropdown.
- * @param {string | null} props.userName - The name of the logged-in user.
- * @returns {JSX.Element} The UI for the new chat screen.
  */
 const NewChatView = React.memo(
   ({
@@ -160,37 +197,47 @@ const NewChatView = React.memo(
     subject: string | null;
     availableSubjects: SubjectData[];
     userName: string | null;
-  }) => (
-    <div className='flex flex-col items-center justify-center h-full text-center text-muted-foreground p-4 animate-fade-in-up'>
-      <div className='p-3 rounded-full border-2 border-primary/20 bg-primary/10 mb-4 animate-scale-in'>
-        <BookCheck className='h-10 w-10 text-primary' />
-      </div>
-      <h3 className='text-2xl font-headline text-foreground mb-2'>
-        Ready for a new learning session, {userName || 'friend'}?
-      </h3>
-      <p className='max-w-md mb-6'>
-        What subject are we diving into today? This helps me tailor my guidance.
-      </p>
+  }) => {
+    const selectedSubjectData =
+      allSubjects.find((s) => s.name === subject) || null;
+    const Icon = selectedSubjectData?.icon || BookCheck;
 
-      {/* The dropdown menu component for subject selection */}
-      <Select onValueChange={onSubjectSelect} value={subject || ''}>
-        <SelectTrigger className='w-[280px]'>
-          <SelectValue placeholder='Select a subject...' />
-        </SelectTrigger>
-        <SelectContent>
-          {/* Loop over the available subjects and create a dropdown item for each one. */}
-          {availableSubjects.map((s) => (
-            <SelectItem key={s.name} value={s.name}>
-              <div className='flex items-center gap-2'>
-                <s.icon className='h-4 w-4' style={{ color: s.color }} />
-                <span>{s.name}</span>
-              </div>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-  ),
+    return (
+      <div className='flex flex-col items-center justify-center h-full text-center text-muted-foreground p-4 animate-fade-in-up relative overflow-hidden'>
+        {selectedSubjectData && (
+          <AnimatedSubjectIcon
+            Icon={selectedSubjectData.icon}
+            subject={selectedSubjectData}
+          />
+        )}
+        <div className='p-3 rounded-full border-2 border-primary/20 bg-primary/10 mb-4 animate-scale-in'>
+          <Icon className='h-8 w-8 text-primary' />
+        </div>
+        <h3 className='text-xl font-headline text-foreground mb-2'>
+          Ready for a new learning session, {userName || 'friend'}?
+        </h3>
+        <p className='max-w-md mb-6 text-sm'>
+          What are we diving into? This helps me tailor my guidance.
+        </p>
+
+        <Select onValueChange={onSubjectSelect} value={subject || ''}>
+          <SelectTrigger className='w-[280px]'>
+            <SelectValue placeholder='Select a subject...' />
+          </SelectTrigger>
+          <SelectContent>
+            {availableSubjects.map((s) => (
+              <SelectItem key={s.name} value={s.name}>
+                <div className='flex items-center gap-2'>
+                  <s.icon className='h-4 w-4' style={{ color: s.color }} />
+                  <span>{s.name}</span>
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    );
+  },
 );
 NewChatView.displayName = 'NewChatView';
 
@@ -207,23 +254,12 @@ const subjectColorMap = new Map<string, string>(
  * @param {string | null} props.chatId - The ID of the current chat session. If it's `null`,
  *   it means this is a new chat.
  * @returns {JSX.Element} The rendered chat interface.
- *
- * C-like Analogy:
- * This is the `main()` function for the chat UI.
- *
- * Internal State (Variables):
- *   - `input`: The text currently in the message input box. (string)
- *   - `subject`: The subject selected for a new chat. (string or null)
- *   - `localLoadingText`: The "AI is thinking..." message, which cycles through different phrases. (string)
- *   - `availableSubjects`: The list of subjects the current student is eligible for.
  */
 export function ChatInterface({
   chatId: currentChatId,
 }: {
   chatId: string | null;
 }) {
-  // `useState` is a React Hook for declaring a state variable.
-  // C-like analogy: `char* input = ""; void setInput(char* newValue) { ... }`
   const [input, setInput] = useState('');
   const [subject, setSubject] = useState<string | null>(null);
   const [localLoadingText, setLocalLoadingText] = useState(
@@ -232,30 +268,20 @@ export function ChatInterface({
   const [availableSubjects, setAvailableSubjects] = useState<SubjectData[]>([]);
   const [userName, setUserName] = useState<string | null>(null);
 
-  // Other hooks to get access to common utilities.
   const { toast } = useToast();
-  const scrollAreaRef = useRef<HTMLDivElement>(null); // Pointer to the scrollable message area.
-  const inputRef = useRef<HTMLTextAreaElement>(null); // Pointer to the text input box.
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // This connects the UI component to the chat logic controller (`useChat`).
-  // It returns the current state (`messages`, `isLoading`, `chatSubject`) and the
-  // primary action function (`sendMessage`).
   const { messages, sendMessage, isLoading, chatSubject } =
     useChat(currentChatId);
 
-  // Safety check: if `messages` is null (which can happen initially), use an empty array.
   const safeMessages = messages || [];
 
-  // Determine the current subject. If a subject is selected for a new chat, use that.
-  // Otherwise, use the subject from the existing chat session data.
   const currentSubject = subject || chatSubject;
-  // Get the accent color for the current subject from our map.
   const chatAccentColor = currentSubject
     ? subjectColorMap.get(currentSubject) || 'hsl(var(--primary))'
     : 'hsl(var(--primary))';
 
-  // This `useEffect` runs once when the component is first created.
-  // Its job is to determine which subjects the current student should see in the dropdown.
   useEffect(() => {
     try {
       const userInfoStr = sessionStorage.getItem('lyra-user-info');
@@ -269,23 +295,27 @@ export function ChatInterface({
     } catch (e) {
       setAvailableSubjects(getSubjectsForUser(null, null)); // Fallback on error
     }
-  }, []); // The empty `[]` means this runs only once.
+  }, []);
 
-  // This `useEffect` hook automatically scrolls the chat window to the bottom
-  // whenever a new message is added or when the AI starts/stops thinking.
   useEffect(() => {
-    const scrollArea = scrollAreaRef.current; // Get the element from our pointer.
+    const scrollArea = scrollAreaRef.current;
     if (scrollArea) {
       scrollArea.scrollTo({
-        top: scrollArea.scrollHeight, // Scroll to the very bottom.
-        behavior: 'smooth', // Make it a smooth animation.
+        top: scrollArea.scrollHeight,
+        behavior: 'smooth',
       });
     }
-  }, [safeMessages, isLoading]); // It re-runs whenever `safeMessages` or `isLoading` changes.
+  }, [safeMessages, isLoading]);
 
-  // This `useEffect` runs once to focus the text input box and initialize the Mermaid library.
   useEffect(() => {
-    inputRef.current?.focus(); // Puts the text cursor in the message box.
+    if (inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.style.height = 'auto'; // Reset height
+      inputRef.current.style.height = `${inputRef.current.scrollHeight}px`;
+    }
+  }, [input]);
+  
+  useEffect(() => {
     mermaid.initialize({
       startOnLoad: true,
       theme: 'neutral',
@@ -301,27 +331,19 @@ export function ChatInterface({
     });
   }, []);
 
-  // This `useEffect` hook manages the "AI is thinking..." text.
-  // It starts a timer to cycle through different fun loading messages.
   useEffect(() => {
     if (isLoading) {
       setLocalLoadingText(getLoadingText(currentSubject));
       const interval = setInterval(() => {
         setLocalLoadingText(getLoadingText(currentSubject));
       }, 2500);
-      // Return a cleanup function. It runs when `isLoading` becomes false.
-      // It stops the timer to prevent memory leaks.
       return () => clearInterval(interval);
     }
-  }, [isLoading, currentSubject]); // It re-runs whenever `isLoading` or `currentSubject` changes.
+  }, [isLoading, currentSubject]);
 
-  /**
-   * Sends the user's message. Called when the user hits "Enter" or clicks the send button.
-   */
   const handleSendMessage = async () => {
-    if (!input.trim()) return; // Don't send empty messages.
+    if (!input.trim()) return;
 
-    // For new chats, a subject must be selected first.
     if (!currentChatId && !subject) {
       toast({
         variant: 'destructive',
@@ -332,38 +354,31 @@ export function ChatInterface({
     }
 
     const currentInput = input;
-    setInput(''); // Optimistically clear the input box for a responsive feel.
+    setInput('');
 
-    // Call the `sendMessage` function from the `useChat` hook.
     await sendMessage(currentInput, subject);
   };
 
-  // Wrapper to call `handleSendMessage` when the form is submitted.
   const handleSubmit = (e: FormEvent) => {
-    e.preventDefault(); // Prevents the webpage from reloading.
+    e.preventDefault();
     handleSendMessage();
   };
 
-  // Handles keyboard input in the text area.
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    // If the user presses "Enter" but NOT "Shift+Enter"...
     if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault(); // ...prevent a new line from being added...
-      handleSendMessage(); // ...and send the message instead.
+      e.preventDefault();
+      handleSendMessage();
     }
   };
 
-  // ========================== RETURN JSX (The View) ==========================
   return (
     <div
       className='flex h-[calc(100vh-theme(spacing.14))] md:h-screen flex-col items-center'
-      // Pass the accent color as a CSS variable for child components to use.
       style={{ '--chat-accent-color': chatAccentColor } as React.CSSProperties}
     >
       <div className='flex-grow w-full max-w-3xl mx-auto overflow-hidden'>
         <ScrollArea className='h-full' ref={scrollAreaRef}>
           <div className='p-4 sm:p-6 space-y-6'>
-            {/* Conditional Rendering: If this is a new chat, show the NewChatView. */}
             {safeMessages.length === 0 && !currentChatId && (
               <NewChatView
                 onSubjectSelect={setSubject}
@@ -373,7 +388,6 @@ export function ChatInterface({
               />
             )}
 
-            {/* Loop over the messages and render a message bubble for each one. */}
             {safeMessages.map((message: Message, index) => (
               <div
                 key={message.id || index}
@@ -381,7 +395,6 @@ export function ChatInterface({
                   message.role === 'user' ? 'justify-end' : ''
                 } animate-fade-in-up`}
               >
-                {/* If the message is from the AI, show the Bot avatar. */}
                 {message.role === 'assistant' && (
                   <Avatar className='h-8 w-8 border bg-card'>
                     <AvatarFallback className='bg-transparent'>
@@ -389,7 +402,6 @@ export function ChatInterface({
                     </AvatarFallback>
                   </Avatar>
                 )}
-                {/* The message bubble itself. */}
                 <div
                   className={`max-w-xl rounded-lg p-3 text-sm transition-all duration-300 ${
                     message.role === 'user'
@@ -397,8 +409,6 @@ export function ChatInterface({
                       : 'bg-card/80 backdrop-blur-sm border'
                   }`}
                 >
-                  {/* If the message is from the assistant, render it using ReactMarkdown
-                      so that formatting (bold, lists, and our custom code blocks) works. */}
                   {message.role === 'assistant' ? (
                     <div className='prose dark:prose-invert max-w-none prose-p:my-2'>
                       <ReactMarkdown
@@ -412,7 +422,6 @@ export function ChatInterface({
                     <p className='whitespace-pre-wrap'>{message.content}</p>
                   )}
                 </div>
-                {/* If the message is from the user, show the User avatar. */}
                 {message.role === 'user' && (
                   <Avatar className='h-8 w-8 border bg-card'>
                     <AvatarFallback className='bg-transparent'>
@@ -425,7 +434,6 @@ export function ChatInterface({
                 )}
               </div>
             ))}
-            {/* If `isLoading` is true, show the "AI is thinking..." bubble. */}
             {isLoading && (
               <div className='flex items-start gap-4 animate-fade-in-up'>
                 <Avatar className='h-8 w-8 border bg-card'>
@@ -444,7 +452,6 @@ export function ChatInterface({
         </ScrollArea>
       </div>
 
-      {/* The bottom part of the screen with the input box. */}
       <div className='w-full max-w-3xl mx-auto p-4 sm:p-6'>
         <Card
           className={cn(
@@ -461,7 +468,7 @@ export function ChatInterface({
               className='w-full flex items-center gap-2'
             >
               <Textarea
-                ref={inputRef} // Attach our pointer to this element.
+                ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -470,12 +477,12 @@ export function ChatInterface({
                     ? 'Please select a subject above to begin.'
                     : 'Message Lyra...'
                 }
-                className='flex-grow resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent'
+                className='flex-grow resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent max-h-48'
                 rows={1}
                 disabled={
                   isLoading ||
                   (!subject && !currentChatId && availableSubjects.length > 0)
-                } // Disable input while loading or if no subject is selected.
+                }
               />
               <Button
                 type='submit'
