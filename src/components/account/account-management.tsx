@@ -44,7 +44,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Trash2, User, ShieldAlert } from 'lucide-react';
+import { Loader2, Trash2, User, ShieldAlert, Bug } from 'lucide-react';
 import { useFirebase, useUser } from '@/firebase';
 import { updateProfile, updateEmail } from 'firebase/auth';
 import {
@@ -82,6 +82,7 @@ import {
 } from '@/lib/subjects-data';
 import type { UserProfile, School } from '@/types';
 import { COLLECTIONS } from '@/lib/constants';
+import { Combobox } from '../ui/combobox';
 
 // `zod` is used to define the "schema" or structure of our form data.
 // It's like defining a `struct` in C and also providing validation rules for each member.
@@ -129,6 +130,7 @@ export function AccountManagement() {
   const [isDeletingChat, setIsDeletingChat] = useState(false);
   const [userInfo, setUserInfo] = useState<UserProfile | null>(null);
   const [availableSubjects, setAvailableSubjects] = useState<string[]>([]);
+  const [shouldThrowError, setShouldThrowError] = useState(false);
 
   // Initialize the form using the `useForm` hook from `react-hook-form`.
   const form = useForm<ProfileFormData>({
@@ -201,6 +203,13 @@ export function AccountManagement() {
   useEffect(() => {
     fetchUserInfo();
   }, [fetchUserInfo]);
+
+  // This effect will trigger the error when the state is set.
+  useEffect(() => {
+    if (shouldThrowError) {
+      throw new Error('This is a test error triggered by the user.');
+    }
+  }, [shouldThrowError]);
 
   /**
    * The callback function that gets executed when the main profile form is submitted.
@@ -327,6 +336,17 @@ export function AccountManagement() {
     options: classes.map((c) => ({ label: c.name, value: c.name })),
   }));
 
+  const handleAddSchool = (schoolName: string) => {
+    // In a real app, this would trigger an API call to a backend
+    // to add the new school to a central database after verification.
+    // For now, we will just show a toast.
+    toast({
+      title: 'Feature Not Implemented',
+      description: `In a real app, '${schoolName}' would be sent for verification. For now, it's just used in your profile.`,
+    });
+    form.setValue('school', schoolName);
+  };
+  
   // ========================== RETURN JSX (The View) ==========================
   // The rest of this file is the JSX code that describes what the component looks like.
   return (
@@ -396,22 +416,18 @@ export function AccountManagement() {
                 control={form.control}
                 name='school'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className='flex flex-col'>
                     <FormLabel>School</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {schoolOptions.map((s) => (
-                          <SelectItem key={s} value={s}>
-                            {s}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Combobox
+                      options={schoolOptions.map((s) => ({
+                        value: s,
+                        label: s,
+                      }))}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder='Select or type school name...'
+                      onNotFound={handleAddSchool}
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -589,6 +605,21 @@ export function AccountManagement() {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+          </div>
+          <div className='flex items-center justify-between p-4 border border-destructive/20 rounded-md'>
+            <div>
+              <h4 className='font-semibold'>Trigger Test Error</h4>
+              <p className='text-sm text-muted-foreground'>
+                Intentionally cause an error to test the error boundary.
+              </p>
+            </div>
+            <Button
+              variant='destructive'
+              onClick={() => setShouldThrowError(true)}
+            >
+              <Bug className='mr-2 h-4 w-4' />
+              Trigger Error
+            </Button>
           </div>
         </CardContent>
       </Card>
