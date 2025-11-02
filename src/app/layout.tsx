@@ -71,7 +71,7 @@ export const metadata: Metadata = {
     url: 'https://lyra-edu.vercel.app', // TODO: Replace with your actual production URL
     images: [
       {
-        url: 'https://lyra-app.vercel.app/opengraph-image.png', // TODO: Replace with your actual OG image URL
+        url: 'https://lyra-edu.vercel.app/opengraph-image.png', // TODO: Replace with your actual OG image URL
         width: 1200,
         height: 630,
         alt: 'Lyra: Ethical AI Tutor',
