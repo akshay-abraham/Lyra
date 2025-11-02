@@ -68,10 +68,10 @@ export const metadata: Metadata = {
     title: 'Lyra: Ethical AI Tutor',
     description: 'An ethical AI tutor designed to guide students towards solutions, not just give them away. Empower students and support teachers with pedagogical guardrails you control.',
     type: 'website',
-    url: 'https://lyra-app.vercel.app', // TODO: Replace with your actual production URL
+    url: 'https://lyra-edu.vercel.app', // TODO: Replace with your actual production URL
     images: [
       {
-        url: 'https://lyra-app.vercel.app/og-image.png', // TODO: Replace with your actual OG image URL
+        url: 'https://lyra-app.vercel.app/opengraph-image.png', // TODO: Replace with your actual OG image URL
         width: 1200,
         height: 630,
         alt: 'Lyra: Ethical AI Tutor',
