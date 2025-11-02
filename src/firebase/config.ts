@@ -5,47 +5,32 @@
  *
  * @description
  * This file serves as a configuration store for connecting to a specific Firebase
- * project. It holds the essential credentials required by the Firebase SDK.
+ * project. It reads its values from environment variables, which is a security best
+ * practice to avoid hard-coding sensitive credentials in the source code.
  *
- * C-like Analogy:
- * This file is the direct equivalent of a `config.h` header file or a `.properties`
- * file in a C/Java project. Its sole purpose is to store hard-coded configuration
- * values as constants.
+ * To use this, you must create a `.env.local` file in the root of your project
+ * and populate it with the values from your Firebase project console.
  *
- * ```c
- * #ifndef CONFIG_H
- * #define CONFIG_H
- *
- * #define FIREBASE_API_KEY "AIzaSyD..."
- * #define FIREBASE_PROJECT_ID "my-firebase-project"
- * // etc.
- *
- * #endif // CONFIG_H
- * ```
- *
- * This TypeScript file achieves the same goal by exporting a constant object named
- * `firebaseConfig`. These values are provided by Firebase when you create a new
- * web app in your project console.
- *
- * This configuration is used by `initializeFirebase()` as a fallback if it cannot
- * find the automatic configuration provided by Firebase Hosting. This is a common
- * pattern for local development, where Hosting's environment variables aren't available.
+ * Example `.env.local` file:
+ * NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSy...
+ * NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+ * NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+ * NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+ * NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=1234567890
+ * NEXT_PUBLIC_FIREBASE_APP_ID=1:12345:web:abcdef123
  */
 
 /**
  * The Firebase configuration object for your web app.
  *
- * These details are obtained from the Firebase console:
- * Project settings > General > Your apps > Web app > Firebase SDK snippet > Config.
- *
- * It is safe to expose these values in a client-side app. Firebase security is
- * handled by Firestore Security Rules, not by hiding these keys.
+ * These details are read from environment variables, which should be defined
+ * in a `.env.local` file for local development.
  */
 export const firebaseConfig = {
-  apiKey: "AIzaSyCAzNBsxoLOZEpDra6iGCYnOWzoip9xjOw",
-  authDomain: "lyra-edu.firebaseapp.com",
-  projectId: "lyra-edu",
-  storageBucket: "lyra-edu.appspot.com",
-  messagingSenderId: "363825260695",
-  appId: "1:363825260695:web:4d137f5b2d97f6c05e61d2"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
