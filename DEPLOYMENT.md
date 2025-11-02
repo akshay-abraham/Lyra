@@ -13,7 +13,7 @@ For security reasons, Firebase Authentication will block sign-in requests from u
 If you encounter an `auth/unauthorized-domain` error after deploying, follow these steps to resolve it:
 
 1.  **Go to your Firebase Console**: Open your web browser and navigate to the [Firebase Console](https://console.firebase.google.com/).
-2.  **Select Your Project**: Choose the Firebase project that is connected to your Lyra application (e.g., `studio-1148187791-ff9d6`).
+2.  **Select Your Project**: Choose the Firebase project that is connected to your Lyra application (e.g., `lyra-edu`).
 3.  **Navigate to Authentication**: In the left-hand menu, click on **Authentication**.
 4.  **Go to the "Settings" Tab**: Inside the Authentication section, click on the **Settings** tab.
 5.  **Go to the "Authorized domains" section**: Click on the **Authorized domains** sub-tab.
