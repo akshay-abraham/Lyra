@@ -40,7 +40,7 @@
  */
 
 // Import necessary types and components.
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter, Sora } from 'next/font/google'; // Google font loading utility from Next.js.
 import './globals.css'; // The global stylesheet.
 import { Toaster } from '@/components/ui/toaster'; // Component to display pop-up notifications (toasts).
@@ -78,8 +78,22 @@ export const metadata: Metadata = {
       },
     ],
     siteName: 'Lyra',
-  }
+  },
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Lyra',
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
+
+export const viewport: Viewport = {
+  themeColor: '#fbfbfb',
+};
+
 
 /**
  * The root layout component for the application.
