@@ -426,15 +426,18 @@
   mask-composite: intersect;
 }
 
-/* Border Glow */
+/* Border Glow - Now uses the animated gradient */
 [data-glow]:hover::before {
-  background-image: radial-gradient(
-    calc(var(--glow-spotlight-size) * 0.8) calc(var(--glow-spotlight-size) * 0.8) at
-    calc(var(--x, 0) * 1px)
-    calc(var(--y, 0) * 1px),
-    hsl(var(--hue) var(--glow-saturation) var(--glow-lightness) / var(--glow-border-spot-opacity)), transparent 100%
-  );
-  filter: brightness(1.5);
+  background-image: linear-gradient(
+      45deg,
+      hsl(var(--primary)),
+      hsl(var(--accent)),
+      hsl(12, 95%, 53%)
+    );
+  background-size: 200% 200%;
+  animation: gradient-animation 4s ease infinite;
+  filter: brightness(1.5) blur(2px);
+  opacity: var(--glow-border-spot-opacity);
 }
 /* Inner White Highlight */
 [data-glow]:hover::after {
