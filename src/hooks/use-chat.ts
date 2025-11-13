@@ -220,7 +220,7 @@ export function useChat(chatId: string | null) {
           );
 
           currentChatId = chatSessionRef.id;
-          router.push(`/?chatId=${currentChatId}`, { scroll: false });
+          router.push(`/chat?chatId=${currentChatId}`, { scroll: false });
         }
 
         if (!currentChatId) {

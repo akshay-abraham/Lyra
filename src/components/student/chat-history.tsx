@@ -182,7 +182,7 @@ export function ChatHistory({ onLinkClick }: { onLinkClick: () => void }) {
             <div className='flex flex-col gap-1'>
               {sessions.map((session) => (
                 <SidebarMenuItem key={session.id}>
-                  <Link href={`/?chatId=${session.id}`} onClick={onLinkClick}>
+                  <Link href={`/chat?chatId=${session.id}`} onClick={onLinkClick}>
                     <SidebarMenuButton
                       isActive={pathname.includes(session.id)}
                       tooltip={session.title}

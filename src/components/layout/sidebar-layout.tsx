@@ -112,9 +112,9 @@ function SidebarMenuItems() {
       <div className='p-2'>
         <SidebarMenuItem>
           {/* Each link is wrapped in Next.js's `<Link>` component for fast client-side navigation. */}
-          <Link href='/' onClick={handleLinkClick}>
+          <Link href='/chat' onClick={handleLinkClick}>
             {/* The `isActive` prop highlights the button if the current URL matches its link. */}
-            <SidebarMenuButton isActive={pathname === '/'} tooltip='New Chat'>
+            <SidebarMenuButton isActive={pathname === '/chat'} tooltip='New Chat'>
               <PlusCircle />
               <span>New Chat</span>
             </SidebarMenuButton>
@@ -182,7 +182,7 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
   const handleLogout = async () => {
     await auth.signOut(); // Call Firebase SDK to sign out.
     sessionStorage.removeItem('lyra-user-info'); // Clean up local session data.
-    router.push('/login'); // Redirect to login page.
+    router.push('/'); // Redirect to login page.
   };
 
   return (
@@ -234,7 +234,7 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
           <SidebarTrigger>
             <Menu />
           </SidebarTrigger>
-          <Link href='/' className='ml-4 flex items-center space-x-2'>
+          <Link href='/chat' className='ml-4 flex items-center space-x-2'>
             <Logo />
             <span className='font-bold font-headline'>Lyra</span>
           </Link>
