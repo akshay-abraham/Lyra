@@ -1,3 +1,4 @@
+
 // Copyright (C) 2025 Akshay K Rooben Abraham
 /**
  * @fileoverview The `useChat` custom hook, the "brain" of the chat interface.
@@ -206,8 +207,17 @@ export function useChat(chatId: string | null) {
         }
 
         if (!currentChatId) {
-          const titleResponse = await generateChatTitle({ firstMessage: content });
-          const newTitle = titleResponse.title || 'New Chat';
+          // --- Generate Title ---
+          let newTitle = 'New Chat'; // Default title
+          try {
+            // Attempt to generate a title, but don't let it block the chat.
+            const titleResponse = await generateChatTitle({ firstMessage: content });
+            newTitle = titleResponse.title || newTitle;
+          } catch (error) {
+            console.warn('AI title generation failed. Using default title.', error);
+            // We use the default title, so no need to throw the error.
+          }
+          // --- End Generate Title ---
 
           const chatSessionRef = await addDoc(
             collection(firestore, COLLECTIONS.USERS, user.uid, COLLECTIONS.CHAT_SESSIONS),
