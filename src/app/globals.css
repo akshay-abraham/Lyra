@@ -55,15 +55,6 @@
     --sidebar-accent-foreground: 222.2 47.4% 11.2%;
     --sidebar-border: 214.3 31.8% 91.4%;
     --sidebar-ring: 255 80% 60%; /* Lavender */
-
-    --glow-border-size: 2px;
-    --glow-spotlight-size: 400px;
-    --glow-bg-spot-opacity: 0.15;
-    --glow-border-spot-opacity: 0.4;
-    --glow-saturation: 100%;
-    --glow-lightness: 60%;
-    --glow-hue: 0;
-
   }
 
   /*
@@ -164,7 +155,6 @@
       transform: translate(110%, 30%);
     }
   }
-
 
   @keyframes move-blob-1 {
     from {
@@ -289,88 +279,136 @@
    Extreme Loading Screen Animations
    ================================= */
 @keyframes float {
-  0% { transform: translateY(0px) translateX(0px) rotate(0deg); }
-  25% { transform: translateY(-20px) translateX(20px) rotate(10deg); }
-  50% { transform: translateY(20px) translateX(-20px) rotate(-10deg); }
-  75% { transform: translateY(-15px) translateX(15px) rotate(5deg); }
-  100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+  0% {
+    transform: translateY(0px) translateX(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-20px) translateX(20px) rotate(10deg);
+  }
+  50% {
+    transform: translateY(20px) translateX(-20px) rotate(-10deg);
+  }
+  75% {
+    transform: translateY(-15px) translateX(15px) rotate(5deg);
+  }
+  100% {
+    transform: translateY(0px) translateX(0px) rotate(0deg);
+  }
 }
 
-.animate-float1 { animation: float 30s ease-in-out infinite; }
-.animate-float2 { animation: float 25s ease-in-out infinite reverse; }
-.animate-float3 { animation: float 20s ease-in-out infinite; }
+.animate-float1 {
+  animation: float 30s ease-in-out infinite;
+}
+.animate-float2 {
+  animation: float 25s ease-in-out infinite reverse;
+}
+.animate-float3 {
+  animation: float 20s ease-in-out infinite;
+}
 
 @keyframes bounce-in {
-  0% { transform: scale(0.5); opacity: 0; }
-  50% { transform: scale(1.1); }
-  70% { transform: scale(0.95); }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 .animate-bounce-in {
   animation: bounce-in 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 @keyframes pop-in {
-  0% { transform: scale(0.9); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 .animate-pop-in {
   animation: pop-in 0.5s ease-out forwards;
 }
 
 @keyframes heartbeat {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.3); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 .animate-heartbeat {
   animation: heartbeat 1.5s ease-in-out infinite;
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .animate-fade-in {
   animation: fade-in 0.5s ease-out forwards;
 }
 
-
 /* =================================
    Glow Card Animation
    ================================= */
 
 [data-glow] {
-  --hue: calc(255 + (var(--xp, 0) * 50)); /* Lavender (255) to Orange (25) */
-  --lightness: calc(60% + (var(--yp, 0) * 20%)); /* Brighter at the top */
+  --glow-border-size: 2px;
+  --glow-spotlight-size: 400px;
+  --glow-bg-spot-opacity: 0.15;
+  --glow-border-spot-opacity: 0.4;
+  --glow-saturation: 100%;
+  --glow-lightness: 60%;
+  
+  /* The hue transitions from primary (255) to accent (24) based on horizontal position */
+  --hue: calc(255 - (var(--xp, 0) * 231));
 
-  background-image: radial-gradient(
-    var(--glow-spotlight-size) var(--glow-spotlight-size) at
-    calc(var(--x, 0) * 1px)
-    calc(var(--y, 0) * 1px),
-    hsl(var(--hue) var(--glow-saturation) var(--lightness) / var(--glow-bg-spot-opacity)),
-    transparent
-  );
-  background-color: hsl(var(--card) / 0.5); /* Semi-transparent card background */
-  background-size: calc(100% + (2 * var(--glow-border-size))) calc(100% + (2 * var(--glow-border-size)));
-  background-position: 50% 50%;
-  border: var(--glow-border-size) solid hsl(var(--border) / 0.5); /* Semi-transparent border */
   position: relative;
   touch-action: none;
   border-radius: var(--radius);
-  backdrop-filter: blur(10px);
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
   transition: background-color 0.2s, border-color 0.2s;
 }
 
 [data-glow]:hover {
-  background-color: hsl(var(--card) / 0.7);
-  border-color: hsl(var(--border) / 0.8);
+  background-image: radial-gradient(
+    var(--glow-spotlight-size) var(--glow-spotlight-size) at
+    calc(var(--x, 0) * 1px)
+    calc(var(--y, 0) * 1px),
+    hsl(var(--hue) var(--glow-saturation) var(--glow-lightness) / var(--glow-bg-spot-opacity)),
+    transparent
+  );
+  background-color: hsl(var(--card) / 0.5); /* Semi-transparent card background on hover */
+  background-size: calc(100% + (2 * var(--glow-border-size))) calc(100% + (2 * var(--glow-border-size)));
+  background-position: 50% 50%;
+  border: var(--glow-border-size) solid hsl(var(--border) / 0.5); /* Semi-transparent border */
+  backdrop-filter: blur(10px);
 }
 
 
-[data-glow]::before,
-[data-glow]::after {
+[data-glow]:hover::before,
+[data-glow]:hover::after {
   pointer-events: none;
   content: "";
   position: absolute;
@@ -389,17 +427,17 @@
 }
 
 /* Border Glow */
-[data-glow]::before {
+[data-glow]:hover::before {
   background-image: radial-gradient(
     calc(var(--glow-spotlight-size) * 0.8) calc(var(--glow-spotlight-size) * 0.8) at
     calc(var(--x, 0) * 1px)
     calc(var(--y, 0) * 1px),
-    hsl(var(--hue) var(--glow-saturation) var(--lightness) / var(--glow-border-spot-opacity)), transparent 100%
+    hsl(var(--hue) var(--glow-saturation) var(--glow-lightness) / var(--glow-border-spot-opacity)), transparent 100%
   );
   filter: brightness(1.5);
 }
 /* Inner White Highlight */
-[data-glow]::after {
+[data-glow]:hover::after {
   background-image: radial-gradient(
     calc(var(--glow-spotlight-size) * 0.5) calc(var(--glow-spotlight-size) * 0.5) at
     calc(var(--x, 0) * 1px)

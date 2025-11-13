@@ -168,7 +168,7 @@ export default function HomePage() {
         {/* Motivation Section */}
         <section id='motivation' className='w-full py-16 px-4'>
           <div className='container mx-auto max-w-4xl'>
-            <Card className='bg-card/50 backdrop-blur-sm border-border/50 animate-fade-in-up'>
+            <Card className='bg-card/80 backdrop-blur-sm border-primary/20 shadow-lg animate-fade-in-up'>
               <CardHeader>
                 <h2 className='text-3xl font-bold text-center font-headline'>
                   Stop Outsourcing Thinking. Start Guided Learning.
@@ -200,7 +200,11 @@ export default function HomePage() {
         <section id='features' className='w-full py-16 px-4 bg-primary/5'>
           <div className='container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-left'>
             {features.map((feature, index) => (
-              <div key={feature.title} data-glow className='h-full p-6 flex flex-col justify-between'>
+              <div
+                key={feature.title}
+                data-glow
+                className='h-full p-6 flex flex-col justify-between'
+              >
                 <div>
                   <div className='p-3 rounded-full border-2 border-primary/10 bg-card mb-4 w-fit'>
                     {feature.icon}
