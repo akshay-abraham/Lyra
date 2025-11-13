@@ -1,0 +1,1146 @@
+commit d7f1f26bf7e9e35aab046e0b724651f5ea78b593
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Nov 11 07:22:57 2025 +0000
+
+    add pwa
+
+commit 48250c2bd53f03006415cc297bf33abca4810e07
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sun Nov 2 20:47:08 2025 +0000
+
+    rm: deployment.md
+
+commit c38f957b6f42a69814c996e9f12c5c985ccc5998
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sun Nov 2 20:31:56 2025 +0000
+
+    fix: domain change implementaion
+
+commit e3c574a0e9c7e5394d3e84754311b60cbfa46a95
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sun Nov 2 20:20:25 2025 +0000
+
+    feat: add open-grap image
+
+commit acde5ec29bdadb7289dd379c5a0d1d4d9427fd60
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sun Nov 2 20:08:49 2025 +0000
+
+    feat: Add open-grap meta data
+
+commit 8b242002f7fe6554f50635df8bade8a995d07bef
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sun Nov 2 07:28:24 2025 +0000
+
+    chore: set up env
+
+commit d8d850049a1184c65db1bcdb9e5abee846bbd2ab
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sun Nov 2 07:24:18 2025 +0000
+
+    chore: new firebase baas
+
+commit fdb24803e30e5234bfd6a428ce3a4fdd77353c19
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sun Nov 2 06:12:54 2025 +0000
+
+    Update LICENSE
+
+commit 5c349f79206e8e0d3ddd63c4fcd564e3b36351ab
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 22:42:59 2025 +0000
+
+    refactor(ui): streamline teacher dashboard flow
+
+commit 9a90866db0b3d32183bc75d0343fc7f3cd8ec088
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 22:38:38 2025 +0000
+
+    fix(ui): resolve RAG management overflow on mobile
+
+commit 67054b28723d74339c7c7042796aa22241f5a4f6
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 22:32:24 2025 +0000
+
+    perf: implement performance optimizations and code cleanup
+
+commit 25c70f07852d706e97a10cced74f9fc26cf2f204
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 22:29:21 2025 +0000
+
+    perf: optimize mobile performance
+
+commit a90ba8327166c55e521232a5dbdafbe4501c37a7
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 22:19:10 2025 +0000
+
+    fix(build): resolve source map 404 error
+
+commit a471812e61c796e0e28a336c8623dd424bf77fd1
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 22:13:48 2025 +0000
+
+    feat(version): update to Genkit 22
+
+commit 45f0ba241a6a19b755c25342c17c81606647f9b2
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 22:10:25 2025 +0000
+
+    chore(deps): downgrade to Next.js 15
+
+commit 2adbce9db7be74e7dd290be12eee2df40d000a50
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 08:18:19 2025 +0000
+
+    feat(ui): add new login background animation
+
+commit 6b6dbbdaf17e22d693849635f316178fd24b6de4
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 08:13:11 2025 +0000
+
+    feat(login): implement login page improvements
+
+commit 2583cca668af8405cde58040b5700c350066032c
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 08:08:59 2025 +0000
+
+    fix(ui): align div with user icon
+
+commit 60d6f759537aba268fdad699e07d798583381488
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 08:07:04 2025 +0000
+
+    fix(ui): correct text alignment with user input
+
+commit 1631f108b762bca076186ccc1087470efa295bea
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 08:04:26 2025 +0000
+
+    feat(ui): integrate Lyra logo in layout
+
+commit 5103572271f930bb20f0d3aec67f11a6ec229b28
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 08:01:57 2025 +0000
+
+    style(ui): refine input bar with subject theming
+
+commit dded836db29bd4d501db0cf44abdc18e61f1d86a
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 07:58:35 2025 +0000
+
+    style(ui): enhance minimal pill design and send button
+
+commit 0025a37dc9393794e8aa3c64552c30248d5aed4e
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 07:51:08 2025 +0000
+
+    feat(ui): implement subject-based theme adaptation
+
+commit 5483d837b15b517af3dd810979c5d9b9af00bd2d
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 07:48:42 2025 +0000
+
+    refactor(ui): remove legacy subject animations
+
+commit c5298fdc79ebba9d78af4cc93a3d3c863a2b264c
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 07:45:06 2025 +0000
+
+    refactor(chat): streamline chat interface
+
+commit 1a2aab2b88d548fb933495c96eb91d52e5471915
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 07:39:00 2025 +0000
+
+    refactor(error): unify toast error implementation
+
+commit 291ad094534b63c923881e096adebc8b1ad5d9fa
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 07:37:39 2025 +0000
+
+    fix(ui): standardize error notification system
+
+commit 8b30bc5ef0af20b23bd9ee127b48de58bda18441
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 07:35:54 2025 +0000
+
+    fix(ui): update error popup styling
+
+commit 172cceb32562b7da4e928b3265de26d96d169b41
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 07:32:39 2025 +0000
+
+    feat(error): implement friendly error handling
+
+commit af664d73fa8dd9330bd47a3824df392da8353085
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 07:28:03 2025 +0000
+
+    feat(chat): improve session initialization flow
+
+commit 3b56571330feaff2fd3c9ae6f1e637e284d50ba6
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 07:23:44 2025 +0000
+
+    feat(ui): enhance subject selection dropdown
+
+commit 282152c671d17286bf13c569b2b702990f3aa5cd
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 07:02:50 2025 +0000
+
+    feat(build): upgrade Turbopack configuration
+
+commit 8a0e22cd8e6a491a2cfe57c494ea32a7860a755b
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 06:59:49 2025 +0000
+
+    feat(error): improve error message detail and clarity
+
+commit 7d0ed90e22f42a371efffe6d176cb8f64375a314
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 06:53:41 2025 +0000
+
+    feat(ui): implement engaging loading animations
+
+commit b083b2eda374993341ddc8f4a15536cc8ed80903
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 06:51:42 2025 +0000
+
+    feat(ui): enhance loading screen with branding
+
+commit b8cf028a5d727d8ca10bd90f3a6b686fcce15397
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 06:45:40 2025 +0000
+
+    feat(ui): add school suggestion functionality
+
+commit 0d72635013c13dd2114fd2c82900ce2b8e945858
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 06:40:06 2025 +0000
+
+    fix(image): resolve image dimension constraints
+
+commit 13f488a078172fc93d5b04bc4b0a3556b6d8e7c2
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 06:32:10 2025 +0000
+
+    chore: remove deprecated PNG assets
+
+commit 1bc2b51f01f878c2bcdefc3ec374173dbd411f8c
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 06:30:15 2025 +0000
+
+    feat(assets): implement WebP logo versions
+
+commit 997effa7bf69b402688ad9a663041d9ffff29f6c
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 06:28:10 2025 +0000
+
+    perf(assets): convert PNG assets to WebP format
+
+commit aaeef6bc074b1c9e5394e42d9c46274c8face6b2
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 06:03:34 2025 +0000
+
+    feat(build): integrate Turbopack
+
+commit a432112f75279f47bb7ad3a9923b5d81f160d86e
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 05:43:12 2025 +0000
+
+    feat(deps): upgrade to React 19
+
+commit 65f6229442958686afc3d888ac3a1e7394fa1054
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 05:41:28 2025 +0000
+
+    fix(console): resolve div nesting validation error
+
+commit 4b63482e4b63110aef86046dfffd5685bb391fac
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 05:39:26 2025 +0000
+
+    style(ui): further simplify footer design
+
+commit c8b765eb1c72dc9635f084eb788af67ce9bc53c9
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 05:36:39 2025 +0000
+
+    style(ui): minimize footer author attribution
+
+commit ed7c4635d488b4a121ca01099c67a7f1085d4796
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 05:26:57 2025 +0000
+
+    refactor(ui): streamline footer content
+
+commit 18f30c2bf716cc3deac858dc5b379eb8ae48933f
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 05:21:27 2025 +0000
+
+    refactor(ui): simplify personal website link presentation
+
+commit 684a663b4809c1d671067e1504abbdf8925faa9c
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 05:19:26 2025 +0000
+
+    feat(ui): enhance minimal design approach
+
+commit eabb6d0f252beefb74805e3ca2d6f6807885d710
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 05:08:21 2025 +0000
+
+    refactor(ui): improve implementation architecture
+
+commit 779deaae32993c7e6c32036ffeeeb611ddd064c0
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 05:00:57 2025 +0000
+
+    refactor(routes): redirect about page traffic to login
+
+commit ef3995792a22ec4ab1cf05d4196bbccb0deb0aef
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Nov 1 04:48:59 2025 +0000
+
+    feat(ui): implement cascading animations on login page
+
+commit cfa7411687a5dc1b2bad57d0011855f938c93c38
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Fri Oct 31 01:05:05 2025 +0000
+
+    feat(assets): add Genkit logo asset
+
+commit 4acdf071ff0a4a01cd13a2a097f0ea1ce9d816f3
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Fri Oct 31 00:51:05 2025 +0000
+
+    fix(ui): adjust Genkit logo positioning
+
+commit cc4f64d10dab855b875f1e07a0dc5de52f6484ed
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Fri Oct 31 00:49:56 2025 +0000
+
+    fix(ui): update Genkit logo implementation
+
+commit 0f34439ac5003a7d37b01646f5b9d94298b3b2e0
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Fri Oct 31 00:34:26 2025 +0000
+
+    add GitHub logo integration
+
+commit 67872d0eea4901c40609ab0652ed963b1293f695
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Fri Oct 31 00:26:18 2025 +0000
+
+    feat(ui): integrate SimpleIcons for homepage navigation
+
+commit 3241fd813179d0d2eea05f89114477e13c132c3e
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Fri Oct 31 00:17:52 2025 +0000
+
+    feat(ui): implement new splash screen based on updated branding
+
+commit 9dd6c8de52a9c5f220a9937984cc3bb3a7ad4c4c
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Fri Oct 31 00:10:55 2025 +0000
+
+    docs: update README documentation
+
+commit 89bd1fca2631c01c85390627c245fb1dbe40daa7
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Mon Oct 27 22:38:20 2025 +0000
+
+    chore: remove legacy nix configuration and unused hooks
+
+commit c60345ddf2b7576b3f00867c3f0c7d8d1399d413
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Mon Oct 27 22:00:20 2025 +0000
+
+    feat(login): add animated "Powered by" tech section
+    
+    Added clean animated footer listing technologies (Next.js, Firebase, Genkit).
+    
+    Ensured design consistency with existing login page aesthetic.
+
+commit 391b9a588606f748399abdfecdb3a3777d1f84b5
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Mon Oct 27 21:57:41 2025 +0000
+
+    feat(ui): enhance login screen animation and integrate image logo
+    
+    Increased intensity and movement of background animation.
+    
+    Replaced SVG logo with image-based logo using Next.js <Image> component.
+    
+    Unified branding across login, sidebar, and about pages.
+    
+    Merged login form into hero section for cohesive design.
+    
+    Refined header logo alignment for visual consistency.
+
+commit 190d0aaef5faec5d42c186f6ecd1ab213f522b65
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Mon Oct 27 21:45:02 2025 +0000
+
+    style(theme): switch to bright color scheme with glow animation
+    
+    Replaced dark palette with bright, vibrant color theme.
+    
+    Added subtle pulsing glow animation for background.
+    
+    Unified app styling for consistent bright mode appearance.
+
+commit 3d8b481aab73359b0d7b1b03400bcf544272a294
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Mon Oct 27 21:38:28 2025 +0000
+
+    feat(login): rebuild login page with hero layout and space-like theme
+    
+    Replaced layout with full-screen hero section featuring headline and CTA.
+    
+    Integrated login form seamlessly within the hero section.
+    
+    Added multi-layer animated gradient and dark space-inspired color palette.
+    
+    Enhanced Google logo prominence.
+
+commit 2488239288aeafad98a78736a1789fd97272f5b8
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Mon Oct 27 21:26:36 2025 +0000
+
+    feat(login): redesign login layout and extract Google logo component
+    
+    Created reusable <GoogleLogo /> component.
+    
+    Implemented new two-column login page layout (intro + login card).
+    
+    Integrated animated gradient background for a modern feel.
+    
+    Updated login form to use the new logo component.
+
+commit 883ee4ddc1600f62f92a095cd77231bdc3284b01
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Mon Oct 27 21:10:58 2025 +0000
+
+    chore(ui): minor aesthetic improvements and UI polish
+    
+    Updated Google logo SVG to high-quality version.
+    
+    Redesigned license section on About page with improved styling and icons.
+
+commit df3d1e8c3ab8d43a0c695c531683a14d34898712
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Mon Oct 27 20:46:49 2025 +0000
+
+    refactor(auth): switch to Google-only authentication flow
+    
+    Removed email/password login and registration logic.
+    
+    Simplified login page to a single “Sign in with Google” button.
+    
+    Updated registration form to only handle profile completion post-Google sign-in.
+    
+    Removed password-related UI and account security settings.
+
+commit b084ec8c26ffd7a00f45dad0887b3d1a338056a7
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Mon Oct 27 20:41:15 2025 +0000
+
+    feat(auth): integrate Google Sign-In for email verification only
+    
+    Added Google Auth as a sign-in option via Firebase.
+    
+    Ensured new users must still complete registration (name, role, school, etc.).
+    
+    Locked pre-filled email field for verification.
+    
+    Updated backend config to include google.com as provider.
+
+commit 0f253e32c443beff60f05bb8bbf4b236eb366853
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Mon Oct 27 20:39:30 2025 +0000
+
+    feat(auth): integrate Google Sign-In for email verification only
+    
+    Added Google Auth as a sign-in option via Firebase.
+    
+    Ensured new users must still complete registration (name, role, school, etc.).
+    
+    Locked pre-filled email field for verification.
+    
+    Updated backend config to include google.com as provider.
+
+commit 4146d08ff995f47a1a285b71d7963f0d5da41a14
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Mon Oct 27 00:33:33 2025 +0000
+
+    chores(cleanup): remove unused.
+
+commit a0f28b75761bb3c665f492f15ce32696c63296c1
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Mon Oct 27 00:10:15 2025 +0000
+
+    fix(firestore): rules error
+
+commit 1205113a2368d2538641b49411ce795e098846ed
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Mon Oct 27 00:09:25 2025 +0000
+
+    fix(firestore): rules error
+
+commit 07dcb320fafdedf6e78bcae583ecfdfb9e3b5fa5
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Mon Oct 27 00:04:20 2025 +0000
+
+    docs(comments): more files commenting.
+
+commit eb850165d803ec71fb2ecf027acd5b377cc4bc2c
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sun Oct 26 23:53:01 2025 +0000
+
+    docs(comments): added improved jsdoc comments and fixedd copyright bug
+
+commit e7ef3692d1cca1127439242aad5830823a66327d
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sun Oct 26 16:18:49 2025 +0000
+
+    chore(prettier): added semicolons
+
+commit ff499bb505e773e88b46790dace7033f6357c51d
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Fri Oct 24 14:57:10 2025 +0000
+
+    fix(branding): added public dir && added logo.png for use in ui
+
+commit 6ae371c6f61f09cdee627096fcd710009ea678d5
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Mon Oct 20 23:55:38 2025 +0000
+
+    feat(CI/CD): setup and ran prettier and eslint
+
+commit 4499da19b358ec9e95b5af9ae7d5beebc1ee477f
+Merge: 0ec9a73 b29c1bb
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Mon Oct 20 15:47:04 2025 +0000
+
+    chore: rm redundant tailwind config & other unused components
+
+commit 0ec9a73d789f22733c821dd414606749023e6119
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Mon Oct 20 09:45:13 2025 +0000
+
+    chore: cleanup README
+
+commit b29c1bb93f53c75a6716ee63a0a5fd841c9eb0a2
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Mon Oct 20 08:56:15 2025 +0000
+
+    chore: clean unused component
+
+commit 03a82ac4d1f9fa05efff099c5a1987bd29611e80
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sun Oct 19 07:32:04 2025 +0000
+
+    fix(Docs):redundant license
+
+commit b642c2ef6c8bc9f739d36ba173be5a4fc8827f76
+Merge: 1b4388c cb1c39a
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sun Oct 19 07:27:40 2025 +0000
+
+    docs: add psedocode and AGPL v3 LICENSE
+
+commit cb1c39a8ba92a1cab40d585530af2ca3a8d9ce56
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sun Oct 19 07:09:35 2025 +0000
+
+    chore(license): migrate to GNU AGPL v3 and update legal references
+    
+    - Replaced proprietary license with GNU Affero General Public License v3.
+    - Updated LICENSE link on the About page to:
+      https://github.com/akshay-abraham/Lyra/blob/main/LICENSE
+    - Removed standalone Terms and Conditions popup.
+    - Added implicit agreement notice during sign-up flow.
+    - Inserted copyright header:
+      // Copyright (C) 2025 Akshay K Rooben Abraham
+      across all code files.
+    - Improved overall legal transparency and alignment with open-source standards.
+
+commit d0fb9ddbf333b9cff07e5e9658fa024ff4c9351e
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sun Oct 19 05:45:54 2025 +0000
+
+    docs(components): add detailed pseudocode comments excluding UI folder
+    
+    - Annotated main logic components such as auth, account, and layout.
+    - Added step-by-step pseudocode for control flow and event handling.
+    - Improved clarity of component purpose and state transitions.
+    - Excluded generic UI elements to maintain focus on core logic.
+
+commit b0a104515df0ed58ee91d45fe37f550ef4123369
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sun Oct 19 05:32:11 2025 +0000
+
+    docs(src/firebase): add structured pseudocode and explanations
+    
+    - Added documentation for Firebase initialization and data context.
+    - Explained async data handling using sequential pseudocode.
+    - Simplified understanding of real-time updates and error flow.
+    - Clarified key Firebase logic through C-style analogies.
+
+commit 54fda5901350cda7ae0e0f6b60e833bb4debc147
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sun Oct 19 05:19:48 2025 +0000
+
+    docs(src/app): add detailed comments and pseudocode to all app-level files
+    
+    - Documented page routing, layout, and data flow.
+    - Added explanations for authentication and state management.
+    - Clarified connections between pages and global app logic.
+    - Used concise pseudocode to illustrate main execution paths.
+
+commit e7e7baaa5c4db8d1580ea08d5f8e8958abad728c
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sun Oct 19 04:55:47 2025 +0000
+
+    docs(src/ai): rewrite files with clear pseudocode and C-like syntax
+    
+    - Added structured comments and pseudocode for each function.
+    - Explained data flow and logic as sequential steps.
+    - Described key data structures similar to C structs.
+    - Enhanced readability for educational and review purposes.
+
+commit bf06b97137fb8e097bfafbf66aa94050fd58aaea
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sun Oct 19 04:43:16 2025 +0000
+
+    docs: add extensive C-style pseudocode and explanations across core files
+    
+    - Added detailed file-level and function-level documentation.
+    - Explained logic flow with pseudocode and analogies to C.
+    - Clarified how hooks, Firebase integration, and chat logic connect.
+    - Improved code readability for easier walkthrough and explanation.
+
+commit 1b4388cbeb18f57475103188110f8ec650ce5b0a
+Author: Akshay Abraham <151937846+akshay-abraham@users.noreply.github.com>
+Date:   Sun Oct 19 12:14:52 2025 +0530
+
+    Delete propietary license
+
+commit 0fbf30e2f2c3f8ede835208f6aab2a59f7ae5565
+Author: Akshay Abraham <151937846+akshay-abraham@users.noreply.github.com>
+Date:   Sun Oct 19 12:09:38 2025 +0530
+
+    Add GNU Affero General Public License v3
+    
+    Added the GNU Affero General Public License version 3 to the project.
+
+commit 32c74d52123aab3b89307818a9f3addc6dcab32e
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sun Oct 19 04:03:16 2025 +0000
+
+    fix(firestore): artifact
+
+commit 7a4519d9eeb3526bf15b6985140399ea80e32ae6
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 11:39:10 2025 +0000
+
+    style(branding): new favicon
+
+commit d91106ad068bbf549ca62c63607a9a42b6570388
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 11:38:44 2025 +0000
+
+    chores: cleanup
+
+commit 10db850a2192db9706b67040dd605befe8fb8942
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 03:35:41 2025 +0000
+
+    feat(firestore): apply manual rules fixes and verify permission resolution
+
+commit a47087b25cb6f4c0c54c608cb2f6cf4e2f200c64
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 03:31:46 2025 +0000
+
+    chore(firestore): update Firestore security rules to resolve permission issues
+
+commit 22d76348157bbcd37054df29e1189df4674f6174
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 03:14:47 2025 +0000
+
+    ix(runtime): guard against null dereferences during Firestore error handling
+
+commit 48eb99b784e06fc314aae6b8bc6c49e9dc384f84
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 03:11:22 2025 +0000
+
+    fix(firestore): address FirestorePermissionError and secure database rules
+
+commit d596b3953b0629b6c7d13003a713204c70f4e721
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 03:10:23 2025 +0000
+
+    fix(firestore): address FirestorePermissionError and secure database rules
+
+commit ec6017694a81697d43a25ce506ec44bf3c89944d
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 03:05:21 2025 +0000
+
+    fix(firestore): address FirestorePermissionError and secure database rules
+
+commit dd5f631031291c250950dc2baac8f8ea5a4eeed6
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 03:03:43 2025 +0000
+
+    fix(firestore): address FirestorePermissionError and secure database rules
+
+commit d6bdd4b170dde56d3f83ebedd37f4d1aa43ff6a4
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 03:02:34 2025 +0000
+
+    fix(firestore): address FirestorePermissionError and secure database rules
+
+commit b582996395e141619219ab1cd05bc5bc207308a9
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 03:01:01 2025 +0000
+
+    fix(chat): handle Firestore permission errors during chat initialization
+
+commit 233e79e13d98168a495688b1e6360a6fb95e1cfc
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 02:54:19 2025 +0000
+
+    fix(firestore): address FirestorePermissionError and secure database rules
+
+commit 93f47dcf35f15bb18ddc6aa0f0b44f18fc248cf6
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 02:52:43 2025 +0000
+
+    fix(firestore): handle Firestore permission errors during chat initialization
+
+commit 20734277111d5b51f051e2569acef1195f349491
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 02:49:48 2025 +0000
+
+    fix(firestore): address FirestorePermissionError and secure database rules
+
+commit c71bf6b976c4640a884451040393aa3cff88179d
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 02:47:43 2025 +0000
+
+    fix(firestore): address FirestorePermissionError and secure database rules
+
+commit 37faf77677764e576c4809af903b51d15ce0b82c
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 02:39:18 2025 +0000
+
+    fix(firestore): add retries and permission checks for failed read/write operations
+
+commit 17a4a4d704183715677f89aabb0b0548eb687dcd
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 02:37:28 2025 +0000
+
+    fix(firestore): ensure new user records are created in Authentication and Firestore with proper handling
+
+commit fbbff9d99ee4fc0a9b80b617207c3140420d3fa3
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 02:33:35 2025 +0000
+
+    fix(firestore): detect and handle "Missing or insufficient permissions" errors
+
+commit 52210846d501489e662ad761532cd93423fa9518
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 02:31:17 2025 +0000
+
+    fix(firestore): handle Firestore permission errors and report console diagnostics
+
+commit fed3e5c93a18bd4fea4e21aeaa3273a3539f13d6
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 02:27:54 2025 +0000
+
+    feat(ui): add password visibility toggle and basic account page
+
+commit e2dac912283cbe8116f14b7491926f9ffd0ffd2e
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 02:22:55 2025 +0000
+
+    feat(auth): add animated password strength meter
+
+commit e1ce62bffce2636f42fb2b34c30721ed5befbbd8
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 02:21:16 2025 +0000
+
+    feat(auth): add confirm-password field and password strength validation
+
+commit f7b6ef389945b9a83fd858ecf391dde85aca3790
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 02:17:44 2025 +0000
+
+    fix(auth): apply organized class dropdown to teacher registration
+
+commit 18113b0c333e2fc79c3fe96a5f529bcb6fe35771
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 02:04:56 2025 +0000
+
+    refactor(ui): group class divisions into an organized dropdown
+
+commit 615fbdd402c9d7e4a3cf4c015afcb4225020e05f
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 01:58:02 2025 +0000
+
+    fix(build): resolve module resolution error for missing 'cm' dependency
+
+commit 9c5701519849d5678d466e9a04f2c25d1be73f96
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 01:57:00 2025 +0000
+
+    feat(registration): collect school, classes, and subjects during teacher/student signup
+
+commit cdc03eecb1b35634df0097119fe0c9d3d70edb33
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 01:11:15 2025 +0000
+
+    chore(files): miscellaneous file changes and cleanup
+
+commit dc63818688f55618c41fdb23631538dbe4602d51
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Sat Oct 18 01:09:49 2025 +0000
+
+    feat(auth): integrate Firebase Authentication
+
+commit 08811147a70f5bd16b1c6193e351c3a67d1e3266
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Wed Oct 15 12:48:24 2025 +0000
+
+    perf(app): remove dead code and optimize performance
+
+commit 7a13523a44b9ea390b4e13718aa97705a54cb7e4
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Wed Oct 15 12:35:49 2025 +0000
+
+    docs(license): add author contact email to license
+
+commit 2d523eef53699c2bac8adb57c49867ce22ffdc84
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Wed Oct 15 12:22:52 2025 +0000
+
+    chore(auth): remove scroll-to-agree requirement; enforce explicit acceptance
+
+commit 944672b2fe0c165c5c0e4c5abb7249a3c1217e29
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Wed Oct 15 12:19:57 2025 +0000
+
+    fix(ui): restore scrolling and improve T&C text, animations, and contrast
+
+commit 5c34c154a0f4a2818f1fcdb29e3bae0031b95cbf
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Wed Oct 15 12:15:26 2025 +0000
+
+    fix(auth): remove countdown timer from terms-and-conditions modal
+
+commit fc222714d72481b72378be911ac542a7deae1929
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Wed Oct 15 12:13:39 2025 +0000
+
+    feat(auth): replace About redirect with terms-and-conditions modal
+
+commit 401592938cd6764c09c5982cf4ff4101ff022da5
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Wed Oct 15 12:08:29 2025 +0000
+
+    feat(auth): add login disclaimer and terms agreement
+
+commit 44ce2d75aeadfa962a1d246189b3702588284e80
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Wed Oct 15 12:03:59 2025 +0000
+
+    docs(about): display proprietary license information on About page
+
+commit 320b31a0e0bdc2ec36cc43ae1f8caba0555df818
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Wed Oct 15 12:01:37 2025 +0000
+
+    chore(license): temporarily switch to proprietary license and remove Apache-2.0 references
+
+commit e4bfadd4b12b7e5030444ea07ed4b47b9a2bfc96
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 23:59:30 2025 +0000
+
+    chore(release): prepare alpha v1 for Atal Tinkering Lab presentation
+
+commit 52caa2df4c02725e32e264c83531cbbaff89ddbe
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 23:38:14 2025 +0000
+
+    chore(config): move API keys to environment variables
+
+commit a57f29902a3a2248bbf6332773429fd16904a109
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 23:26:15 2025 +0000
+
+    feat(chat): organize chat history by subject
+
+commit 9634f0375c1e59edb85b16513576d081af078689
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 23:21:38 2025 +0000
+
+    feat(data): personalize subjects list based on user role
+
+commit 06c4d45e251620ebbfb89e13e59e88f1b7e2b031
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 23:03:28 2025 +0000
+
+    perf(db): optimize data handling and smooth UI animations
+
+commit 3eb4c7082dea804953cc2c518afea3ccb1ba9d11
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 22:56:29 2025 +0000
+
+    fix(auth): handle missing or insufficient permissions in backend calls
+
+commit eff048e47c3d3ecd3f083dec906e8f1110800a40
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 22:55:21 2025 +0000
+
+    fix(runtime): improve object validation and error handling
+
+commit cecf2bf78814bf3b548f59eac7f348ae3671c4a5
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 22:54:09 2025 +0000
+
+    fix(auth): correct authentication state reporting
+
+commit 52e7c45f62458d6ed941421db3141b56b70c2c43
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 22:51:36 2025 +0000
+
+    fix(runtime): guard against undefined length property access
+
+commit 8c7f4b58e4b6d0a40c3dc1fee952e2c56c461374
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 22:50:49 2025 +0000
+
+    fix(stability): resolve functional regressions causing instability
+
+commit e3f78df09fcc999985a9fc81f14cffe173290357
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 22:49:17 2025 +0000
+
+    fix(chat): address remaining prompt submission issues
+
+commit 01f3bc41ecb14bd8acb197e25a832ea715ab7fc4
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 22:47:33 2025 +0000
+
+    fix(chat): further address prompt submission regression
+
+commit ba4b81536fdb2af860f1b76676222229ee410b17
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 22:45:28 2025 +0000
+
+    fix(chat): restore prompt submission and input behavior# Please enter the commit message for your changes. Lines starting
+
+commit a36e7dd6fd7e1e1496b4538d207dadfd1c37e456
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 22:41:25 2025 +0000
+
+    fix(build): import React where required to resolve undefined reference
+
+commit f2c7a63c4dfc16115c0db36e226a2874d9b9a661
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 22:40:33 2025 +0000
+
+    chore(files): miscellaneous file changes and cleanup
+
+commit b363d38c7d54dcc5794f20681abe42cea3f930e1
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 22:39:00 2025 +0000
+
+    chore(api): configure backend services
+
+commit 7f7d556e07acb69537bd17c817a17aa78ab4c68d
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 22:32:13 2025 +0000
+
+    style(auth): update login screen color scheme
+
+commit 41f3266b43f0158d5f846adec994174c7fbd6290
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 22:24:59 2025 +0000
+
+    chore(ui): remove particle background animations
+
+commit 6fda4267ca31c3689d8e48385b6c8305e86993c3
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 22:22:33 2025 +0000
+
+    fix(data): correct teacher title and sort names alphabetically
+
+commit 1184f7557dc386ccecd8112af4566f6e0b38ece8
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 22:14:09 2025 +0000
+
+    feat(data): normalize teacher name titles and add themed animations
+
+commit a6305a315609be10d4530706c0446c8491bb10c9
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 22:09:04 2025 +0000
+
+    fix(build): fix ECMAScript parsing error during build
+
+commit 4bc18bf9904b2d4c2f2416ebad597c186bf8a4df
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 22:05:07 2025 +0000
+
+    feat(data): add additional staff entries to dataset
+
+commit 76bd9ac3d07cbec96a7a7e416fcf036cee7cb4ed
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 14:50:17 2025 +0000
+
+    fix(ui): improve animation visibility and correct menu bar theme
+
+commit 42fe91e75c983960e3d702a6c9f69e3bde700a1a
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 14:44:09 2025 +0000
+
+    fix(about): resolve layout issue causing about page to render full-screen
+
+commit a2f26d49e852785c71976d014068706b9c6dfee7
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 14:40:49 2025 +0000
+
+    fix(ui): display menu bar and icons correctly on desktop
+
+commit c56dd209d05bf6b846deb15c3a269c25c95aca89
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 14:37:13 2025 +0000
+
+    fix(auth): enable guest login button and related flows
+
+commit 5b79e15a36786e7db0a4d40ff2b0bfdc9fc825db
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 14:29:01 2025 +0000
+
+    fix(auth): ensure teacher login grants full app access including chat
+
+commit a02dc80c1ab8851e61ff07660e2e4cbb0e09368e
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 14:20:46 2025 +0000
+
+    feat(auth): add login page with school selection
+
+commit 0fc498f445ec0efd0ed61661efd2eb387c64bd5e
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 12:30:50 2025 +0000
+
+    style(branding): refine author presentation and visual polish
+
+commit 8e52476cbf75c84b73a0618ad00b732c5ff994a2
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 12:29:16 2025 +0000
+
+    docs(about): update license icon and author prominence
+
+commit 806bcc4cb87c6dbda9df4ee1671e0e899e8e9ff8
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 12:27:44 2025 +0000
+
+    docs(branding): update project attribution and branding copy
+
+commit f90e07f43bba1fcc736e054994bc3bece176e5f3
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 12:18:48 2025 +0000
+
+    feat(chat): improve chat animations for dynamic interactions
+
+commit 9814e8b70b0f32b4695dd084964cac6ffe65a9ee
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 12:12:06 2025 +0000
+
+    fix(ui): restore acrylic styling to mobile menu bar
+
+commit 10bc804ac3ce7eb5e928ac303ba9d8435bd15923
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 12:04:55 2025 +0000
+
+    fix(dialog): ensure DialogContent receives required dialog properties
+
+commit dc6beb1dc48129a675f3f257e29cec9dd0d958ba
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 11:49:37 2025 +0000
+
+    style(ui): apply translucent acrylic effect to mobile menu bars
+
+commit fbdc08233e8dd0275b12858f445b700d5ecb58b6
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 08:09:48 2025 +0000
+
+    style(ui): enhance visual effects with glow and glass-like surfaces
+
+commit 70cd12d517b30cb6a2aca16cad9505a2cce76320
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 08:01:53 2025 +0000
+
+    feat(navigation): make menu auto-collapsible on small devices and optimize transitions
+
+commit 86e46f1af366a7552a2af505b2ad6357cd7d2c8f
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 07:42:05 2025 +0000
+
+    feat(ui): add refined animations for improved UX
+
+commit 235c52cface35f3a5ffaa5287845ad1aa21ab3cd
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 06:09:42 2025 +0000
+
+    feat(editor): add markdown support for prompts and input fields
+
+commit f28cc31dd58c043040d884612e0a66596ee68b54
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 06:01:02 2025 +0000
+
+    style(ui): update fonts and iconography for a modern look
+
+commit 61a49fbb3d790465909a206659e9fb0b9d63cd47
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 05:46:48 2025 +0000
+
+    fix(build): resolve Node.js evaluation error during build
+
+commit a26ace1d04e8571249562beb3962485d49c68417
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 05:46:10 2025 +0000
+
+    feat(ui): modernize UI and update color palette
+
+commit ec48cc7713161f13caa457c3f9727504da7f95ab
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 05:36:36 2025 +0000
+
+    fix(ui): remove deprecated legacyBehavior prop from Link components
+
+commit 6a9c8bce073761eb3fc36f02d5b4ed80cbbd695d
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 05:35:30 2025 +0000
+
+    fix(app): resolve runtime error reported by framework
+
+commit 1b811d560279001f3ec0d2aab721b40ff9d13f2e
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 04:42:32 2025 +0000
+
+    docs(readme): add README
+
+commit 9b6344a66d218ed54436b6bc4386bc9f5b5936e4
+Author: Akshay Abraham <akshaykroobenabraham@gmail.com>
+Date:   Tue Oct 14 04:04:48 2025 +0000
+
+    feat(core): add initial prototype
+
+commit 05b36b7b8054b28d5a34deb46dae9697c3206e16
+Author: Firebase Studio <noreply@firebase.studio>
+Date:   Wed Oct 8 21:16:14 2025 +0000
+
+    chore(workspace): initialize project structure
