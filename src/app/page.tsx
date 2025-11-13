@@ -1,4 +1,3 @@
-
 // Copyright (C) 2025 Akshay K Rooben Abraham
 /**
  * @fileoverview Login Page (`/`).
@@ -46,6 +45,7 @@ import { NextJsLogo } from '@/components/auth/nextjs-logo';
 import { ReactLogo } from '@/components/auth/react-logo';
 import { TailwindCssLogo } from '@/components/auth/tailwind-css-logo';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { TiltCard } from '@/components/landing/tilt-card';
 
 /**
  * The main component for the redesigned home page.
@@ -144,8 +144,7 @@ export default function HomePage() {
             style={{ animationDelay: '0.2s' }}
           >
             <h1 className='text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl font-headline gradient-text'>
-              An ethical AI tutor—built FOR students, designed BY educators, and
-              customisable BY teachers.
+              An ethical AI tutor, customizable by teachers.
             </h1>
              <p className='mt-4 text-lg max-w-2xl mx-auto text-muted-foreground/80'>
               Lyra fosters critical thinking by turning every prompt into a learning opportunity, not a shortcut.
@@ -197,25 +196,21 @@ export default function HomePage() {
         <section id='features' className='w-full py-16 px-4 bg-primary/5'>
           <div className='container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-left'>
             {features.map((feature, index) => (
-              <Card
-                key={feature.title}
-                className='flex flex-col items-start p-6 bg-card/50 backdrop-blur-sm border-border/50 animate-fade-in-up opacity-0 transition-all duration-300 hover:border-primary/50 hover:shadow-primary/10 hover:shadow-2xl hover:-translate-y-2'
-                style={{ animationDelay: `${0.5 + index * 0.2}s` }}
-              >
-                <CardHeader className='p-0 mb-4'>
-                  <div className='p-3 rounded-full border-2 border-primary/10 bg-card mb-4 w-fit'>
-                    {feature.icon}
+               <TiltCard key={feature.title}>
+                 <div className='p-6 h-full flex flex-col justify-between'>
+                    <div>
+                      <div className='p-3 rounded-full border-2 border-primary/10 bg-card mb-4 w-fit' style={{ transform: "translateZ(25px)" }}>
+                        {React.cloneElement(feature.icon, { style: { transform: "translateZ(50px)" } })}
+                      </div>
+                      <h3 className='text-xl font-headline font-bold text-foreground' style={{ transform: "translateZ(40px)" }}>
+                        {feature.title}
+                      </h3>
+                    </div>
+                    <p className='text-muted-foreground mt-2' style={{ transform: "translateZ(30px)" }}>
+                      {feature.description}
+                    </p>
                   </div>
-                  <h3 className='text-xl font-headline font-bold text-foreground'>
-                    {feature.title}
-                  </h3>
-                </CardHeader>
-                <CardContent className='p-0'>
-                  <p className='text-muted-foreground'>
-                    {feature.description}
-                  </p>
-                </CardContent>
-              </Card>
+               </TiltCard>
             ))}
           </div>
         </section>
