@@ -26,8 +26,6 @@ import {
   BrainCircuit,
   GraduationCap,
   Sparkles,
-  BookOpen,
-  Scale,
 } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -108,7 +106,7 @@ export default function LoginPage() {
       </div>
 
       {/* Header */}
-      <header className='fixed top-0 left-0 w-full p-4 sm:p-6 z-20 bg-background/80'>
+      <header className='fixed top-0 left-0 w-full p-4 sm:p-6 z-20 bg-background/80 backdrop-blur-sm'>
         <div className='container mx-auto flex items-center justify-between'>
           <div className='flex items-center gap-3'>
             <Logo />
@@ -140,9 +138,8 @@ export default function LoginPage() {
             style={{ animationDelay: '0.2s' }}
           >
             <h1 className='text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl font-headline gradient-text'>
-              An Ethical AI Tutor,
-              <br />
-              Customizable by Teachers.
+              An ethical AI tutor—built FOR students, designed BY educators, and
+              customisable BY teachers.
             </h1>
             <p className='mt-6 text-lg max-w-2xl mx-auto leading-8 text-muted-foreground'>
               Lyra is designed to guide students toward solutions, not just give
@@ -313,8 +310,8 @@ export default function LoginPage() {
                         {siteConfig.developer.name}.
                       </p>
                       <p>
-                        Unauthorized reproduction, distribution, modification,
-                        or deployment of this system, in whole or in part, is
+                        Unauthorized reproduction, distribution, modification, or
+                        deployment of this system, in whole or in part, is
                         strictly prohibited.
                       </p>
                       <p>
