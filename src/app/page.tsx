@@ -136,7 +136,7 @@ export default function HomePage() {
         {/* Hero Section */}
         <main
           id='hero'
-          className='flex w-full flex-col items-center space-y-8 py-20 px-4'
+          className='flex w-full flex-col items-center space-y-8 py-16 px-4'
         >
           <div
             className='max-w-3xl animate-fade-in-up'
@@ -145,7 +145,7 @@ export default function HomePage() {
             <h1 className='text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl font-headline gradient-text'>
               Stop Outsourcing Thinking.
               <br />
-              Start Guiding Learning.
+              Start Guided Learning.
             </h1>
             <p className='mt-6 text-lg max-w-2xl mx-auto leading-8 text-muted-foreground'>
               An ethical AI tutor—built FOR students, designed BY educators, and
@@ -164,7 +164,7 @@ export default function HomePage() {
         </main>
 
         {/* Motivation Section */}
-        <section id='motivation' className='w-full py-20 px-4'>
+        <section id='motivation' className='w-full py-16 px-4'>
           <div className='container mx-auto max-w-4xl'>
             <Card className='bg-card/50 backdrop-blur-sm border-border/50 animate-fade-in-up'>
               <CardHeader>
@@ -172,7 +172,7 @@ export default function HomePage() {
                   The Problem with AI in Education
                 </h2>
               </CardHeader>
-              <CardContent className='space-y-6'>
+              <CardContent className='space-y-4'>
                 <p className='text-muted-foreground text-center max-w-2xl mx-auto'>
                   Today's AI often gives the complete answer, encouraging
                   students to{' '}
@@ -182,51 +182,17 @@ export default function HomePage() {
                   . The institutional response? Ban AI. But history shows us
                   prohibition doesn't work.
                 </p>
-                <div className='text-left max-w-lg mx-auto p-4 border rounded-lg bg-background/50'>
-                  <p className='font-mono text-sm text-muted-foreground'>
-                    // User asks a generic AI a question:
-                  </p>
-                  <p className='font-mono text-sm text-foreground'>
-                    <strong className='text-blue-500'>user:</strong> "derive
-                    gravity pls"
-                  </p>
-                  <p className='font-mono text-sm mt-2 text-red-500'>
-                    <strong className='text-red-500'>ai_response:</strong> "Sure,
-                    here is the full derivation of gravitational potential
-                    energy..." [Shows entire answer]
-                  </p>
-                  <p className='font-mono text-sm text-red-700 mt-2'>
-                    // ❌ Critical thinking bypassed.
-                  </p>
-                </div>
                 <p className='text-center text-lg font-semibold text-foreground pt-4'>
                   The solution isn’t to ban AI—it’s to build AI that actually
-                  helps us learn.
+                  teaches. Lyra fosters critical thinking by asking Socratic questions, turning every prompt into a learning opportunity, not a shortcut.
                 </p>
-                <div className='text-left max-w-lg mx-auto p-4 border rounded-lg bg-primary/5'>
-                  <p className='font-mono text-sm text-muted-foreground'>
-                    // User asks Lyra the same question:
-                  </p>
-                  <p className='font-mono text-sm text-foreground'>
-                    <strong className='text-blue-500'>user:</strong> "Derive the
-                    formula for gravitational potential energy."
-                  </p>
-                  <p className='font-mono text-sm mt-2 text-primary'>
-                    <strong className='text-primary'>lyra_response:</strong> "Great
-                    question! What do you already know about gravitational
-                    force?"
-                  </p>
-                  <p className='font-mono text-sm text-green-700 mt-2'>
-                    // ✅ Socratic dialogue initiated.
-                  </p>
-                </div>
               </CardContent>
             </Card>
           </div>
         </section>
 
         {/* Features Section */}
-        <section id='features' className='w-full py-20 px-4 bg-primary/5'>
+        <section id='features' className='w-full py-16 px-4 bg-primary/5'>
           <div className='container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-left'>
             {features.map((feature, index) => (
               <Card
@@ -253,7 +219,7 @@ export default function HomePage() {
         </section>
 
         {/* Technology Section */}
-        <section id='tech' className='w-full py-20 px-4'>
+        <section id='tech' className='w-full py-16 px-4'>
           <div className='container mx-auto'>
             <h2
               className='text-center text-3xl font-headline font-bold mb-4 animate-fade-in-up opacity-0'
@@ -288,37 +254,38 @@ export default function HomePage() {
         </section>
 
         {/* Footer */}
-        <footer className='w-full p-8 text-center border-t border-border'>
+        <footer className='w-full p-6 text-center border-t border-border'>
           <div className='container mx-auto text-xs text-muted-foreground space-y-2'>
-            <div className='flex items-center justify-center space-x-1'>
-              <span>© 2025</span>
-              <Link
-                href={siteConfig.developer.url}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='underline-offset-4 hover:underline hover:text-foreground'
-              >
-                {siteConfig.developer.name} 🔗
-              </Link>
+            <div className='flex flex-col sm:flex-row items-center justify-center gap-x-4 gap-y-1'>
+              <div className='flex items-center space-x-1'>
+                <span>© 2025</span>
+                <Link
+                  href={siteConfig.developer.url}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='underline-offset-4 hover:underline hover:text-foreground'
+                >
+                  {siteConfig.developer.name} 🔗
+                </Link>
+              </div>
+              <div className='flex items-center space-x-1'>
+                <span>Mentor:</span>
+                <a
+                  href={`mailto:${siteConfig.mentor.email}`}
+                  className='underline-offset-4 hover:underline hover:text-foreground'
+                >
+                  {siteConfig.mentor.name}
+                </a>
+              </div>
             </div>
 
-            <div className='flex items-center justify-center space-x-1'>
-              <span>Mentor:</span>
-              <a
-                href={`mailto:${siteConfig.mentor.email}`}
-                className='underline-offset-4 hover:underline hover:text-foreground'
-              >
-                {siteConfig.mentor.name}
-              </a>
-            </div>
-
-            <Accordion type='single' collapsible className='w-auto pt-2'>
+            <Accordion type='single' collapsible className='w-auto'>
               <AccordionItem value='license' className='border-none'>
                 <AccordionTrigger className='p-0 text-xs hover:no-underline hover:text-foreground inline-flex mx-auto'>
                   License Information
                 </AccordionTrigger>
                 <AccordionContent>
-                  <div className='text-xs text-muted-foreground max-w-prose text-left mx-auto mt-4 p-4 bg-card/50 rounded-lg border space-y-2'>
+                  <div className='text-xs text-muted-foreground max-w-prose text-left mx-auto mt-2 p-4 bg-card/50 rounded-lg border space-y-2'>
                     <p>
                       <strong>
                         © 2025 {siteConfig.developer.name}. All rights reserved.
