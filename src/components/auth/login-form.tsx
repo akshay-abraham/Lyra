@@ -96,7 +96,7 @@ export function LoginForm() {
         if (userData.role === 'teacher') {
           router.push('/teacher');
         } else {
-          router.push('/');
+          router.push('/chat');
         }
       } else {
         // 3b. If no document exists, this is a new user.
@@ -139,7 +139,7 @@ export function LoginForm() {
     >
       <div className='flex flex-col items-center space-y-4'>
         <h2 className='text-2xl font-headline font-semibold text-foreground'>
-          Get Started
+          Get Started with Lyra
         </h2>
         <Button
           variant='outline'
