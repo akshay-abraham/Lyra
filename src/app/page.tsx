@@ -1,3 +1,4 @@
+
 // Copyright (C) 2025 Akshay K Rooben Abraham
 /**
  * @fileoverview Login Page (`/`).
@@ -136,7 +137,7 @@ export default function HomePage() {
         {/* Hero Section */}
         <main
           id='hero'
-          className='flex w-full flex-col items-center space-y-8 py-16 px-4'
+          className='flex w-full flex-col items-center space-y-6 py-16 px-4'
         >
           <div
             className='max-w-3xl animate-fade-in-up'
@@ -148,8 +149,10 @@ export default function HomePage() {
               Start Guided Learning.
             </h1>
             <p className='mt-6 text-lg max-w-2xl mx-auto leading-8 text-muted-foreground'>
-              An ethical AI tutor—built FOR students, designed BY educators, and
-              customisable BY teachers.
+              An ethical AI tutor, customizable by teachers.
+            </p>
+             <p className='mt-4 text-sm max-w-2xl mx-auto text-muted-foreground/80'>
+              Lyra fosters critical thinking by turning every prompt into a learning opportunity, not a shortcut.
             </p>
           </div>
           <Suspense fallback={<LoadingScreen />}>
@@ -259,29 +262,18 @@ export default function HomePage() {
         {/* Footer */}
         <footer className='w-full p-6 text-center border-t border-border'>
           <div className='container mx-auto text-xs text-muted-foreground space-y-2'>
-            <div className='sm:flex sm:items-center sm:justify-center sm:gap-x-4 sm:space-y-0 space-y-1'>
-              <div className='flex items-center justify-center space-x-1'>
-                <span>© 2025</span>
-                <Link
-                  href={siteConfig.developer.url}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='underline-offset-4 hover:underline hover:text-foreground'
-                >
-                  {siteConfig.developer.name} 🔗
-                </Link>
-              </div>
-              <div className='flex items-center justify-center space-x-1'>
-                <span>Mentor:</span>
-                <a
-                  href={`mailto:${siteConfig.mentor.email}`}
-                  className='underline-offset-4 hover:underline hover:text-foreground'
-                >
-                  {siteConfig.mentor.name}
-                </a>
-              </div>
+            <div className='flex items-center justify-center space-x-1'>
+              <span>© 2025</span>
+              <Link
+                href={siteConfig.developer.url}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='underline-offset-4 hover:underline hover:text-foreground'
+              >
+                {siteConfig.developer.name}
+              </Link>
             </div>
-
+            
             <Accordion type='single' collapsible className='w-auto mx-auto'>
               <AccordionItem value='license' className='border-none'>
                 <AccordionTrigger className='p-0 text-xs hover:no-underline hover:text-foreground'>
