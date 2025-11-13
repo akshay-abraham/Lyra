@@ -176,15 +176,18 @@ export default function HomePage() {
                 <p className='text-muted-foreground text-center max-w-2xl mx-auto'>
                   Today's AI often gives the complete answer, encouraging
                   students to{' '}
-                  <strong className='text-foreground'>
+                  <strong className='text-foreground gradient-text'>
                     outsource their thinking
                   </strong>
                   . The institutional response? Ban AI. But history shows us
                   prohibition doesn't work.
                 </p>
                 <p className='text-center text-lg font-semibold text-foreground pt-4'>
-                  The solution isn’t to ban AI—it’s to build AI that actually
-                  teaches. Lyra fosters critical thinking by asking Socratic questions, turning every prompt into a learning opportunity, not a shortcut.
+                  The solution isn’t to ban AI—it’s to build AI that{' '}
+                  <span className='gradient-text'>actually teaches</span>. Lyra
+                  fosters critical thinking by asking Socratic questions,
+                  turning every prompt into a learning opportunity, not a
+                  shortcut.
                 </p>
               </CardContent>
             </Card>
@@ -256,8 +259,8 @@ export default function HomePage() {
         {/* Footer */}
         <footer className='w-full p-6 text-center border-t border-border'>
           <div className='container mx-auto text-xs text-muted-foreground space-y-2'>
-            <div className='flex flex-col sm:flex-row items-center justify-center gap-x-4 gap-y-1'>
-              <div className='flex items-center space-x-1'>
+            <div className='sm:flex sm:items-center sm:justify-center sm:gap-x-4 sm:space-y-0 space-y-1'>
+              <div className='flex items-center justify-center space-x-1'>
                 <span>© 2025</span>
                 <Link
                   href={siteConfig.developer.url}
@@ -268,7 +271,7 @@ export default function HomePage() {
                   {siteConfig.developer.name} 🔗
                 </Link>
               </div>
-              <div className='flex items-center space-x-1'>
+              <div className='flex items-center justify-center space-x-1'>
                 <span>Mentor:</span>
                 <a
                   href={`mailto:${siteConfig.mentor.email}`}
@@ -279,9 +282,9 @@ export default function HomePage() {
               </div>
             </div>
 
-            <Accordion type='single' collapsible className='w-auto'>
+            <Accordion type='single' collapsible className='w-auto mx-auto'>
               <AccordionItem value='license' className='border-none'>
-                <AccordionTrigger className='p-0 text-xs hover:no-underline hover:text-foreground inline-flex mx-auto'>
+                <AccordionTrigger className='p-0 text-xs hover:no-underline hover:text-foreground'>
                   License Information
                 </AccordionTrigger>
                 <AccordionContent>
