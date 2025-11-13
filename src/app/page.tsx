@@ -144,14 +144,10 @@ export default function HomePage() {
             style={{ animationDelay: '0.2s' }}
           >
             <h1 className='text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl font-headline gradient-text'>
-              Stop Outsourcing Thinking.
-              <br />
-              Start Guided Learning.
+              An ethical AI tutor—built FOR students, designed BY educators, and
+              customisable BY teachers.
             </h1>
-            <p className='mt-6 text-lg max-w-2xl mx-auto leading-8 text-muted-foreground'>
-              An ethical AI tutor, customizable by teachers.
-            </p>
-             <p className='mt-4 text-sm max-w-2xl mx-auto text-muted-foreground/80'>
+             <p className='mt-4 text-lg max-w-2xl mx-auto text-muted-foreground/80'>
               Lyra fosters critical thinking by turning every prompt into a learning opportunity, not a shortcut.
             </p>
           </div>
@@ -172,7 +168,7 @@ export default function HomePage() {
             <Card className='bg-card/50 backdrop-blur-sm border-border/50 animate-fade-in-up'>
               <CardHeader>
                 <h2 className='text-3xl font-bold text-center font-headline'>
-                  The Problem with AI in Education
+                  Stop Outsourcing Thinking. Start Guided Learning.
                 </h2>
               </CardHeader>
               <CardContent className='space-y-4'>
