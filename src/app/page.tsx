@@ -1,18 +1,18 @@
 // Copyright (C) 2025 Akshay K Rooben Abraham
 /**
- * @fileoverview Login Page (`/login`).
+ * @fileoverview Login Page (`/`).
  * @copyright Copyright (C) 2025 Akshay K Rooben Abraham. All rights reserved.
  *
  * @description
- * This file serves as the entry point for the `/login` route of the application.
- * It has been redesigned into a sophisticated, multi-section landing page to provide a
- * more engaging and informative welcome experience for users, inspired by modern AI tool websites.
+ * This file serves as the main home page for the Lyra application. It's a
+ * sophisticated, multi-section landing page designed to be a "mini-presentation"
+ * that captures the core narrative and value proposition of Lyra.
  *
  * It features:
  * - A full-screen container with a powerful, animated gradient background.
  * - A clean header with the application logo and name.
- * - A central "hero" section with a bold headline and the login form.
- * - A collapsible "Motivation" section to share the project's story.
+ * - A central "hero" section with a bold, compelling headline.
+ * - A highly interactive "Motivation" section that tells the story of Lyra.
  * - Visual, icon-driven cards that highlight Lyra's core pedagogical features.
  * - A "Powered By" section showcasing the technology stack.
  * - A minimal, collapsible license and credits section in the footer.
@@ -26,8 +26,6 @@ import {
   BrainCircuit,
   GraduationCap,
   Sparkles,
-  BookOpen,
-  Scale,
   ZapOff,
 } from 'lucide-react';
 import Image from 'next/image';
@@ -35,11 +33,6 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { siteConfig } from '@/lib/site-config';
 import { GitHubLogo } from '@/components/auth/github-logo';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
 import {
   Accordion,
   AccordionContent,
@@ -54,11 +47,11 @@ import { TailwindCssLogo } from '@/components/auth/tailwind-css-logo';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
 /**
- * The main component for the redesigned login page.
+ * The main component for the redesigned home page.
  *
- * @returns {JSX.Element} The JSX that describes the structure of the login page.
+ * @returns {JSX.Element} The JSX that describes the structure of the page.
  */
-export default function LoginPage() {
+export default function HomePage() {
   const features = [
     {
       icon: <GraduationCap className='h-10 w-10 text-primary' />,
@@ -155,9 +148,8 @@ export default function LoginPage() {
               Start Guiding Learning.
             </h1>
             <p className='mt-6 text-lg max-w-2xl mx-auto leading-8 text-muted-foreground'>
-              Lyra is an ethical AI tutor wrapped in{' '}
-              <strong className='text-foreground'>pedagogical guardrails</strong>{' '}
-              to ensure it helps students learn, not just copy-paste answers.
+              An ethical AI tutor—built FOR students, designed BY educators, and
+              customisable BY teachers.
             </p>
           </div>
           <Suspense fallback={<LoadingScreen />}>
@@ -174,44 +166,62 @@ export default function LoginPage() {
         {/* Motivation Section */}
         <section id='motivation' className='w-full py-20 px-4'>
           <div className='container mx-auto max-w-4xl'>
-            <Collapsible>
-              <div className='text-sm text-muted-foreground max-w-none text-center animate-fade-in-up'>
-                <p>
+            <Card className='bg-card/50 backdrop-blur-sm border-border/50 animate-fade-in-up'>
+              <CardHeader>
+                <h2 className='text-3xl font-bold text-center font-headline'>
+                  The Problem with AI in Education
+                </h2>
+              </CardHeader>
+              <CardContent className='space-y-6'>
+                <p className='text-muted-foreground text-center max-w-2xl mx-auto'>
                   Today's AI often gives the complete answer, encouraging
                   students to{' '}
                   <strong className='text-foreground'>
                     outsource their thinking
                   </strong>
-                  . The institutional response? Ban AI. But prohibition doesn't
-                  work...{' '}
-                  <CollapsibleTrigger asChild>
-                    <Button
-                      variant='link'
-                      className='text-sm p-0 text-primary/80 hover:text-accent font-normal'
-                    >
-                      (see our solution)
-                    </Button>
-                  </CollapsibleTrigger>
+                  . The institutional response? Ban AI. But history shows us
+                  prohibition doesn't work.
                 </p>
-              </div>
-              <CollapsibleContent>
-                <div className='text-muted-foreground text-sm max-w-prose text-left mx-auto mt-8 space-y-2 animate-fade-in-up'>
-                  <p>
-                    A good human tutor rarely gives the solution directly.
-                    Instead, they ask guiding questions, offer hints, and
-                    encourage students to verbalize their thought process. This
-                    is where Lyra shines.
+                <div className='text-left max-w-lg mx-auto p-4 border rounded-lg bg-background/50'>
+                  <p className='font-mono text-sm text-muted-foreground'>
+                    // User asks a generic AI a question:
                   </p>
-                  <p>
-                    The solution isn’t to ban AI—it’s to build AI that actually
-                    helps us learn. Lyra is our answer: an ethical AI tutor
-                    built for students but designed and customizable by
-                    teachers, ensuring technology serves pedagogy, not the other
-                    way around.
+                  <p className='font-mono text-sm text-foreground'>
+                    <strong className='text-blue-500'>user:</strong> "derive
+                    gravity pls"
+                  </p>
+                  <p className='font-mono text-sm mt-2 text-red-500'>
+                    <strong className='text-red-500'>ai_response:</strong> "Sure,
+                    here is the full derivation of gravitational potential
+                    energy..." [Shows entire answer]
+                  </p>
+                  <p className='font-mono text-sm text-red-700 mt-2'>
+                    // ❌ Critical thinking bypassed.
                   </p>
                 </div>
-              </CollapsibleContent>
-            </Collapsible>
+                <p className='text-center text-lg font-semibold text-foreground pt-4'>
+                  The solution isn’t to ban AI—it’s to build AI that actually
+                  helps us learn.
+                </p>
+                <div className='text-left max-w-lg mx-auto p-4 border rounded-lg bg-primary/5'>
+                  <p className='font-mono text-sm text-muted-foreground'>
+                    // User asks Lyra the same question:
+                  </p>
+                  <p className='font-mono text-sm text-foreground'>
+                    <strong className='text-blue-500'>user:</strong> "Derive the
+                    formula for gravitational potential energy."
+                  </p>
+                  <p className='font-mono text-sm mt-2 text-primary'>
+                    <strong className='text-primary'>lyra_response:</strong> "Great
+                    question! What do you already know about gravitational
+                    force?"
+                  </p>
+                  <p className='font-mono text-sm text-green-700 mt-2'>
+                    // ✅ Socratic dialogue initiated.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </section>
 
