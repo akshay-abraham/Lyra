@@ -17,9 +17,10 @@
  * - A "Powered By" section showcasing the technology stack.
  * - A minimal, collapsible license and credits section in the footer.
  */
-
+'use client';
 import { LoginForm } from '@/components/auth/login-form';
 import { Suspense } from 'react';
+import React from 'react';
 import { LoadingScreen } from '@/components/layout/loading-screen';
 import { Logo } from '@/components/layout/logo';
 import {
@@ -45,7 +46,7 @@ import { NextJsLogo } from '@/components/auth/nextjs-logo';
 import { ReactLogo } from '@/components/auth/react-logo';
 import { TailwindCssLogo } from '@/components/auth/tailwind-css-logo';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { TiltCard } from '@/components/landing/tilt-card';
+import { useGlowPointer } from '@/hooks/useGlowPointer';
 
 /**
  * The main component for the redesigned home page.
@@ -53,6 +54,8 @@ import { TiltCard } from '@/components/landing/tilt-card';
  * @returns {JSX.Element} The JSX that describes the structure of the page.
  */
 export default function HomePage() {
+  useGlowPointer();
+
   const features = [
     {
       icon: <GraduationCap className='h-10 w-10 text-primary' />,
@@ -146,8 +149,9 @@ export default function HomePage() {
             <h1 className='text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl font-headline gradient-text'>
               An ethical AI tutor, customizable by teachers.
             </h1>
-             <p className='mt-4 text-lg max-w-2xl mx-auto text-muted-foreground/80'>
-              Lyra fosters critical thinking by turning every prompt into a learning opportunity, not a shortcut.
+            <p className='mt-4 text-lg max-w-2xl mx-auto text-muted-foreground/80'>
+              Lyra fosters critical thinking by turning every prompt into a
+              learning opportunity, not a shortcut.
             </p>
           </div>
           <Suspense fallback={<LoadingScreen />}>
@@ -196,21 +200,19 @@ export default function HomePage() {
         <section id='features' className='w-full py-16 px-4 bg-primary/5'>
           <div className='container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-left'>
             {features.map((feature, index) => (
-               <TiltCard key={feature.title}>
-                 <div className='p-6 h-full flex flex-col justify-between'>
-                    <div>
-                      <div className='p-3 rounded-full border-2 border-primary/10 bg-card mb-4 w-fit' style={{ transform: "translateZ(25px)" }}>
-                        {React.cloneElement(feature.icon, { style: { transform: "translateZ(50px)" } })}
-                      </div>
-                      <h3 className='text-xl font-headline font-bold text-foreground' style={{ transform: "translateZ(40px)" }}>
-                        {feature.title}
-                      </h3>
-                    </div>
-                    <p className='text-muted-foreground mt-2' style={{ transform: "translateZ(30px)" }}>
-                      {feature.description}
-                    </p>
+              <div key={feature.title} data-glow className='h-full p-6 flex flex-col justify-between'>
+                <div>
+                  <div className='p-3 rounded-full border-2 border-primary/10 bg-card mb-4 w-fit'>
+                    {feature.icon}
                   </div>
-               </TiltCard>
+                  <h3 className='text-xl font-headline font-bold text-foreground'>
+                    {feature.title}
+                  </h3>
+                </div>
+                <p className='text-muted-foreground mt-2'>
+                  {feature.description}
+                </p>
+              </div>
             ))}
           </div>
         </section>
@@ -264,7 +266,7 @@ export default function HomePage() {
                 {siteConfig.developer.name}
               </Link>
             </div>
-            
+
             <Accordion type='single' collapsible className='w-auto mx-auto'>
               <AccordionItem value='license' className='border-none'>
                 <AccordionTrigger className='p-0 text-xs hover:no-underline hover:text-foreground'>
@@ -274,7 +276,8 @@ export default function HomePage() {
                   <div className='text-xs text-muted-foreground max-w-prose text-left mx-auto mt-2 p-4 bg-card/50 rounded-lg border space-y-2'>
                     <p>
                       <strong>
-                        © 2025 {siteConfig.developer.name}. All rights reserved.
+                        © 2025 {siteConfig.developer.name}. All rights
+                        reserved.
                       </strong>
                     </p>
                     <p>
