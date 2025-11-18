@@ -1,6 +1,6 @@
 # 🪐 Lyra
 ## 📖 Motivation
-
+sdf
 ### 1. The Current Dilemma in Education and AI
 
 In today’s classrooms, AI is often met with suspicion. Educators worry that students will **outsource thinking** — generating essays, solving problem sets, or even writing code entirely with AI.
