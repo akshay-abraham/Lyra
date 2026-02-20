@@ -22,12 +22,14 @@ export const AI_MODELS = [
     label: 'Gemini · 3 Flash',
     provider: 'google',
     model: 'gemini-3-flash',
+    fallbackModel: 'gemini-2.5-flash',
   },
   {
     id: 'google:gemini-3.1-pro',
     label: 'Gemini · 3.1 Pro',
     provider: 'google',
     model: 'gemini-3.1-pro',
+    fallbackModel: 'gemini-2.5-pro',
   },
   {
     id: 'deepseek:deepseek-chat',
