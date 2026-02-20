@@ -1,4 +1,3 @@
-
 // Copyright (C) 2025 Akshay K Rooben Abraham
 /**
  * @fileoverview The `useChat` custom hook, the "brain" of the chat interface.
@@ -66,8 +65,14 @@ import { generateAITutorResponse } from '@/ai/flows/generate-ai-tutor-response';
 import { generateChatTitle } from '@/ai/flows/generate-chat-title';
 import { useToast } from '@/hooks/use-toast';
 import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
-import type { Message, ChatSession, TeacherSettings, UserProfile } from '@/types';
+import type {
+  Message,
+  ChatSession,
+  TeacherSettings,
+  UserProfile,
+} from '@/types';
 import { COLLECTIONS, FIELDS } from '@/lib/constants';
+import { DEFAULT_AI_MODEL, type AIModelId } from '@/lib/ai-models';
 
 /**
  * The `useChat` custom hook, the controller for all chat logic.
@@ -89,7 +94,13 @@ export function useChat(chatId: string | null) {
   // 1. Get the current chat session document (which contains the subject).
   const chatSessionRef = useMemoFirebase(() => {
     if (!user || !firestore || !chatId) return null;
-    return doc(firestore, COLLECTIONS.USERS, user.uid, COLLECTIONS.CHAT_SESSIONS, chatId);
+    return doc(
+      firestore,
+      COLLECTIONS.USERS,
+      user.uid,
+      COLLECTIONS.CHAT_SESSIONS,
+      chatId,
+    );
   }, [user, firestore, chatId]);
   const { data: chatSession } = useDoc<ChatSession>(chatSessionRef);
 
@@ -100,7 +111,14 @@ export function useChat(chatId: string | null) {
       return null;
     }
     return query(
-      collection(firestore, COLLECTIONS.USERS, user.uid, COLLECTIONS.CHAT_SESSIONS, chatId, COLLECTIONS.MESSAGES),
+      collection(
+        firestore,
+        COLLECTIONS.USERS,
+        user.uid,
+        COLLECTIONS.CHAT_SESSIONS,
+        chatId,
+        COLLECTIONS.MESSAGES,
+      ),
       orderBy('createdAt', 'asc'),
     );
   }, [user, firestore, chatId]);
@@ -131,7 +149,8 @@ export function useChat(chatId: string | null) {
       studentProfile: UserProfile,
       subject: string,
     ): Promise<TeacherSettings | null> => {
-      if (!firestore || !studentProfile.class || !studentProfile.school) return null;
+      if (!firestore || !studentProfile.class || !studentProfile.school)
+        return null;
 
       try {
         const teachersQuery = query(
@@ -155,17 +174,25 @@ export function useChat(chatId: string | null) {
         });
 
         if (!teacherDoc) {
-          console.log(`No teacher found for class "${studentProfile.class}" who teaches subject "${subject}"`);
+          console.log(
+            `No teacher found for class "${studentProfile.class}" who teaches subject "${subject}"`,
+          );
           return null;
         }
 
         const teacherId = teacherDoc.id;
         const settingsId = `${teacherId}_${subject.replace(/\s+/g, '-')}`;
-        const settingsDocRef = doc(firestore, COLLECTIONS.TEACHER_SETTINGS, settingsId);
+        const settingsDocRef = doc(
+          firestore,
+          COLLECTIONS.TEACHER_SETTINGS,
+          settingsId,
+        );
         const settingsSnapshot = await getDoc(settingsDocRef);
 
         if (!settingsSnapshot.exists()) {
-          console.log(`No settings found for teacher "${teacherId}" and subject "${subject}"`);
+          console.log(
+            `No settings found for teacher "${teacherId}" and subject "${subject}"`,
+          );
           return null;
         }
 
@@ -183,25 +210,53 @@ export function useChat(chatId: string | null) {
    *
    * @param {string} content - The text content of the user's message.
    * @param {string | null} subject - The subject for a new chat.
+   * @param {AIModelId | null} selectedModel - The model selected for a new chat.
    */
   const sendMessage = useCallback(
-    async (content: string, subject: string | null) => {
+    async (
+      content: string,
+      subject: string | null,
+      selectedModel: AIModelId | null,
+    ) => {
       if (!user || !firestore) {
-        toast({ variant: 'destructive', title: 'Error', description: 'User not authenticated.' });
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'User not authenticated.',
+        });
         return;
       }
 
       setIsLoading(true);
       let currentChatId = chatId;
       let finalSubject = subject;
+      let finalModel: AIModelId = selectedModel ?? DEFAULT_AI_MODEL;
 
       try {
         if (chatSession?.subject) {
           finalSubject = chatSession.subject;
         }
 
+        if (chatSession?.model) {
+          finalModel = chatSession.model as AIModelId;
+        }
+
         if (!finalSubject) {
-          toast({ variant: 'destructive', title: 'Error', description: 'Subject is required for a new chat.' });
+          toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: 'Subject is required for a new chat.',
+          });
+          setIsLoading(false);
+          return;
+        }
+
+        if (!currentChatId && !selectedModel) {
+          toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: 'Model selection is required for a new chat.',
+          });
           setIsLoading(false);
           return;
         }
@@ -211,20 +266,31 @@ export function useChat(chatId: string | null) {
           let newTitle = 'New Chat'; // Default title
           try {
             // Attempt to generate a title, but don't let it block the chat.
-            const titleResponse = await generateChatTitle({ firstMessage: content });
+            const titleResponse = await generateChatTitle({
+              firstMessage: content,
+            });
             newTitle = titleResponse.title || newTitle;
           } catch (error) {
-            console.warn('AI title generation failed. Using default title.', error);
+            console.warn(
+              'AI title generation failed. Using default title.',
+              error,
+            );
             // We use the default title, so no need to throw the error.
           }
           // --- End Generate Title ---
 
           const chatSessionRef = await addDoc(
-            collection(firestore, COLLECTIONS.USERS, user.uid, COLLECTIONS.CHAT_SESSIONS),
+            collection(
+              firestore,
+              COLLECTIONS.USERS,
+              user.uid,
+              COLLECTIONS.CHAT_SESSIONS,
+            ),
             {
               [FIELDS.USER_ID]: user.uid,
               subject: finalSubject,
               title: newTitle,
+              model: finalModel,
               [FIELDS.START_TIME]: serverTimestamp(),
             },
           );
@@ -237,9 +303,19 @@ export function useChat(chatId: string | null) {
           throw new Error('Failed to create or identify chat session.');
         }
 
-        const messagesCol = collection(firestore, COLLECTIONS.USERS, user.uid, COLLECTIONS.CHAT_SESSIONS, currentChatId, COLLECTIONS.MESSAGES);
+        const messagesCol = collection(
+          firestore,
+          COLLECTIONS.USERS,
+          user.uid,
+          COLLECTIONS.CHAT_SESSIONS,
+          currentChatId,
+          COLLECTIONS.MESSAGES,
+        );
         const userMessage: Message = { role: 'user', content };
-        addDocumentNonBlocking(messagesCol, { ...userMessage, createdAt: serverTimestamp() });
+        addDocumentNonBlocking(messagesCol, {
+          ...userMessage,
+          createdAt: serverTimestamp(),
+        });
 
         const userDocRef = doc(firestore, COLLECTIONS.USERS, user.uid);
         const userDoc = await getDoc(userDocRef);
@@ -247,7 +323,10 @@ export function useChat(chatId: string | null) {
         if (userDoc.exists()) {
           const userProfile = userDoc.data() as UserProfile;
           if (userProfile.role === 'student') {
-            teacherSettings = await getTeacherSettings(userProfile, finalSubject);
+            teacherSettings = await getTeacherSettings(
+              userProfile,
+              finalSubject,
+            );
           }
         }
 
@@ -255,24 +334,49 @@ export function useChat(chatId: string | null) {
           problemStatement: content,
           systemPrompt: teacherSettings?.systemPrompt,
           exampleGoodAnswers: teacherSettings?.exampleAnswers,
+          model: finalModel,
         });
         if (!response.tutorResponse) {
           throw new Error('Failed to get a response from the AI tutor.');
         }
 
-        const assistantMessage: Message = { role: 'assistant', content: response.tutorResponse };
-        addDocumentNonBlocking(messagesCol, { ...assistantMessage, createdAt: serverTimestamp() });
+        const assistantMessage: Message = {
+          role: 'assistant',
+          content: response.tutorResponse,
+        };
+        addDocumentNonBlocking(messagesCol, {
+          ...assistantMessage,
+          createdAt: serverTimestamp(),
+        });
       } catch (error) {
         console.error('Error sending message:', error);
-        const errorMessage = 'I seem to be having trouble connecting. Please try again in a moment.';
+        const errorMessage =
+          'I seem to be having trouble connecting. Please try again in a moment.';
 
         if (currentChatId) {
-          const messagesCol = collection(firestore, COLLECTIONS.USERS, user.uid, COLLECTIONS.CHAT_SESSIONS, currentChatId, COLLECTIONS.MESSAGES);
-          const errorResponseMessage: Message = { role: 'assistant', content: errorMessage };
-          addDocumentNonBlocking(messagesCol, { ...errorResponseMessage, createdAt: serverTimestamp() });
+          const messagesCol = collection(
+            firestore,
+            COLLECTIONS.USERS,
+            user.uid,
+            COLLECTIONS.CHAT_SESSIONS,
+            currentChatId,
+            COLLECTIONS.MESSAGES,
+          );
+          const errorResponseMessage: Message = {
+            role: 'assistant',
+            content: errorMessage,
+          };
+          addDocumentNonBlocking(messagesCol, {
+            ...errorResponseMessage,
+            createdAt: serverTimestamp(),
+          });
         }
 
-        toast({ variant: 'destructive', title: 'Oh no! Something went wrong.', description: 'There was a problem with your request.' });
+        toast({
+          variant: 'destructive',
+          title: 'Oh no! Something went wrong.',
+          description: 'There was a problem with your request.',
+        });
       } finally {
         setIsLoading(false);
       }
@@ -286,5 +390,7 @@ export function useChat(chatId: string | null) {
     sendMessage,
     isLoading,
     chatSubject: chatSession?.subject,
+    chatModel:
+      (chatSession?.model as AIModelId | undefined) ?? DEFAULT_AI_MODEL,
   };
 }

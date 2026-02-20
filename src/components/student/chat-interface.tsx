@@ -59,6 +59,7 @@ import {
   allSubjects,
 } from '@/lib/subjects-data';
 import type { Message } from '@/types';
+import { AI_MODELS, DEFAULT_AI_MODEL, type AIModelId } from '@/lib/ai-models';
 import { Logo } from '../layout/logo';
 
 /**
@@ -150,11 +151,15 @@ const NewChatView = React.memo(
   ({
     onSubjectSelect,
     subject,
+    onModelSelect,
+    model,
     availableSubjects,
     userName,
   }: {
     onSubjectSelect: (subject: string) => void;
     subject: string | null;
+    onModelSelect: (model: AIModelId) => void;
+    model: AIModelId | null;
     availableSubjects: SubjectData[];
     userName: string | null;
   }) => {
@@ -174,21 +179,39 @@ const NewChatView = React.memo(
           What are we diving into? This helps me tailor my guidance.
         </p>
 
-        <Select onValueChange={onSubjectSelect} value={subject || ''}>
-          <SelectTrigger className='w-[280px]'>
-            <SelectValue placeholder='Select a subject...' />
-          </SelectTrigger>
-          <SelectContent>
-            {availableSubjects.map((s) => (
-              <SelectItem key={s.name} value={s.name}>
-                <div className='flex items-center gap-2'>
-                  <s.icon className='h-4 w-4' style={{ color: s.color }} />
-                  <span>{s.name}</span>
-                </div>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className='flex flex-col gap-3'>
+          <Select onValueChange={onSubjectSelect} value={subject || ''}>
+            <SelectTrigger className='w-[280px]'>
+              <SelectValue placeholder='Select a subject...' />
+            </SelectTrigger>
+            <SelectContent>
+              {availableSubjects.map((s) => (
+                <SelectItem key={s.name} value={s.name}>
+                  <div className='flex items-center gap-2'>
+                    <s.icon className='h-4 w-4' style={{ color: s.color }} />
+                    <span>{s.name}</span>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select
+            onValueChange={(value) => onModelSelect(value as AIModelId)}
+            value={model || ''}
+          >
+            <SelectTrigger className='w-[280px]'>
+              <SelectValue placeholder='Select an AI model...' />
+            </SelectTrigger>
+            <SelectContent>
+              {AI_MODELS.map((aiModel) => (
+                <SelectItem key={aiModel.id} value={aiModel.id}>
+                  {aiModel.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     );
   },
@@ -216,6 +239,7 @@ export function ChatInterface({
 }) {
   const [input, setInput] = useState('');
   const [subject, setSubject] = useState<string | null>(null);
+  const [model, setModel] = useState<AIModelId | null>(DEFAULT_AI_MODEL);
   const [localLoadingText, setLocalLoadingText] = useState(
     getLoadingText(null),
   );
@@ -226,12 +250,18 @@ export function ChatInterface({
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const { messages, sendMessage, isLoading, chatSubject } =
+  const { messages, sendMessage, isLoading, chatSubject, chatModel } =
     useChat(currentChatId);
 
   const safeMessages = messages || [];
 
-  const currentSubject = subject || chatSubject;
+  const currentSubject = subject ?? chatSubject ?? null;
+
+  useEffect(() => {
+    if (currentChatId) {
+      setModel(chatModel);
+    }
+  }, [chatModel, currentChatId]);
   const chatAccentColor = currentSubject
     ? subjectColorMap.get(currentSubject) || 'hsl(var(--primary))'
     : 'hsl(var(--primary))';
@@ -268,7 +298,7 @@ export function ChatInterface({
       inputRef.current.style.height = `${inputRef.current.scrollHeight}px`;
     }
   }, [input]);
-  
+
   useEffect(() => {
     mermaid.initialize({
       startOnLoad: true,
@@ -307,10 +337,20 @@ export function ChatInterface({
       return;
     }
 
+    if (!currentChatId && !model) {
+      toast({
+        variant: 'destructive',
+        title: 'Please select an AI model',
+        description:
+          'You need to choose an AI model before starting a new chat.',
+      });
+      return;
+    }
+
     const currentInput = input;
     setInput('');
 
-    await sendMessage(currentInput, subject);
+    await sendMessage(currentInput, subject, model);
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -337,6 +377,8 @@ export function ChatInterface({
               <NewChatView
                 onSubjectSelect={setSubject}
                 subject={subject}
+                onModelSelect={setModel}
+                model={model}
                 availableSubjects={availableSubjects}
                 userName={userName}
               />
@@ -419,14 +461,16 @@ export function ChatInterface({
               onKeyDown={handleKeyDown}
               placeholder={
                 !subject && !currentChatId && availableSubjects.length > 0
-                  ? 'Please select a subject above to begin.'
+                  ? 'Please select a subject and model above to begin.'
                   : 'Message Lyra...'
               }
               className='flex-grow resize-none border-0 shadow-none focus-visible:ring-0 bg-transparent max-h-48 p-2'
               rows={1}
               disabled={
                 isLoading ||
-                (!subject && !currentChatId && availableSubjects.length > 0)
+                ((!subject || !model) &&
+                  !currentChatId &&
+                  availableSubjects.length > 0)
               }
             />
             <Button
