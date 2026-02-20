@@ -53,6 +53,46 @@ function buildPrompt(input: GenerateAITutorResponseInput) {
   return `${systemPrompt}${examples}\n\nProblem Statement: ${input.problemStatement}`;
 }
 
+async function parseOpenAIText(response: Response) {
+  const json = await response.json();
+  return (
+    json?.output_text ||
+    json?.choices?.[0]?.message?.content ||
+    json?.choices?.[0]?.text ||
+    undefined
+  ) as string | undefined;
+}
+
+async function callOpenAIResponses({
+  apiKey,
+  model,
+  prompt,
+}: {
+  apiKey: string;
+  model: string;
+  prompt: string;
+}) {
+  const response = await fetch('https://api.openai.com/v1/responses', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model,
+      input: prompt,
+      temperature: 0.7,
+    }),
+  });
+
+  if (!response.ok) {
+    const details = await response.text();
+    throw new Error(`OpenAI call failed (${response.status}): ${details}`);
+  }
+
+  return parseOpenAIText(response);
+}
+
 async function callOpenAICompatible({
   baseUrl,
   apiKey,
@@ -143,12 +183,10 @@ export async function generateAITutorResponse(
       throw new Error('OPENAI_API_KEY is missing.');
     }
 
-    tutorResponse = await callOpenAICompatible({
-      baseUrl: 'https://api.openai.com/v1',
+    tutorResponse = await callOpenAIResponses({
       apiKey: process.env.OPENAI_API_KEY,
       model: modelConfig.model,
       prompt,
-      temperature: 0.7,
     });
   } else if (modelConfig.provider === 'deepseek') {
     if (!process.env.DEEPSEEK_API_KEY) {
@@ -167,11 +205,23 @@ export async function generateAITutorResponse(
       throw new Error('GEMINI_API_KEY is missing.');
     }
 
-    tutorResponse = await callGemini({
-      model: modelConfig.model,
-      prompt,
-      apiKey: process.env.GEMINI_API_KEY,
-    });
+    try {
+      tutorResponse = await callGemini({
+        model: modelConfig.model,
+        prompt,
+        apiKey: process.env.GEMINI_API_KEY,
+      });
+    } catch (error) {
+      if ('fallbackModel' in modelConfig && modelConfig.fallbackModel) {
+        tutorResponse = await callGemini({
+          model: modelConfig.fallbackModel,
+          prompt,
+          apiKey: process.env.GEMINI_API_KEY,
+        });
+      } else {
+        throw error;
+      }
+    }
   }
 
   if (!tutorResponse) {

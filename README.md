@@ -125,7 +125,18 @@ NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
 
 3. For Next.js `15.3+`, PostHog is initialized in `instrumentation-client.ts`.
 
-4. Add server-side model keys for multi-provider model selection:
+4. Ensure Firebase public client variables are set (required for login/chat runtime):
+
+```bash
+NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_firebase_app_id
+```
+
+5. Add server-side model keys for multi-provider model selection:
 
 ```bash
 OPENAI_API_KEY=your_openai_api_key
@@ -133,7 +144,7 @@ GEMINI_API_KEY=your_gemini_api_key
 DEEPSEEK_API_KEY=your_deepseek_api_key
 ```
 
-5. In a new chat, select both a subject and a model. Lyra now supports:
+6. In a new chat, select both a subject and a model. Lyra now supports:
 
 - ChatGPT: GPT-5 Nano, GPT-5 Mini, GPT-5.2
 - Gemini: 3 Flash, 3.1 Pro

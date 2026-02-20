@@ -46,7 +46,7 @@ interface FirebaseClientProviderProps {
  * @param {FirebaseClientProviderProps} props - A props object containing the `children` to render.
  * @returns {JSX.Element} The main FirebaseProvider wrapping the application.
  *
-* C-like Explanation: `function FirebaseClientProvider(props) -> returns JSX_Element`
+ * C-like Explanation: `function FirebaseClientProvider(props) -> returns JSX_Element`
  *
  * PSEUDOCODE:
  * ```c
@@ -77,6 +77,14 @@ interface FirebaseClientProviderProps {
 export function FirebaseClientProvider({
   children,
 }: FirebaseClientProviderProps) {
+  if (typeof window === 'undefined') {
+    return (
+      <FirebaseProvider firebaseApp={null} auth={null} firestore={null}>
+        {children}
+      </FirebaseProvider>
+    );
+  }
+
   // `useMemo` ensures that `initializeFirebase()` is called only ONCE per application lifecycle on the client.
   // The empty dependency array `[]` at the end is the key; it tells React "never re-run this function,
   // just keep the first result forever".

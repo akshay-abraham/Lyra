@@ -67,9 +67,9 @@ import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
  */
 interface FirebaseProviderProps {
   children: ReactNode;
-  firebaseApp: FirebaseApp;
-  firestore: Firestore;
-  auth: Auth;
+  firebaseApp: FirebaseApp | null;
+  firestore: Firestore | null;
+  auth: Auth | null;
 }
 
 /**
@@ -102,9 +102,9 @@ export interface FirebaseContextState {
  * @interface FirebaseServicesAndUser
  */
 export interface FirebaseServicesAndUser {
-  firebaseApp: FirebaseApp;
-  firestore: Firestore;
-  auth: Auth;
+  firebaseApp: FirebaseApp | null;
+  firestore: Firestore | null;
+  auth: Auth | null;
   user: User | null;
   isUserLoading: boolean;
   userError: Error | null;
@@ -237,15 +237,17 @@ export const useFirebase = (): FirebaseServicesAndUser => {
     !context.firestore ||
     !context.auth
   ) {
-    throw new Error(
-      'Firebase core services not available. Check FirebaseProvider props.',
-    );
+    if (typeof window !== 'undefined') {
+      throw new Error(
+        'Firebase core services not available. Check FirebaseProvider props.',
+      );
+    }
   }
 
   return {
-    firebaseApp: context.firebaseApp,
-    firestore: context.firestore,
-    auth: context.auth,
+    firebaseApp: context.firebaseApp as FirebaseApp,
+    firestore: context.firestore as Firestore,
+    auth: context.auth as Auth,
     user: context.user,
     isUserLoading: context.isUserLoading,
     userError: context.userError,
