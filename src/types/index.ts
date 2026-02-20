@@ -107,6 +107,7 @@ export interface ChatSession {
   userId: string;
   title: string;
   subject: string;
+  model?: string;
   startTime: FieldValue;
 }
 

@@ -49,5 +49,5 @@ export const ai = genkit({
   // Set the default model for all AI generation calls. This prevents us from
   // having to specify the model in every single `ai.generate()` call, reducing
   // redundancy and making it easy to change the model globally.
-  model: 'googleai/gemini-2.5-flash',
+  model: 'googleai/gemini-3-flash',
 });
