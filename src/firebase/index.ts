@@ -26,7 +26,7 @@
  */
 'use client';
 
-import { firebaseConfig } from '@/firebase/config';
+import { firebaseConfig, getMissingFirebaseEnvVars } from '@/firebase/config';
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
@@ -77,6 +77,15 @@ export function initializeFirebase() {
           e,
         );
       }
+
+      const missingVars = getMissingFirebaseEnvVars();
+      if (missingVars.length > 0) {
+        throw new Error(
+          `Firebase initialization failed. Missing environment variables: ${missingVars.join(', ')}. ` +
+            'Add these in your hosting provider and .env.local.',
+        );
+      }
+
       // Initialize using the hard-coded config from `config.ts`.
       firebaseApp = initializeApp(firebaseConfig);
     }
