@@ -106,3 +106,22 @@ Created by **Akshay K. Rooben Abraham**
 Mentor: **Mr. Rishikesh Babu**
 📧 [cbrishikesh007@gmail.com](mailto:cbrishikesh007@gmail.com)
 
+
+---
+
+## 📊 PostHog Analytics Setup
+
+1. Install dependencies:
+
+```bash
+npm install posthog-js
+```
+
+2. Add the following variables to `.env.local` and your hosting provider:
+
+```bash
+NEXT_PUBLIC_POSTHOG_KEY=phc_WHPsiyZp0ZU0nZRKP3BR5zmvoktBQkhZshzK6rgPDX3
+NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
+```
+
+3. For Next.js `15.3+`, PostHog is initialized in `instrumentation-client.ts`.
